@@ -40,6 +40,9 @@ let portfolio = store.get("cb_portfolio") || {};
 let saved = store.get("cb_saved") || {};
 let applied = store.get("cb_applied") || {};
 let view = "all";
+// Collabs whose Apply button was clicked, so the button can look visited.
+let clicked = store.get("cb_clicked") || {};
+const STAR = `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>`;
 const today = () => new Date().toISOString().slice(0, 10);
 
 // ---------- helpers ----------
@@ -98,14 +101,18 @@ function card(l) {
   const isSaved = !!saved[l.id];
   const appliedOn = applied[l.id] && applied[l.id].at;
 
-  return `<article class="card${appliedOn ? " is-applied" : ""}" data-id="${escapeHtml(l.id)}">
+  const opened = !appliedOn && clicked[l.id];
+  const ctaClass = appliedOn ? "apply done" : opened ? "apply opened" : "apply";
+  const ctaText = appliedOn ? `✓ Applied ${formatDate(appliedOn)}` : `Apply on ${escapeHtml(l.source)}`;
+
+  return `<article class="card" data-id="${escapeHtml(l.id)}">
     <div class="card-head"><span>${escapeHtml(l.source)} · ${escapeHtml(l.hostname)}</span>${l.published ? `<span>Posted ${formatDate(l.published)}</span>` : ""}</div>
     <h3>${escapeHtml(l.title)}</h3>
     <p>${escapeHtml(l.description)}</p>
-    <div class="tags">${appliedOn ? `<span class="tag applied">Applied ${formatDate(appliedOn)}</span>` : ""}${tags}</div>
+    <div class="tags">${tags}</div>
     <div class="card-actions">
-      <a class="apply" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply>${appliedOn ? "Open post again" : `Apply on ${escapeHtml(l.source)}`}</a>
-      ${appliedOn ? "" : `<button type="button" class="save${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}">${isSaved ? "Saved" : "Save"}</button>`}
+      <a class="${ctaClass}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply title="${appliedOn ? "Open the post again" : opened ? "You opened this post" : ""}">${ctaText}</a>
+      ${appliedOn ? "" : `<button type="button" class="star${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove from saved" : "Save for later"}" title="${isSaved ? "Saved" : "Save for later"}">${STAR}</button>`}
     </div>
     ${appliedOn ? `<button type="button" class="link-btn undo" data-unapply>Not applied? Undo</button>` : `<button type="button" class="link-btn undo" data-markapplied>Already applied? Mark it</button>`}
   </article>`;
@@ -169,7 +176,13 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("[data-save]")) toggleSave(id);
   else if (e.target.closest("[data-unapply]")) markApplied(id, false);
   else if (e.target.closest("[data-markapplied]")) markApplied(id, true);
-  else if (e.target.closest("[data-apply]") && !applied[id]) store.set(PENDING, { id, at: Date.now() });
+  else if (e.target.closest("[data-apply]") && !applied[id]) {
+    store.set(PENDING, { id, at: Date.now() });
+    clicked[id] = today();
+    store.set("cb_clicked", clicked);
+    const btn = e.target.closest("[data-apply]");
+    btn.classList.add("opened");
+  }
 });
 
 function askIfApplied() {

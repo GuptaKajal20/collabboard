@@ -148,12 +148,8 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
   cursor: pointer;
 }
 .menu-toggle:hover { color: var(--text); }
-.app { position: relative; }
 .menu-open {
-  position: absolute;
-  top: 20px;
-  left: 32px;
-  z-index: 6;
+  margin-bottom: 20px;
   height: 36px;
   padding: 0 14px;
   border-radius: 8px;
@@ -167,7 +163,6 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
 }
 .app.menu-collapsed { grid-template-columns: 1fr; }
 .app.menu-collapsed .side { display: none; }
-.app.menu-collapsed .main { padding-top: 68px; }
 .pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; }
 .pager:empty { display: none; }
 .pager button {
@@ -198,7 +193,8 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
 .menu a:hover { background: var(--tag-bg); }
 .menu a.active { background: var(--accent-soft); color: var(--accent); }
 .side-foot { margin-top: auto; display: grid; gap: 4px; padding: 0 10px; font-size: 14px; }
-.main { padding: 32px 32px 48px; min-width: 0; max-width: 1180px; }
+.main { padding: 32px 32px 48px; min-width: 0; width: 100%; max-width: 1240px; margin: 0 auto; }
+.app.menu-collapsed .main { max-width: 1400px; }
 
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
 .section-head .sub { margin-bottom: 0; }
@@ -239,22 +235,25 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
 .tag.barter { background: var(--barter-bg); color: var(--barter-text); font-weight: 500; }
 .card-actions { margin-top: auto; display: flex; gap: 8px; }
 .card-actions .apply { flex: 1; }
-.save {
+.star {
+  flex: none;
+  width: 40px;
   height: 40px;
-  padding: 0 14px;
+  display: grid;
+  place-items: center;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--card);
-  color: var(--text);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--muted);
   cursor: pointer;
 }
-.save.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.star svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.star:hover { color: var(--text); }
+.star.on { color: #e3a008; border-color: #e3a008; }
+.star.on svg { fill: #f5b301; stroke: #e3a008; }
 .undo { justify-self: start; text-align: left; font-size: 12px; }
-.card.is-applied { border-color: var(--paid-text); }
-.tag.applied { background: var(--paid-text); color: var(--card); font-weight: 500; }
+.apply.opened { background: var(--accent-soft); color: var(--accent); }
+.apply.done { background: var(--paid-bg); color: var(--paid-text); }
 .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
 .tabs button {
   display: inline-flex;
@@ -355,7 +354,6 @@ label.check input { width: auto; }
   .side-top { padding: 0; }
   .menu-toggle, .menu-open { display: none !important; }
   .app.menu-collapsed .side { display: flex; }
-  .app.menu-collapsed .main { padding-top: 20px; }
   .menu { display: flex; gap: 4px; order: 3; width: 100%; overflow-x: auto; }
   .menu a { padding: 8px 12px; font-size: 14px; white-space: nowrap; }
   .side-foot { margin: 0 0 0 auto; padding: 0; display: flex; gap: 10px; align-items: center; }
