@@ -7,6 +7,9 @@
   --accent: #5b4bd6;
   --accent-soft: #eeecfd;
   --accent-text: #ffffff;
+  --cta-bg: #1e1b4b;
+  --cta-text: #c4b5fd;
+  --cta-glow: rgba(30, 27, 75, 0.45);
   --paid-bg: #e3f4ec;
   --paid-text: #0f6e56;
   --barter-bg: #faeeda;
@@ -36,6 +39,9 @@
     --accent: #8f84ee;
     --accent-soft: #2a2648;
     --accent-text: #161615;
+    --cta-bg: #1e1b4b;
+    --cta-text: #c4b5fd;
+    --cta-glow: rgba(124, 108, 240, 0.3);
     --paid-bg: #123a2f;
     --paid-text: #7fd8b8;
     --barter-bg: #3d2c10;
@@ -62,7 +68,8 @@
 body::before {
   content: "";
   position: fixed;
-  inset: 0;
+  inset: -8%;
+  animation: drift 40s ease-in-out infinite alternate;
   z-index: -1;
   pointer-events: none;
   background:
@@ -107,7 +114,8 @@ label:has(> .opt) > :is(input, textarea) { grid-column: 1 / -1; }
   cursor: pointer;
   white-space: nowrap;
 }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.btn.primary { background: var(--cta-bg); border-color: var(--cta-bg); color: var(--cta-text); box-shadow: 0 6px 16px -8px var(--cta-glow); }
+@media (prefers-color-scheme: dark) { .btn.primary, .apply:not(.opened):not(.done), .pager button.current, .tabs button.active { border: 1px solid rgba(196, 181, 253, 0.28); } }
 .btn:hover { opacity: 0.92; }
 
 input, select, textarea {
@@ -208,7 +216,7 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
   font-size: 14px;
   cursor: pointer;
 }
-.pager button.current { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.pager button.current { background: var(--cta-bg); border-color: var(--cta-bg); color: var(--cta-text); font-weight: 600; }
 .pager button:disabled { opacity: 0.4; cursor: default; }
 .pager .gap { color: var(--muted); padding: 0 2px; }
 .menu { display: grid; gap: 4px; }
@@ -333,7 +341,7 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
   font-weight: 500;
   cursor: pointer;
 }
-.tabs button.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.tabs button.active { background: var(--cta-bg); color: var(--cta-text); border-color: var(--cta-bg); }
 .tab-count { font-size: 12px; padding: 0 7px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-text); }
 .ask {
   position: fixed;
@@ -378,15 +386,15 @@ a.stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
   justify-content: center;
   height: 40px;
   border-radius: 10px;
-  background: var(--accent);
-  color: var(--accent-text);
+  background: var(--cta-bg);
+  color: var(--cta-text);
   text-decoration: none;
   font-weight: 500;
   font-size: 14px;
-  box-shadow: 0 6px 16px -6px var(--accent);
+  box-shadow: 0 6px 16px -6px var(--cta-glow);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
-.apply:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -8px var(--accent); }
+.apply:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -8px var(--cta-glow); }
 .apply:active { transform: translateY(0); }
 .empty { grid-column: 1 / -1; text-align: center; padding: 40px 16px; color: var(--muted); border: 1px dashed var(--border); border-radius: 12px; }
 
@@ -489,6 +497,13 @@ label.check input { width: auto; }
   .pf-preview-wrap { position: static; }
   .kit { border: 0; border-top: 6px solid var(--k); border-radius: 0; padding: 8px 0 0; }
   .kit-stats div, .kit-initial { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* Very slow movement of the colour wash behind the page. */
+@keyframes drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(3%, -2%, 0) scale(1.05); }
+  100% { transform: translate3d(-2%, 3%, 0) scale(1.02); }
 }
 
 /* ---------- calmer motion for people who ask for it ---------- */
