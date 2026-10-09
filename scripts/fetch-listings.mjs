@@ -34,9 +34,25 @@ const SCAM_WORDS = [
 
 // Results that are clearly not opportunities (guides, rate cards, news).
 const NOISE_WORDS = [
-  "how to", "rate card", "top 10", "top 20", "best influencer", "agencies in",
-  "what is", "guide", "statistics", "report", "salary",
+  "how to", "rate card", "top ", "best influencer", "agencies in", "agency",
+  "what is", "guide", "statistics", "report", "salary", "template", "examples",
+  "benefits", "cost", "ways to", "which platform", "platforms for", "marketing platform",
+  "tool for", "builder", "app store", "google play", "manager", "specialist", "job at",
+  "careers", "decoded", "find verified", "hire ugc", "tiktok",
 ];
+
+// Sites that publish articles, apps, directories or job ads rather than brand calls.
+const BLOCKED_SITES = [
+  "feedspot.com", "sproutsocial.com", "modash.io", "ninjapromo.io", "qolab.in", "blog.youtube",
+  "apps.apple.com", "play.google.com", "apps.shopify.com", "razorpay.com", "doc2form.dev",
+  "entstargate.com", "jnujaipur.ac.in", "shine.com", "internshala.com", "wellfound.com",
+  "google.com", "billo.app", "ainfluencer.com", "collabvue.com", "alphanumero.io",
+  "marketingbugs.in", "kalakrit.in", "oyimedia.com", "ugccontent.in", "pitchlo.com",
+  "tiktok.com", "influish.com", "kollabkit.com", "naukri.com", "indeed.com",
+];
+
+// Titles that say nothing; the description is used instead.
+const GENERIC_TITLE = /^(instagram|facebook|threads|linkedin|https?:\/\/\S+|.*'s post)$/i;
 
 const NICHES = {
   Beauty: ["beauty", "skincare", "skin care", "makeup", "cosmetic", "haircare", "hair care"],
@@ -58,6 +74,18 @@ const stripTags = (s = "") =>
 
 const has = (text, words) => words.some((w) => text.includes(w));
 
+// Social pages often have no real title; take the first meaningful sentence instead.
+const PAGE_CHROME = /log in|sign up|close menu|never miss a post|profile picture|cookie/i;
+function titleFromText(text, hostname) {
+  const sentence = text
+    .split(/(?<=[.!?])\s|\n/)
+    .map((x) => x.trim())
+    .find((x) => x.length >= 15 && !PAGE_CHROME.test(x));
+  if (sentence) return sentence.slice(0, 100);
+  const site = hostname.replace(/^www\./, "").split(".")[0];
+  return `Creator collab post on ${site.charAt(0).toUpperCase() + site.slice(1)}`;
+}
+
 function detectPay(text) {
   const paid = /\bpaid\b|₹|\brs\.?\s?\d|\binr\b|per reel|per post|remuneration|compensation|stipend/.test(text);
   const barter = /barter|free product|gifted|pr package|product in exchange|hamper/.test(text);
@@ -69,6 +97,9 @@ function detectPay(text) {
 
 function detectSource(hostname, url) {
   if (url.includes("docs.google.com/forms") || url.includes("forms.gle")) return "Google Form";
+  if (/jotform|typeform|tally\.so|forms\.zoho|zohopublic/.test(hostname)) return "Form";
+  if (hostname.includes("facebook.com")) return "Facebook";
+  if (hostname.includes("threads.")) return "Threads";
   if (hostname.includes("linkedin.com")) return "LinkedIn";
   if (hostname.includes("instagram.com")) return "Instagram";
   if (hostname.includes("t.me") || hostname.includes("telegram")) return "Telegram";
@@ -102,14 +133,17 @@ function parseDate(result) {
 function toListing(result, today) {
   const url = result.url;
   if (!url) return null;
-  const title = stripTags(result.title);
+  const hostname = new URL(url).hostname;
+  if (BLOCKED_SITES.some((s) => hostname === s || hostname.endsWith("." + s))) return null;
+
   const description = stripTags(result.content).slice(0, 400);
+  let title = stripTags(result.title);
+  if (GENERIC_TITLE.test(title)) title = titleFromText(description, hostname);
   const text = `${title} ${description}`.toLowerCase();
 
   if (has(text, SCAM_WORDS)) return null;
   if (has(title.toLowerCase(), NOISE_WORDS)) return null;
 
-  const hostname = new URL(url).hostname;
   const niches = Object.entries(NICHES).filter(([, words]) => has(text, words)).map(([n]) => n);
   const languages = LANGUAGES.filter((l) => text.includes(l.toLowerCase()));
 
@@ -185,7 +219,11 @@ async function main() {
   }
 
   const byId = new Map();
-  for (const old of await loadExisting()) byId.set(old.id, old);
+  for (const old of await loadExisting()) {
+    // Re-check saved listings so new filter rules also clean up older ones.
+    const again = toListing({ title: old.title, url: old.url, content: old.description, published_date: old.published }, old.firstSeen);
+    if (again) byId.set(again.id, again);
+  }
   for (const r of results) {
     const l = toListing(r, today);
     if (!l) continue;

@@ -1,6 +1,6 @@
 # CollabBoard
 
-A free board of brand collaboration opportunities for Indian creators. Every morning a script searches the web (Brave Search API), removes scams, junk and old posts, tags each result, and saves `data/listings.json`. The website reads that file. No login, no database, no admin.
+A free board of brand collaboration opportunities for Indian creators. Every morning a script searches the web (Tavily Search API), removes scams, junk and old posts, tags each result, and saves `data/listings.json`. The website reads that file. No login, no database, no admin.
 
 ## Files
 
@@ -13,9 +13,9 @@ A free board of brand collaboration opportunities for Indian creators. Every mor
 
 ## Go live (about 20 minutes)
 
-1. **Get a Brave key:** sign up free at https://brave.com/search/api/ and copy your API key.
+1. **Get a Tavily key:** sign up free at https://tavily.com (no card needed) and copy your API key.
 2. **Put the code on GitHub:** create a new repository and upload this `collabboard` folder.
-3. **Add the key:** in the repository, go to Settings → Secrets and variables → Actions → New repository secret. Name it `BRAVE_API_KEY` and paste the key.
+3. **Add the key:** in the repository, go to Settings → Secrets and variables → Actions → New repository secret. Name it `TAVILY_API_KEY` and paste the key.
 4. **Fill it for the first time:** go to the Actions tab → "Fetch listings" → Run workflow.
 5. **Publish the site:** sign in to https://vercel.com (or Netlify) with GitHub, import the repository, and deploy. No settings needed. Every daily update redeploys the site automatically.
 
@@ -24,7 +24,7 @@ A free board of brand collaboration opportunities for Indian creators. Every mor
 ```bash
 npm test                                # offline test with sample data
 python3 -m http.server 8080             # then open http://localhost:8080/?test=1
-BRAVE_API_KEY=your_key npm run fetch    # real search, updates data/listings.json
+TAVILY_API_KEY=your_key npm run fetch    # real search, updates data/listings.json
 ```
 
 ## Change what it finds

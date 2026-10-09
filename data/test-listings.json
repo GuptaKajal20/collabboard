@@ -1,6 +1,6 @@
 {
   "updated": "2026-10-09",
-  "count": 2,
+  "count": 1,
   "listings": [
     {
       "id": "https://www.linkedin.com/posts/test-snacks-looking-for-creators",
@@ -19,27 +19,6 @@
       "minFollowers": null,
       "languages": [],
       "published": "2026-10-07",
-      "firstSeen": "2026-10-09"
-    },
-    {
-      "id": "https://docs.google.com/forms/d/e/TEST-FORM-1/viewform",
-      "title": "Test Brand - Influencer collaboration form",
-      "description": "Paid collaboration for skincare creators. Instagram Reels, 5k+ followers, Hindi or English. ₹3000 per reel.",
-      "url": "https://docs.google.com/forms/d/e/TEST-FORM-1/viewform",
-      "hostname": "docs.google.com",
-      "source": "Google Form",
-      "niches": [
-        "Beauty"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Paid",
-      "minFollowers": 5000,
-      "languages": [
-        "Hindi"
-      ],
-      "published": "2026-10-05",
       "firstSeen": "2026-10-09"
     }
   ]
