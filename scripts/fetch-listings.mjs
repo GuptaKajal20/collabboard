@@ -1,8 +1,8 @@
-// Fetches brand collaboration opportunities from the Brave Search API,
+// Fetches brand collaboration opportunities from the Tavily Search API,
 // cleans and tags them, and writes data/listings.json for the website.
 //
 // Usage:
-//   BRAVE_API_KEY=xxx node scripts/fetch-listings.mjs
+//   TAVILY_API_KEY=xxx node scripts/fetch-listings.mjs
 //   node scripts/fetch-listings.mjs --fixture scripts/fixture.json   (offline test, writes data/test-listings.json)
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
@@ -92,8 +92,8 @@ function detectMinFollowers(text) {
 }
 
 function parseDate(result) {
-  if (result.page_age) {
-    const d = new Date(result.page_age);
+  if (result.published_date) {
+    const d = new Date(result.published_date);
     if (!isNaN(d)) return d.toISOString().slice(0, 10);
   }
   return null;
@@ -103,13 +103,13 @@ function toListing(result, today) {
   const url = result.url;
   if (!url) return null;
   const title = stripTags(result.title);
-  const description = stripTags(result.description);
+  const description = stripTags(result.content).slice(0, 400);
   const text = `${title} ${description}`.toLowerCase();
 
   if (has(text, SCAM_WORDS)) return null;
   if (has(title.toLowerCase(), NOISE_WORDS)) return null;
 
-  const hostname = (result.meta_url && result.meta_url.hostname) || new URL(url).hostname;
+  const hostname = new URL(url).hostname;
   const niches = Object.entries(NICHES).filter(([, words]) => has(text, words)).map(([n]) => n);
   const languages = LANGUAGES.filter((l) => text.includes(l.toLowerCase()));
 
@@ -130,14 +130,22 @@ function toListing(result, today) {
   };
 }
 
-async function braveSearch(query, key) {
-  const params = new URLSearchParams({ q: query, country: "IN", count: "20", freshness: "pm" });
-  const res = await fetch(`https://api.search.brave.com/res/v1/web/search?${params}`, {
-    headers: { Accept: "application/json", "X-Subscription-Token": key },
+async function tavilySearch(query, key) {
+  const res = await fetch("https://api.tavily.com/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      query,
+      search_depth: "basic", // 1 credit per search; free plan has 1,000 a month
+      topic: "general",
+      country: "india",
+      time_range: "month",
+      max_results: 20,
+    }),
   });
-  if (!res.ok) throw new Error(`Brave API ${res.status} for "${query}": ${await res.text()}`);
+  if (!res.ok) throw new Error(`Tavily API ${res.status} for "${query}": ${await res.text()}`);
   const data = await res.json();
-  return (data.web && data.web.results) || [];
+  return data.results || [];
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -157,22 +165,22 @@ async function main() {
   let results = [];
 
   if (fixtureIdx !== -1) {
-    results = JSON.parse(await readFile(process.argv[fixtureIdx + 1], "utf8")).web.results;
+    results = JSON.parse(await readFile(process.argv[fixtureIdx + 1], "utf8")).results;
   } else {
-    const key = process.env.BRAVE_API_KEY;
+    const key = process.env.TAVILY_API_KEY;
     if (!key) {
-      console.error("Missing BRAVE_API_KEY. Get a free key at https://brave.com/search/api/");
+      console.error("Missing TAVILY_API_KEY. Get a free key at https://tavily.com");
       process.exit(1);
     }
     for (const q of QUERIES) {
       try {
-        const r = await braveSearch(q, key);
+        const r = await tavilySearch(q, key);
         console.log(`${r.length} results for ${q}`);
         results.push(...r);
       } catch (err) {
         console.error(err.message);
       }
-      await sleep(1100); // free plan allows about 1 request per second
+      await sleep(500);
     }
   }
 
