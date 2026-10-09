@@ -4,55 +4,198 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CollabBoard</title>
-  <meta name="description" content="Brand collaboration opportunities for Indian creators, found automatically every day.">
+  <meta name="description" content="Find brand collaborations and build your creator portfolio. Free for Indian creators.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="top">
-    <div class="wrap top-inner">
+  <!-- Sign-up: shown until the creator has a profile -->
+  <div id="onboarding" class="onboarding" hidden>
+    <div class="onb-intro">
       <a class="logo" href="./">Collab<span>Board</span></a>
-      <span class="updated" id="updated"></span>
+      <h1>Find brand collabs and build your portfolio, free</h1>
+      <p>We search the web every day for Indian brands looking for creators. Tell us about you and we'll show the ones that fit.</p>
+      <ul class="onb-points">
+        <li>Fresh collab openings every morning</li>
+        <li>Filter by niche, paid or barter, and your follower count</li>
+        <li>A portfolio you can download and send to brands</li>
+      </ul>
     </div>
-  </header>
+    <form id="signup" class="onb-form" novalidate>
+      <h2>Create your profile</h2>
+      <label>Your name<input name="name" required autocomplete="name" placeholder="Riya Sharma"></label>
+      <label>Instagram handle <span class="opt">optional</span><input name="instagram" placeholder="@riyacreates"></label>
+      <label>Main niche
+        <select name="niche" required></select>
+      </label>
+      <label>Followers on your biggest platform
+        <select name="followers" required></select>
+      </label>
+      <div class="two">
+        <label>City<input name="city" placeholder="Pune"></label>
+        <label>Language
+          <select name="language"></select>
+        </label>
+      </div>
+      <p class="form-error" id="signup-error" hidden></p>
+      <button class="btn primary" type="submit">Create my profile</button>
+      <p class="fine">No password needed. Your details stay on this device.</p>
+    </form>
+  </div>
 
-  <main class="wrap">
-    <section class="hero">
-      <h1>Brand collabs for creators, in one place</h1>
-      <p>We search the web every day for brands looking for creators in India. Filter what fits you, then apply on the original post or form.</p>
-    </section>
+  <!-- Main app: left menu + pages -->
+  <div id="app" class="app" hidden>
+    <aside class="side">
+      <a class="logo" href="#/dashboard">Collab<span>Board</span></a>
+      <nav class="menu" aria-label="Main menu">
+        <a href="#/dashboard" data-page="dashboard">Dashboard</a>
+        <a href="#/collabs" data-page="collabs">Find Collabs</a>
+        <a href="#/portfolio" data-page="portfolio">My Portfolio</a>
+      </nav>
+      <div class="side-foot">
+        <span id="side-name"></span>
+        <button class="link-btn" id="reset" type="button">Reset profile</button>
+      </div>
+    </aside>
 
-    <section class="filters" aria-label="Filters">
-      <input id="q" type="search" placeholder="Search brand, niche or keyword" aria-label="Search">
-      <select id="niche" aria-label="Niche"><option value="">All niches</option></select>
-      <select id="pay" aria-label="Payment">
-        <option value="">Paid or barter</option>
-        <option value="paid">Paid only</option>
-        <option value="Barter">Barter only</option>
-      </select>
-      <select id="source" aria-label="Source"><option value="">All sources</option></select>
-      <select id="followers" aria-label="Your followers">
-        <option value="">My followers: any</option>
-        <option value="1000">Under 1k</option>
-        <option value="5000">1k to 5k</option>
-        <option value="10000">5k to 10k</option>
-        <option value="25000">10k to 25k</option>
-        <option value="50000">25k to 50k</option>
-        <option value="100000">50k to 1 lakh</option>
-        <option value="10000000">Over 1 lakh</option>
-      </select>
-    </section>
+    <main class="main">
+      <!-- Dashboard -->
+      <section class="page" id="page-dashboard">
+        <h1 id="hello"></h1>
+        <p class="sub">Here's what's new for you today.</p>
+        <div class="stats">
+          <a class="stat" href="#/collabs"><span class="stat-num" id="stat-matches">0</span><span class="stat-label">collabs that fit you</span></a>
+          <a class="stat" href="#/collabs/saved"><span class="stat-num" id="stat-saved">0</span><span class="stat-label">saved for later</span></a>
+          <a class="stat" href="#/collabs/applied"><span class="stat-num" id="stat-applied">0</span><span class="stat-label">applied</span></a>
+          <a class="stat" href="#/portfolio"><span class="stat-num" id="stat-portfolio">0%</span><span class="stat-label">portfolio complete</span></a>
+        </div>
+        <div class="section-head">
+          <h2>Best matches for you</h2>
+          <a href="#/collabs" class="link">See all collabs</a>
+        </div>
+        <div class="grid" id="dash-grid"></div>
+        <div class="callout" id="portfolio-callout">
+          <div>
+            <h3>Finish your portfolio</h3>
+            <p>Brands ask for a media kit before they reply. Build yours in a few minutes.</p>
+          </div>
+          <a class="btn primary" href="#/portfolio">Build portfolio</a>
+        </div>
+      </section>
 
-    <p class="notice">Listings are found automatically and not checked by a person. Never pay a brand to join a campaign.</p>
+      <!-- Find Collabs -->
+      <section class="page" id="page-collabs">
+        <h1>Find Collabs</h1>
+        <p class="sub">Brand collaboration openings found on the web every morning. <span id="updated"></span></p>
+        <div class="tabs" role="tablist" aria-label="Show">
+          <button type="button" role="tab" data-view="all" class="active">All</button>
+          <button type="button" role="tab" data-view="saved">Saved <span class="tab-count" id="count-saved">0</span></button>
+          <button type="button" role="tab" data-view="applied">Applied <span class="tab-count" id="count-applied">0</span></button>
+        </div>
+        <div class="filters" aria-label="Filters">
+          <input id="q" type="search" placeholder="Search brand, niche or keyword" aria-label="Search">
+          <select id="niche" aria-label="Niche"><option value="">All niches</option></select>
+          <select id="pay" aria-label="Payment">
+            <option value="">Paid or barter</option>
+            <option value="paid">Paid only</option>
+            <option value="Barter">Barter only</option>
+          </select>
+          <select id="source" aria-label="Source"><option value="">All sources</option></select>
+          <select id="followers" aria-label="Your followers"></select>
+        </div>
+        <p class="notice">Listings are found automatically and not checked by a person. Never pay a brand to join a campaign.</p>
+        <p class="count" id="count"></p>
+        <div class="grid" id="grid" aria-live="polite"></div>
+      </section>
 
-    <p class="count" id="count"></p>
-    <section class="grid" id="grid" aria-live="polite"></section>
-  </main>
+      <!-- My Portfolio -->
+      <section class="page" id="page-portfolio">
+        <div class="section-head">
+          <div>
+            <h1>My Portfolio</h1>
+            <p class="sub">Fill this in and watch your media kit update as you type. Download it as a PDF to send to brands.</p>
+          </div>
+          <button class="btn primary" id="download" type="button">Download as PDF</button>
+        </div>
+        <div class="pf-layout">
+          <form id="pf-form" class="pf-form" novalidate>
+            <fieldset>
+              <legend>About you</legend>
+              <label>Photo<input type="file" name="photo" accept="image/*"></label>
+              <label>Display name<input name="displayName" placeholder="Riya Sharma"></label>
+              <label>One-line intro<input name="tagline" maxlength="80" placeholder="Skincare and everyday makeup for Indian skin"></label>
+              <label>Short bio<textarea name="bio" rows="3" maxlength="400" placeholder="Who you are, what you post, who watches you."></textarea></label>
+              <div class="two">
+                <label>Niche<select name="niche"></select></label>
+                <label>City<input name="city" placeholder="Pune"></label>
+              </div>
+              <label>Languages you create in<input name="languages" placeholder="Hindi, English"></label>
+            </fieldset>
+            <fieldset>
+              <legend>Your platforms</legend>
+              <div class="two">
+                <label>Instagram handle<input name="igHandle" placeholder="@riyacreates"></label>
+                <label>Instagram followers<input name="igFollowers" inputmode="numeric" placeholder="12000"></label>
+              </div>
+              <div class="two">
+                <label>YouTube channel<input name="ytHandle" placeholder="@riyacreates"></label>
+                <label>YouTube subscribers<input name="ytFollowers" inputmode="numeric" placeholder="3000"></label>
+              </div>
+              <label>Average views per Reel<input name="avgViews" inputmode="numeric" placeholder="8000"></label>
+            </fieldset>
+            <fieldset>
+              <legend>Your rates (₹)</legend>
+              <div class="two">
+                <label>Instagram Reel<input name="rateReel" inputmode="numeric" placeholder="5000"></label>
+                <label>Story<input name="rateStory" inputmode="numeric" placeholder="1500"></label>
+              </div>
+              <div class="two">
+                <label>YouTube video<input name="rateYt" inputmode="numeric" placeholder="10000"></label>
+                <label>UGC video (no posting)<input name="rateUgc" inputmode="numeric" placeholder="3000"></label>
+              </div>
+              <label class="check"><input type="checkbox" name="openBarter"> Open to barter collabs</label>
+            </fieldset>
+            <fieldset>
+              <legend>Work and contact</legend>
+              <label>Brands you've worked with<input name="brands" placeholder="Mamaearth, Nykaa, local cafes"></label>
+              <label>Best content links <span class="opt">one per line</span><textarea name="samples" rows="3" placeholder="https://www.instagram.com/reel/..."></textarea></label>
+              <div class="two">
+                <label>Email<input name="email" type="email" placeholder="riya@email.com"></label>
+                <label>WhatsApp<input name="whatsapp" inputmode="tel" placeholder="98765 43210"></label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>Look</legend>
+              <div class="themes" role="radiogroup" aria-label="Colour theme">
+                <label class="theme-opt"><input type="radio" name="theme" value="violet" checked><span class="swatch violet"></span>Violet</label>
+                <label class="theme-opt"><input type="radio" name="theme" value="coral"><span class="swatch coral"></span>Coral</label>
+                <label class="theme-opt"><input type="radio" name="theme" value="teal"><span class="swatch teal"></span>Teal</label>
+                <label class="theme-opt"><input type="radio" name="theme" value="ink"><span class="swatch ink"></span>Ink</label>
+              </div>
+            </fieldset>
+            <p class="fine">Saved automatically on this device.</p>
+          </form>
+          <div class="pf-preview-wrap">
+            <article class="kit" id="kit"></article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-  <footer class="wrap foot">
-    CollabBoard is free. Found a scam or a broken link? Tell us and we'll remove it.
-  </footer>
+  <!-- Asked when the creator comes back after clicking Apply -->
+  <div class="ask" id="ask" hidden role="dialog" aria-modal="true" aria-labelledby="ask-title">
+    <div class="ask-box">
+      <h2 id="ask-title">Did you apply?</h2>
+      <p id="ask-text"></p>
+      <div class="ask-actions">
+        <button class="btn primary" id="ask-yes" type="button">Yes, mark as applied</button>
+        <button class="btn" id="ask-save" type="button">Not yet, save for later</button>
+        <button class="link-btn" id="ask-no" type="button">No thanks</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

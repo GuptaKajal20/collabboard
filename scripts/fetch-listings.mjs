@@ -154,12 +154,37 @@ function detectMinFollowers(text) {
   return null;
 }
 
-function parseDate(result) {
+// The posting date: from the search API when given, otherwise the first date
+// written on the page (Instagram shows "on October 7, 2026", others "7 Oct 2026").
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+function dateFromText(text, today) {
+  const t = text.toLowerCase();
+  const m = "(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\\.?";
+  const patterns = [
+    [new RegExp(`\\b${m}\\s+(\\d{1,2}),?\\s+(20\\d{2})`), (x) => [x[3], x[1], x[2]]],
+    [new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+${m},?\\s+(20\\d{2})`), (x) => [x[3], x[2], x[1]]],
+    [/\b(20\d{2})-(\d{2})-(\d{2})\b/, (x) => [x[1], MONTHS[Number(x[2]) - 1], x[3]]],
+  ];
+  const earliest = new Date(Date.parse(today) - 365 * 864e5).toISOString().slice(0, 10);
+  for (const [re, parts] of patterns) {
+    const x = t.match(re);
+    if (!x) continue;
+    const [y, mon, d] = parts(x);
+    const mi = MONTHS.indexOf(String(mon).slice(0, 3));
+    if (mi < 0) continue;
+    const iso = `${y}-${String(mi + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    if (!isNaN(Date.parse(iso)) && iso <= today && iso >= earliest) return iso;
+  }
+  return null;
+}
+
+function parseDate(result, today) {
   if (result.published_date) {
+    if (/^\d{4}-\d{2}-\d{2}/.test(result.published_date)) return result.published_date.slice(0, 10);
     const d = new Date(result.published_date);
     if (!isNaN(d)) return d.toISOString().slice(0, 10);
   }
-  return null;
+  return dateFromText(`${result.title || ""} ${result.content || ""} ${(result.raw_content || "").slice(0, 3000)}`, today);
 }
 
 function toListing(result, today) {
@@ -194,7 +219,7 @@ function toListing(result, today) {
     pay: detectPay(fullText),
     minFollowers: detectMinFollowers(fullText),
     languages,
-    published: parseDate(result),
+    published: parseDate(result, today),
     firstSeen: today,
   };
 }
