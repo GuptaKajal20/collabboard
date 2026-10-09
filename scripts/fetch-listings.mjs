@@ -38,7 +38,8 @@ const NOISE_WORDS = [
   "what is", "guide", "statistics", "report", "salary", "template", "examples",
   "benefits", "cost", "ways to", "which platform", "platforms for", "marketing platform",
   "tool for", "builder", "app store", "google play", "manager", "specialist", "job at",
-  "careers", "decoded", "find verified", "hire ugc", "tiktok",
+  "careers", "decoded", "find verified", "hire ugc", "tiktok", "intern", "career",
+  "agencies to follow", "impact of", "sharpens focus", "launches", "(pdf)",
 ];
 
 // Sites that publish articles, apps, directories or job ads rather than brand calls.
@@ -49,10 +50,18 @@ const BLOCKED_SITES = [
   "www.google.com", "careers.google.com", "billo.app", "ainfluencer.com", "collabvue.com", "alphanumero.io",
   "marketingbugs.in", "kalakrit.in", "oyimedia.com", "ugccontent.in", "pitchlo.com",
   "tiktok.com", "influish.com", "kollabkit.com", "naukri.com", "indeed.com",
+  "researchgate.net", "itvoice.in", "adgully.com", "dheya.com", "cmf-fmc.ca", "framer.com", "mandy.com",
+  "exchange4media.com", "afaqs.com", "storyboard18.com", "socialsamosa.com", "medianama.com",
+];
+
+// Posts about places outside India are dropped unless they also mention India.
+const FOREIGN_PLACES = [
+  "phuket", "thailand", "nassau", "bahamas", "canada", "louisiana", "philippines", "dubai",
+  "usa", "united states", "uk only", "london", "australia", "singapore", "malaysia", "nigeria",
 ];
 
 // Titles that say nothing; the description is used instead.
-const GENERIC_TITLE = /^(instagram|facebook|threads|linkedin|https?:\/\/\S+|.*'s post)$/i;
+const GENERIC_TITLE = /^(instagram|facebook|threads|linkedin|https?:\/\/\S+|.*'s post|\| \w+|#.*|may be (a|an) .*|(photo|video) by .*|by continuing.*)$/i;
 
 const NICHES = {
   Beauty: ["beauty", "skincare", "skin care", "makeup", "cosmetic", "haircare", "hair care"],
@@ -75,7 +84,7 @@ const stripTags = (s = "") =>
 const has = (text, words) => words.some((w) => text.includes(w));
 
 // Social pages often have no real title; take the first meaningful sentence instead.
-const PAGE_CHROME = /log in|sign up|close menu|never miss a post|profile picture|cookie/i;
+const PAGE_CHROME = /log in|sign up|close menu|never miss a post|profile picture|cookie|^may be (a|an) |^photo by|^video by|by continuing|terms of use|^#/i;
 function titleFromText(text, hostname) {
   const sentence = text
     .split(/(?<=[.!?])\s|\n/)
@@ -142,6 +151,7 @@ function toListing(result, today) {
   const text = `${title} ${description}`.toLowerCase();
 
   if (has(text, SCAM_WORDS)) return null;
+  if (has(text, FOREIGN_PLACES) && !text.includes("india")) return null;
   if (has(title.toLowerCase(), NOISE_WORDS)) return null;
 
   const niches = Object.entries(NICHES).filter(([, words]) => has(text, words)).map(([n]) => n);
