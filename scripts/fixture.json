@@ -1,0 +1,41 @@
+{
+  "web": {
+    "results": [
+      {
+        "title": "Test Brand - <strong>Influencer collaboration</strong> form",
+        "url": "https://docs.google.com/forms/d/e/TEST-FORM-1/viewform",
+        "description": "Paid collaboration for skincare creators. Instagram Reels, 5k+ followers, Hindi or English. ₹3000 per reel.",
+        "page_age": "2026-10-05T10:00:00",
+        "meta_url": { "hostname": "docs.google.com" }
+      },
+      {
+        "title": "Looking for creators | Test Snacks",
+        "url": "https://www.linkedin.com/posts/test-snacks-looking-for-creators",
+        "description": "We are looking for food creators for a barter collaboration. Free product hamper for YouTube Shorts.",
+        "page_age": "2026-10-07T09:00:00",
+        "meta_url": { "hostname": "www.linkedin.com" }
+      },
+      {
+        "title": "Join our influencer campaign",
+        "url": "https://scam.example.com/join",
+        "description": "Pay a registration fee of ₹499 to join and earn daily.",
+        "page_age": "2026-10-06T09:00:00",
+        "meta_url": { "hostname": "scam.example.com" }
+      },
+      {
+        "title": "How to find brand deals in India - guide",
+        "url": "https://blog.example.com/guide",
+        "description": "A guide for creators.",
+        "page_age": "2026-10-06T09:00:00",
+        "meta_url": { "hostname": "blog.example.com" }
+      },
+      {
+        "title": "Old travel creator call",
+        "url": "https://example.com/old",
+        "description": "Travel creators wanted.",
+        "page_age": "2025-01-01T09:00:00",
+        "meta_url": { "hostname": "example.com" }
+      }
+    ]
+  }
+}

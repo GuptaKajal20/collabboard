@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CollabBoard</title>
+  <meta name="description" content="Brand collaboration opportunities for Indian creators, found automatically every day.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <a class="logo" href="./">Collab<span>Board</span></a>
+      <span class="updated" id="updated"></span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>Brand collabs for creators, in one place</h1>
+      <p>We search the web every day for brands looking for creators in India. Filter what fits you, then apply on the original post or form.</p>
+    </section>
+
+    <section class="filters" aria-label="Filters">
+      <input id="q" type="search" placeholder="Search brand, niche or keyword" aria-label="Search">
+      <select id="niche" aria-label="Niche"><option value="">All niches</option></select>
+      <select id="pay" aria-label="Payment">
+        <option value="">Paid or barter</option>
+        <option value="paid">Paid only</option>
+        <option value="Barter">Barter only</option>
+      </select>
+      <select id="source" aria-label="Source"><option value="">All sources</option></select>
+      <select id="followers" aria-label="Your followers">
+        <option value="">My followers: any</option>
+        <option value="1000">Under 1k</option>
+        <option value="10000">Up to 10k</option>
+        <option value="50000">Up to 50k</option>
+        <option value="100000">Up to 1 lakh</option>
+      </select>
+    </section>
+
+    <p class="notice">Listings are found automatically and not checked by a person. Never pay a brand to join a campaign.</p>
+
+    <p class="count" id="count"></p>
+    <section class="grid" id="grid" aria-live="polite"></section>
+  </main>
+
+  <footer class="wrap foot">
+    CollabBoard is free. Found a scam or a broken link? Tell us and we'll remove it.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
