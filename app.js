@@ -84,7 +84,7 @@ function fillSelect(select, options, placeholder) {
 function card(l) {
   const payClass = l.pay.startsWith("Paid") ? "paid" : l.pay === "Barter" ? "barter" : "";
   const tags = [
-    `<span class="tag ${payClass}">${escapeHtml(l.pay)}</span>`,
+    l.pay !== "Not stated" ? `<span class="tag ${payClass}">${escapeHtml(l.pay)}</span>` : "",
     ...l.niches.map((n) => `<span class="tag">${escapeHtml(n)}</span>`),
     ...l.platforms.filter((p) => p !== "Any").map((p) => `<span class="tag">${escapeHtml(p)}</span>`),
     ...l.languages.map((x) => `<span class="tag">${escapeHtml(x)}</span>`),
@@ -97,16 +97,15 @@ function card(l) {
 
   const isSaved = !!saved[l.id];
   const appliedOn = applied[l.id] && applied[l.id].at;
-  const when = l.published ? `Posted ${formatDate(l.published)}` : `Found ${formatDate(l.firstSeen)}`;
 
   return `<article class="card${appliedOn ? " is-applied" : ""}" data-id="${escapeHtml(l.id)}">
-    <div class="card-head"><span>${escapeHtml(l.source)} · ${escapeHtml(l.hostname)}</span><span title="${l.published ? "Date on the original post" : "Date we found it; the post shows no date"}">${when}</span></div>
+    <div class="card-head"><span>${escapeHtml(l.source)} · ${escapeHtml(l.hostname)}</span>${l.published ? `<span>Posted ${formatDate(l.published)}</span>` : ""}</div>
     <h3>${escapeHtml(l.title)}</h3>
     <p>${escapeHtml(l.description)}</p>
     <div class="tags">${appliedOn ? `<span class="tag applied">Applied ${formatDate(appliedOn)}</span>` : ""}${tags}</div>
     <div class="card-actions">
       <a class="apply" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply>${appliedOn ? "Open post again" : `Apply on ${escapeHtml(l.source)}`}</a>
-      <button type="button" class="save${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}">${isSaved ? "Saved" : "Save"}</button>
+      ${appliedOn ? "" : `<button type="button" class="save${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}">${isSaved ? "Saved" : "Save"}</button>`}
     </div>
     ${appliedOn ? `<button type="button" class="link-btn undo" data-unapply>Not applied? Undo</button>` : `<button type="button" class="link-btn undo" data-markapplied>Already applied? Mark it</button>`}
   </article>`;
@@ -176,9 +175,9 @@ document.addEventListener("click", (e) => {
 function askIfApplied() {
   const pending = store.get(PENDING);
   if (!pending || !el("ask").hidden) return;
-  // Ignore very quick returns (an accidental click) and old leftovers.
+  // Ignore instant returns (the click itself) and old leftovers.
   const away = Date.now() - pending.at;
-  if (away < 4000 || away > 6 * 3600 * 1000) return;
+  if (away < 1500 || away > 6 * 3600 * 1000) return;
   const l = findListing(pending.id);
   if (!l || applied[pending.id]) return store.remove(PENDING);
   el("ask-text").textContent = l.title;
@@ -201,8 +200,64 @@ el("ask-no").addEventListener("click", () => closeAsk("no"));
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !el("ask").hidden) closeAsk("no"); });
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") askIfApplied(); });
 window.addEventListener("focus", askIfApplied);
+window.addEventListener("pageshow", askIfApplied); // returning with the browser's Back button
+
+// ---------- pages of results: 3 rows at a time ----------
+
+const ROWS_PER_PAGE = 3;
+let pageNo = 1;
+let lastItems = [];
+let lastEmpty = "";
+
+function columns() {
+  const cols = getComputedStyle(el("grid")).gridTemplateColumns.split(" ").filter(Boolean).length;
+  return Math.max(1, cols || 1);
+}
+
+function showResults(items, emptyText) {
+  lastItems = items;
+  lastEmpty = emptyText;
+  const perPage = columns() * ROWS_PER_PAGE;
+  const pages = Math.max(1, Math.ceil(items.length / perPage));
+  pageNo = Math.min(Math.max(1, pageNo), pages);
+  const start = (pageNo - 1) * perPage;
+  el("grid").innerHTML = items.length
+    ? items.slice(start, start + perPage).map(card).join("")
+    : `<div class="empty">${emptyText}</div>`;
+  renderPager(pages);
+}
+
+function renderPager(pages) {
+  const pager = el("pager");
+  if (pages <= 1) { pager.innerHTML = ""; return; }
+  // Show first, last and the pages around the current one.
+  const nums = [...new Set([1, pageNo - 1, pageNo, pageNo + 1, pages])].filter((n) => n >= 1 && n <= pages).sort((a, b) => a - b);
+  let html = `<button type="button" data-goto="${pageNo - 1}" ${pageNo === 1 ? "disabled" : ""}>Previous</button>`;
+  nums.forEach((n, i) => {
+    if (i && n - nums[i - 1] > 1) html += `<span class="gap">…</span>`;
+    html += `<button type="button" data-goto="${n}" class="${n === pageNo ? "current" : ""}" ${n === pageNo ? 'aria-current="page"' : ""}>${n}</button>`;
+  });
+  html += `<button type="button" data-goto="${pageNo + 1}" ${pageNo === pages ? "disabled" : ""}>Next</button>`;
+  pager.innerHTML = html;
+}
+
+el("pager").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-goto]");
+  if (!b || b.disabled) return;
+  pageNo = Number(b.dataset.goto);
+  showResults(lastItems, lastEmpty);
+  el("page-collabs").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+// Columns change with screen width, so the page size does too.
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (!el("page-collabs").hidden) showResults(lastItems, lastEmpty); }, 150);
+});
 
 function setView(v) {
+  if (v !== view) pageNo = 1;
   view = v;
   document.querySelectorAll(".tabs [data-view]").forEach((b) => {
     b.classList.toggle("active", b.dataset.view === v);
@@ -221,9 +276,7 @@ function renderCollabs() {
     el("count").textContent = view === "saved"
       ? `${items.length} saved for later`
       : `${items.length} applied`;
-    el("grid").innerHTML = items.length
-      ? items.map(card).join("")
-      : `<div class="empty">${view === "saved" ? "Nothing saved yet. Tap Save on any collab to keep it here." : "No applications yet. After you apply, mark the collab as applied to track it here."}</div>`;
+    showResults(items, view === "saved" ? "Nothing saved yet. Tap Save on any collab to keep it here." : "No applications yet. After you apply, mark the collab as applied to track it here.");
     return;
   }
   const followers = Number(el("followers").value);
@@ -240,9 +293,7 @@ function renderCollabs() {
       : `${shown.length} opportunities · none of these state a follower minimum, so check each post`;
   }
   el("count").textContent = countText;
-  el("grid").innerHTML = shown.length
-    ? shown.map(card).join("")
-    : `<div class="empty">${listings.length ? "No opportunities match these filters. Try clearing one." : "No opportunities yet. New ones are added automatically every morning."}</div>`;
+  showResults(shown, listings.length ? "No opportunities match these filters. Try clearing one." : "No opportunities yet. New ones are added automatically every morning.");
 }
 
 function setupCollabs() {
@@ -251,7 +302,11 @@ function setupCollabs() {
   fillSelect(el("followers"), FOLLOWER_RANGES, "My followers: any");
   // Start from the creator's own profile.
   if (profile) el("followers").value = profile.followers || "";
-  ["q", "niche", "pay", "source", "followers"].forEach((id) => el(id).addEventListener("input", () => setView("all")));
+  ["q", "niche", "pay", "source", "followers"].forEach((id) => el(id).addEventListener("input", () => {
+    pageNo = 1;
+    if (view !== "all") location.hash = "#/collabs";
+    else renderCollabs();
+  }));
   document.querySelectorAll(".tabs [data-view]").forEach((b) => b.addEventListener("click", () => {
     location.hash = b.dataset.view === "all" ? "#/collabs" : `#/collabs/${b.dataset.view}`;
   }));
@@ -453,6 +508,20 @@ function startApp() {
   window.addEventListener("hashchange", showPage);
   showPage();
 }
+
+// ---------- collapsible left menu (remembered on this device) ----------
+
+function setMenu(collapsed) {
+  el("app").classList.toggle("menu-collapsed", collapsed);
+  el("menu-toggle").setAttribute("aria-expanded", String(!collapsed));
+  el("menu-open").hidden = !collapsed;
+  store.set("cb_menu_collapsed", collapsed);
+  // Wider content area means more cards per row.
+  if (!el("page-collabs").hidden) showResults(lastItems, lastEmpty);
+}
+el("menu-toggle").addEventListener("click", () => setMenu(true));
+el("menu-open").addEventListener("click", () => setMenu(false));
+if (store.get("cb_menu_collapsed")) setMenu(true);
 
 el("reset").addEventListener("click", () => {
   if (!confirm("Remove your profile and portfolio from this device?")) return;

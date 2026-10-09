@@ -134,7 +134,57 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
   background: var(--card);
   border-right: 1px solid var(--border);
 }
-.side .logo { padding: 0 10px; }
+.side-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 0 10px; }
+.menu-toggle {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.menu-toggle:hover { color: var(--text); }
+.app { position: relative; }
+.menu-open {
+  position: absolute;
+  top: 20px;
+  left: 32px;
+  z-index: 6;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.app.menu-collapsed { grid-template-columns: 1fr; }
+.app.menu-collapsed .side { display: none; }
+.app.menu-collapsed .main { padding-top: 68px; }
+.pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 24px; }
+.pager:empty { display: none; }
+.pager button {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pager button.current { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+.pager button:disabled { opacity: 0.4; cursor: default; }
+.pager .gap { color: var(--muted); padding: 0 2px; }
 .menu { display: grid; gap: 4px; }
 .menu a {
   display: block;
@@ -302,7 +352,10 @@ label.check input { width: auto; }
     border-right: 0;
     border-bottom: 1px solid var(--border);
   }
-  .side .logo { padding: 0; }
+  .side-top { padding: 0; }
+  .menu-toggle, .menu-open { display: none !important; }
+  .app.menu-collapsed .side { display: flex; }
+  .app.menu-collapsed .main { padding-top: 20px; }
   .menu { display: flex; gap: 4px; order: 3; width: 100%; overflow-x: auto; }
   .menu a { padding: 8px 12px; font-size: 14px; white-space: nowrap; }
   .side-foot { margin: 0 0 0 auto; padding: 0; display: flex; gap: 10px; align-items: center; }
@@ -325,7 +378,7 @@ label.check input { width: auto; }
 @media print {
   @page { margin: 12mm; }
   body { background: #ffffff; }
-  .side, .pf-form, .section-head, #page-dashboard, #page-collabs, .ask { display: none !important; }
+  .side, .pf-form, .section-head, #page-dashboard, #page-collabs, .ask, .menu-open { display: none !important; }
   .app, .main, .pf-layout { display: block; padding: 0; }
   .pf-preview-wrap { position: static; }
   .kit { border: 0; border-top: 6px solid var(--k); border-radius: 0; padding: 8px 0 0; }
