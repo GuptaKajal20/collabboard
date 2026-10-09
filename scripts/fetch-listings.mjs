@@ -46,7 +46,7 @@ const BLOCKED_SITES = [
   "feedspot.com", "sproutsocial.com", "modash.io", "ninjapromo.io", "qolab.in", "blog.youtube",
   "apps.apple.com", "play.google.com", "apps.shopify.com", "razorpay.com", "doc2form.dev",
   "entstargate.com", "jnujaipur.ac.in", "shine.com", "internshala.com", "wellfound.com",
-  "google.com", "billo.app", "ainfluencer.com", "collabvue.com", "alphanumero.io",
+  "www.google.com", "careers.google.com", "billo.app", "ainfluencer.com", "collabvue.com", "alphanumero.io",
   "marketingbugs.in", "kalakrit.in", "oyimedia.com", "ugccontent.in", "pitchlo.com",
   "tiktok.com", "influish.com", "kollabkit.com", "naukri.com", "indeed.com",
 ];
@@ -134,7 +134,7 @@ function toListing(result, today) {
   const url = result.url;
   if (!url) return null;
   const hostname = new URL(url).hostname;
-  if (BLOCKED_SITES.some((s) => hostname === s || hostname.endsWith("." + s))) return null;
+  if (hostname === "google.com" || BLOCKED_SITES.some((s) => hostname === s || hostname.endsWith("." + s))) return null;
 
   const description = stripTags(result.content).slice(0, 400);
   let title = stripTags(result.title);
