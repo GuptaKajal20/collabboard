@@ -23,11 +23,15 @@ let listings = [];
 
 // ---------- storage (may be unavailable in private windows) ----------
 
+// These follow a logged-in creator to other devices.
+const SYNCED = ["cb_profile", "cb_saved", "cb_applied", "cb_clicked", "cb_site"];
+
 const store = {
   get(key) {
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
   },
   set(key, value) {
+    if (SYNCED.includes(key) && typeof scheduleSync === "function") scheduleSync();
     try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
   },
   remove(key) {
@@ -986,7 +990,75 @@ async function setupPortfolio() {
   el("pf-publish").addEventListener("click", publish);
 }
 
-// ---------- sign-up ----------
+// ---------- sign-up, log-in and syncing across devices ----------
+
+// With Supabase set up, creators have email and password accounts and their data
+// follows them to any device. Without it, everything stays in this browser.
+const ACCOUNTS = Cloud.ready;
+var signedIn = false; // "var" so early saves can check it safely
+let signupMode = "signup"; // "signup", or "complete" when logged in but no profile yet
+
+function showAuth(which) {
+  for (const id of ["signup", "login", "newpass"]) el(id).hidden = id !== which;
+  document.querySelectorAll("#auth-switch [data-auth]").forEach((b) => b.classList.toggle("active", b.dataset.auth === which));
+  el("auth-switch").hidden = !ACCOUNTS || which === "newpass" || signupMode === "complete";
+  el("signup").querySelector(".account-fields").hidden = !ACCOUNTS || signupMode === "complete";
+  el("signup").querySelector("h2").textContent = signupMode === "complete" ? "Finish your profile" : "Create your profile";
+  for (const id of ["signup-error", "login-error", "newpass-error"]) el(id).hidden = true;
+}
+
+function authNote(text) {
+  el("auth-note").hidden = !text;
+  el("auth-note").textContent = text || "";
+}
+
+function formError(id, text) {
+  el(id).textContent = text;
+  el(id).hidden = !text;
+}
+
+// Everything that should follow the creator to other devices.
+function collectState() {
+  return { profile, saved, applied, clicked, site: site || null };
+}
+
+let syncTimer = null;
+function scheduleSync() {
+  if (!signedIn) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncNow, 1200);
+}
+async function syncNow() {
+  clearTimeout(syncTimer);
+  if (!signedIn) return;
+  try { await Cloud.saveState(collectState()); } catch { /* retried on the next change */ }
+}
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") syncNow(); });
+
+// After logging in: use the account's saved data, or upload what this browser has.
+async function loadAccount(user) {
+  signedIn = true;
+  let state = null;
+  try { state = await Cloud.loadState(); } catch { state = null; }
+  if (state && state.profile) {
+    profile = state.profile;
+    saved = state.saved || {};
+    applied = state.applied || {};
+    clicked = state.clicked || {};
+    if (state.site) site = P.migrate(state.site);
+    store.set("cb_profile", profile);
+    store.set("cb_saved", saved);
+    store.set("cb_applied", applied);
+    store.set("cb_clicked", clicked);
+    if (site) store.set("cb_site", site);
+  } else if (!profile && user.user_metadata && user.user_metadata.profile) {
+    profile = user.user_metadata.profile;
+  }
+  if (profile) {
+    profile.email = user.email;
+    await syncNow();
+  }
+}
 
 function setupSignup() {
   const form = el("signup");
@@ -994,25 +1066,129 @@ function setupSignup() {
   fillSelect(form.followers, FOLLOWER_RANGES, "Choose a range");
   fillSelect(form.language, LANGUAGES);
 
-  form.addEventListener("input", () => { el("signup-error").hidden = true; });
-  form.addEventListener("submit", (e) => {
+  if (ACCOUNTS) {
+    form.querySelector(".account-fields").hidden = false;
+    el("signup-fine").textContent = "Use this email and password to log in on any device.";
+    el("logout").hidden = false;
+    el("reset").hidden = true;
+  }
+
+  document.querySelectorAll("#auth-switch [data-auth]").forEach((b) => b.addEventListener("click", () => { authNote(""); showAuth(b.dataset.auth); }));
+  form.addEventListener("input", () => formError("signup-error", ""));
+  el("login").addEventListener("input", () => formError("login-error", ""));
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = Object.fromEntries(new FormData(form));
+    const needAccount = ACCOUNTS && signupMode === "signup";
     const missing = [];
     if (!data.name.trim()) missing.push("your name");
+    if (needAccount && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email || "")) missing.push("a valid email");
+    if (needAccount && (data.password || "").length < 8) missing.push("a password of at least 8 characters");
     if (!data.niche) missing.push("your niche");
     if (!data.followers) missing.push("your followers");
-    if (missing.length) {
-      el("signup-error").textContent = `Please add ${missing.join(", ")}.`;
-      el("signup-error").hidden = false;
-      return;
-    }
-    profile = { ...data, name: data.name.trim(), createdAt: new Date().toISOString().slice(0, 10) };
+    if (missing.length) return formError("signup-error", `Please add ${missing.join(", ")}.`);
+
+    const { email, password, ...details } = data;
+    profile = { ...details, name: details.name.trim(), createdAt: new Date().toISOString().slice(0, 10) };
     store.set("cb_profile", profile);
+
+    if (needAccount) {
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = "Creating your account…";
+      try {
+        const res = await Cloud.signUp(email.trim(), password, profile);
+        if (res.needsConfirm) {
+          authNote(`Almost done. We sent a link to ${email.trim()}. Open it to confirm your email, then log in here.`);
+          showAuth("login");
+          el("login").email.value = email.trim();
+          return;
+        }
+        await loadAccount(res.user);
+      } catch (err) {
+        return formError("signup-error", err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Create my profile";
+      }
+    } else if (signedIn) {
+      await syncNow();
+    }
     startApp();
     location.hash = "#/dashboard";
   });
+
+  el("login").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const email = f.email.value.trim();
+    if (!email || !f.password.value) return formError("login-error", "Please enter your email and password.");
+    const btn = f.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = "Logging in…";
+    try {
+      const user = await Cloud.logIn(email, f.password.value);
+      await loadAccount(user);
+      authNote("");
+      if (profile) {
+        startApp();
+        location.hash = "#/dashboard";
+      } else {
+        signupMode = "complete";
+        showAuth("signup");
+      }
+    } catch (err) {
+      formError("login-error", err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Log in";
+    }
+  });
+
+  el("forgot").addEventListener("click", async () => {
+    const email = el("login").email.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return formError("login-error", "Type your email above first, then click Forgot your password.");
+    try {
+      await Cloud.sendReset(email);
+      authNote(`We sent a reset link to ${email}. Open it on this device to choose a new password.`);
+    } catch (err) {
+      formError("login-error", err.message);
+    }
+  });
+
+  el("newpass").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pw = e.target.password.value;
+    if (pw.length < 8) return formError("newpass-error", "Your password needs at least 8 characters.");
+    try {
+      await Cloud.setPassword(pw);
+      authNote("Password saved. You're logged in.");
+      const user = await Cloud.user();
+      await loadAccount(user);
+      if (profile) { startApp(); location.hash = "#/dashboard"; }
+      else { signupMode = "complete"; showAuth("signup"); }
+    } catch (err) {
+      formError("newpass-error", err.message);
+    }
+  });
+
+  if (ACCOUNTS) {
+    Cloud.onRecovery(() => {
+      el("app").hidden = true;
+      el("onboarding").hidden = false;
+      showAuth("newpass");
+    });
+  }
 }
+
+el("logout").addEventListener("click", async () => {
+  await syncNow();
+  await Cloud.logOut();
+  for (const k of ["cb_profile", "cb_saved", "cb_applied", "cb_clicked", "cb_site", "cb_portfolio", "cb_pending_apply"]) store.remove(k);
+  location.hash = "";
+  location.reload();
+});
 
 // ---------- menu and pages ----------
 
@@ -1075,8 +1251,21 @@ async function init() {
     listings = [];
   }
   setupSignup();
-  if (profile) startApp();
-  else el("onboarding").hidden = false;
+  if (ACCOUNTS) {
+    const user = await Cloud.user().catch(() => null);
+    if (user) {
+      await loadAccount(user);
+      if (!profile) signupMode = "complete";
+    } else {
+      // Logged out: nothing personal is shown until they log in.
+      profile = null;
+    }
+  }
+  if (profile && (!ACCOUNTS || signedIn)) startApp();
+  else {
+    el("onboarding").hidden = false;
+    showAuth("signup");
+  }
   askIfApplied();
 }
 

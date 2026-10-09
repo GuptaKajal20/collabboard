@@ -1,4 +1,4 @@
--- CollabBoard: run once in Supabase → SQL Editor → New query → paste → Run.
+-- CollabBoard: run once in Supabase → SQL Editor → New query → paste → Run. Safe to run again.
 -- Creates the portfolios table, a public media bucket, and the rules that let
 -- anyone read published portfolios but only the owner change their own.
 
@@ -46,3 +46,25 @@ drop policy if exists "Creators delete their own files" on storage.objects;
 create policy "Creators delete their own files" on storage.objects
   for delete to authenticated
   using (bucket_id = 'portfolio-media' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- Each creator's private data: profile, saved and applied collabs, and the portfolio draft.
+-- Only the owner can read or change it.
+create table if not exists public.creator_state (
+  owner uuid primary key default auth.uid() references auth.users (id) on delete cascade,
+  data jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.creator_state enable row level security;
+
+drop policy if exists "Owners read their data" on public.creator_state;
+create policy "Owners read their data" on public.creator_state
+  for select to authenticated using (owner = auth.uid());
+
+drop policy if exists "Owners add their data" on public.creator_state;
+create policy "Owners add their data" on public.creator_state
+  for insert to authenticated with check (owner = auth.uid());
+
+drop policy if exists "Owners update their data" on public.creator_state;
+create policy "Owners update their data" on public.creator_state
+  for update to authenticated using (owner = auth.uid()) with check (owner = auth.uid());

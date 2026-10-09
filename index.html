@@ -23,26 +23,55 @@
         <li>A portfolio you can download and send to brands</li>
       </ul>
     </div>
-    <form id="signup" class="onb-form" novalidate>
-      <h2>Create your profile</h2>
-      <label>Your name<input name="name" required autocomplete="name" placeholder="Riya Sharma"></label>
-      <label>Instagram handle <span class="opt">optional</span><input name="instagram" placeholder="@riyacreates"></label>
-      <label>Main niche
-        <select name="niche" required></select>
-      </label>
-      <label>Followers on your biggest platform
-        <select name="followers" required></select>
-      </label>
-      <div class="two">
-        <label>City<input name="city" placeholder="Pune"></label>
-        <label>Language
-          <select name="language"></select>
-        </label>
+    <div class="onb-card">
+      <div class="onb-switch" id="auth-switch" role="tablist" hidden>
+        <button type="button" data-auth="signup" class="active" role="tab">Sign up</button>
+        <button type="button" data-auth="login" role="tab">Log in</button>
       </div>
-      <p class="form-error" id="signup-error" hidden></p>
-      <button class="btn primary" type="submit">Create my profile</button>
-      <p class="fine">No password needed. Your details stay on this device.</p>
-    </form>
+
+      <form id="signup" class="onb-form" novalidate>
+        <h2>Create your profile</h2>
+        <label>Your name<input name="name" required autocomplete="name" placeholder="Riya Sharma"></label>
+        <div class="account-fields" hidden>
+          <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com"></label>
+          <label>Password <span class="opt">at least 8 characters</span><input name="password" type="password" autocomplete="new-password" minlength="8"></label>
+        </div>
+        <label>Instagram handle <span class="opt">optional</span><input name="instagram" placeholder="@riyacreates"></label>
+        <label>Main niche
+          <select name="niche" required></select>
+        </label>
+        <label>Followers on your biggest platform
+          <select name="followers" required></select>
+        </label>
+        <div class="two">
+          <label>City<input name="city" placeholder="Pune"></label>
+          <label>Language
+            <select name="language"></select>
+          </label>
+        </div>
+        <p class="form-error" id="signup-error" hidden></p>
+        <button class="btn primary" type="submit">Create my profile</button>
+        <p class="fine" id="signup-fine">No password needed. Your details stay on this device.</p>
+      </form>
+
+      <form id="login" class="onb-form" novalidate hidden>
+        <h2>Welcome back</h2>
+        <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com"></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password"></label>
+        <p class="form-error" id="login-error" hidden></p>
+        <button class="btn primary" type="submit">Log in</button>
+        <button class="link-btn" id="forgot" type="button">Forgot your password?</button>
+      </form>
+
+      <form id="newpass" class="onb-form" novalidate hidden>
+        <h2>Set a new password</h2>
+        <label>New password <span class="opt">at least 8 characters</span><input name="password" type="password" autocomplete="new-password" minlength="8"></label>
+        <p class="form-error" id="newpass-error" hidden></p>
+        <button class="btn primary" type="submit">Save password</button>
+      </form>
+
+      <p class="form-ok" id="auth-note" hidden></p>
+    </div>
   </div>
 
   <!-- Main app: left menu + pages -->
@@ -60,6 +89,7 @@
       <div class="side-foot">
         <span id="side-name"></span>
         <button class="link-btn" id="reset" type="button">Reset profile</button>
+        <button class="link-btn" id="logout" type="button" hidden>Log out</button>
       </div>
     </aside>
 

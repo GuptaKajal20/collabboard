@@ -147,6 +147,13 @@ label { display: grid; gap: 6px; font-size: 14px; font-weight: 500; }
 .onb-intro h1 { font-size: 36px; margin: 24px 0 12px; }
 .onb-intro p { color: var(--muted); margin: 0 0 20px; max-width: 460px; }
 .onb-points { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.onb-card { display: grid; gap: 14px; }
+.onb-switch { display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--glass); border: 1px solid var(--glass-border); }
+.onb-switch button { flex: 1; height: 38px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: inherit; font-size: 15px; font-weight: 500; cursor: pointer; }
+.onb-switch button.active { background: var(--cta-bg); color: var(--cta-text); }
+.account-fields { display: grid; gap: 14px; }
+.form-ok { margin: 0; padding: 12px 14px; border-radius: 10px; background: var(--paid-bg); color: var(--paid-text); font-size: 14px; }
+.onb-form .link-btn { justify-self: center; }
 .onb-form {
   display: grid;
   gap: 14px;
