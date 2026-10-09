@@ -84,7 +84,7 @@ function fillSelect(select, options, placeholder) {
 
 // ---------- listing cards (shared by Dashboard and Find Collabs) ----------
 
-function card(l) {
+function card(l, i = 0) {
   const payClass = l.pay.startsWith("Paid") ? "paid" : l.pay === "Barter" ? "barter" : "";
   const tags = [
     l.pay !== "Not stated" ? `<span class="tag ${payClass}">${escapeHtml(l.pay)}</span>` : "",
@@ -100,21 +100,25 @@ function card(l) {
 
   const isSaved = !!saved[l.id];
   const appliedOn = applied[l.id] && applied[l.id].at;
-
   const opened = !appliedOn && clicked[l.id];
   const ctaClass = appliedOn ? "apply done" : opened ? "apply opened" : "apply";
   const ctaText = appliedOn ? `✓ Applied ${formatDate(appliedOn)}` : `Apply on ${escapeHtml(l.source)}`;
+  // "Website" says little, so show the site's name instead.
+  const where = l.source === "Website" ? l.hostname : l.source;
+  const meta = [escapeHtml(where), l.published && `Posted ${formatDate(l.published)}`].filter(Boolean).join(" · ");
 
-  return `<article class="card" data-id="${escapeHtml(l.id)}">
-    <div class="card-head"><span>${escapeHtml(l.source)} · ${escapeHtml(l.hostname)}</span>${l.published ? `<span>Posted ${formatDate(l.published)}</span>` : ""}</div>
+  return `<article class="card" data-id="${escapeHtml(l.id)}" style="--i:${i % 12}">
+    <div class="card-head">
+      <span class="card-meta">${meta}</span>
+      <button type="button" class="star${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove from saved" : "Save for later"}" title="${isSaved ? "Saved" : "Save for later"}">${STAR}</button>
+    </div>
     <h3>${escapeHtml(l.title)}</h3>
     <p>${escapeHtml(l.description)}</p>
     <div class="tags">${tags}</div>
     <div class="card-actions">
       <a class="${ctaClass}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply title="${appliedOn ? "Open the post again" : opened ? "You opened this post" : ""}">${ctaText}</a>
-      ${appliedOn ? "" : `<button type="button" class="star${isSaved ? " on" : ""}" data-save aria-pressed="${isSaved}" aria-label="${isSaved ? "Remove from saved" : "Save for later"}" title="${isSaved ? "Saved" : "Save for later"}">${STAR}</button>`}
+      ${appliedOn ? `<button type="button" class="undo" data-unapply title="Mark as not applied">Undo</button>` : ""}
     </div>
-    ${appliedOn ? `<button type="button" class="link-btn undo" data-unapply>Not applied? Undo</button>` : `<button type="button" class="link-btn undo" data-markapplied>Already applied? Mark it</button>`}
   </article>`;
 }
 
