@@ -6,8 +6,9 @@
   <title>CollabBoard</title>
   <meta name="description" content="Find brand collaborations and build your creator portfolio. Free for Indian creators.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="portfolio.css">
 </head>
 <body>
   <!-- Sign-up: shown until the creator has a profile -->
@@ -116,74 +117,49 @@
 
       <!-- My Portfolio -->
       <section class="page" id="page-portfolio">
-        <div class="section-head">
+        <div class="pf-top">
           <div>
             <h1>My Portfolio</h1>
-            <p class="sub">Fill this in and watch your media kit update as you type. Download it as a PDF to send to brands.</p>
+            <p class="sub">Drag blocks in, type straight onto the page, then publish and share your link with brands.</p>
           </div>
-          <button class="btn primary" id="download" type="button">Download as PDF</button>
+          <div class="pf-actions">
+            <div class="seg" role="group" aria-label="Preview size">
+              <button type="button" data-device="desktop" class="active" aria-pressed="true">Desktop</button>
+              <button type="button" data-device="mobile" aria-pressed="false">Mobile</button>
+            </div>
+            <button type="button" class="btn" id="pf-preview" title="Open full-screen preview in a new tab">Preview <span aria-hidden="true">↗</span></button>
+            <button type="button" class="btn primary" id="pf-publish">Publish</button>
+          </div>
         </div>
-        <div class="pf-layout">
-          <form id="pf-form" class="pf-form" novalidate>
-            <fieldset>
-              <legend>About you</legend>
-              <label>Photo<input type="file" name="photo" accept="image/*"></label>
-              <label>Display name<input name="displayName" placeholder="Riya Sharma"></label>
-              <label>One-line intro<input name="tagline" maxlength="80" placeholder="Skincare and everyday makeup for Indian skin"></label>
-              <label>Short bio<textarea name="bio" rows="3" maxlength="400" placeholder="Who you are, what you post, who watches you."></textarea></label>
-              <div class="two">
-                <label>Niche<select name="niche"></select></label>
-                <label>City<input name="city" placeholder="Pune"></label>
-              </div>
-              <label>Languages you create in<input name="languages" placeholder="Hindi, English"></label>
-            </fieldset>
-            <fieldset>
-              <legend>Your platforms</legend>
-              <div class="two">
-                <label>Instagram handle<input name="igHandle" placeholder="@riyacreates"></label>
-                <label>Instagram followers<input name="igFollowers" inputmode="numeric" placeholder="12000"></label>
-              </div>
-              <div class="two">
-                <label>YouTube channel<input name="ytHandle" placeholder="@riyacreates"></label>
-                <label>YouTube subscribers<input name="ytFollowers" inputmode="numeric" placeholder="3000"></label>
-              </div>
-              <label>Average views per Reel<input name="avgViews" inputmode="numeric" placeholder="8000"></label>
-            </fieldset>
-            <fieldset>
-              <legend>Your rates (₹)</legend>
-              <div class="two">
-                <label>Instagram Reel<input name="rateReel" inputmode="numeric" placeholder="5000"></label>
-                <label>Story<input name="rateStory" inputmode="numeric" placeholder="1500"></label>
-              </div>
-              <div class="two">
-                <label>YouTube video<input name="rateYt" inputmode="numeric" placeholder="10000"></label>
-                <label>UGC video (no posting)<input name="rateUgc" inputmode="numeric" placeholder="3000"></label>
-              </div>
-              <label class="check"><input type="checkbox" name="openBarter"> Open to barter collabs</label>
-            </fieldset>
-            <fieldset>
-              <legend>Work and contact</legend>
-              <label>Brands you've worked with<input name="brands" placeholder="Mamaearth, Nykaa, local cafes"></label>
-              <label>Best content links <span class="opt">one per line</span><textarea name="samples" rows="3" placeholder="https://www.instagram.com/reel/..."></textarea></label>
-              <div class="two">
-                <label>Email<input name="email" type="email" placeholder="riya@email.com"></label>
-                <label>WhatsApp<input name="whatsapp" inputmode="tel" placeholder="98765 43210"></label>
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend>Look</legend>
-              <div class="themes" role="radiogroup" aria-label="Colour theme">
-                <label class="theme-opt"><input type="radio" name="theme" value="violet" checked><span class="swatch violet"></span>Violet</label>
-                <label class="theme-opt"><input type="radio" name="theme" value="coral"><span class="swatch coral"></span>Coral</label>
-                <label class="theme-opt"><input type="radio" name="theme" value="teal"><span class="swatch teal"></span>Teal</label>
-                <label class="theme-opt"><input type="radio" name="theme" value="ink"><span class="swatch ink"></span>Ink</label>
-              </div>
-            </fieldset>
-            <p class="fine">Saved automatically on this device.</p>
-          </form>
-          <div class="pf-preview-wrap">
-            <article class="kit" id="kit"></article>
+        <div class="pf-share" id="pf-share" hidden></div>
+        <div class="builder">
+          <div class="canvas-wrap">
+            <div class="canvas" id="canvas" data-device="desktop"></div>
           </div>
+          <aside class="panel">
+            <div class="panel-tabs" role="tablist">
+              <button type="button" data-panel="add" class="active" role="tab">Add</button>
+              <button type="button" data-panel="edit" role="tab">Edit block</button>
+              <button type="button" data-panel="look" role="tab">Look</button>
+            </div>
+            <div class="panel-body" id="panel-add">
+              <p class="fine">Drag a block onto your page, or click it to add below the selected block.</p>
+              <div class="palette" id="palette"></div>
+            </div>
+            <div class="panel-body" id="panel-edit" hidden></div>
+            <div class="panel-body" id="panel-look" hidden>
+              <p class="panel-label">Colour</p>
+              <div class="themes" id="themes">
+                <button type="button" data-theme="violet"><span class="swatch violet"></span>Violet</button>
+                <button type="button" data-theme="coral"><span class="swatch coral"></span>Coral</button>
+                <button type="button" data-theme="teal"><span class="swatch teal"></span>Teal</button>
+                <button type="button" data-theme="ink"><span class="swatch ink"></span>Ink</button>
+              </div>
+              <p class="panel-label">Your link</p>
+              <label class="slug">collabboard-blush.vercel.app/p/<input id="pf-slug" maxlength="40" placeholder="your-name" autocomplete="off"></label>
+              <p class="fine" id="slug-note">Lowercase letters, numbers and dashes.</p>
+            </div>
+          </aside>
         </div>
       </section>
     </main>
@@ -202,6 +178,10 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="cloud.js"></script>
+  <script src="portfolio.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

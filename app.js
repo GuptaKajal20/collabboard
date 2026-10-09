@@ -340,9 +340,22 @@ function fitsProfile(l) {
 }
 
 function portfolioCompletion() {
-  const keys = ["photo", "displayName", "tagline", "bio", "niche", "city", "igHandle", "igFollowers", "rateReel", "brands", "samples", "email"];
-  const done = keys.filter((k) => portfolio[k] && String(portfolio[k]).trim()).length;
-  return Math.round((done / keys.length) * 100);
+  const s = store.get("cb_site");
+  if (!s) return 0;
+  const has = (type, test) => s.blocks.some((b) => b.type === type && test(b));
+  const checks = [
+    has("profile", (b) => b.name && b.tagline),
+    has("profile", (b) => b.photo),
+    has("text", (b) => b.text && b.text.length > 40),
+    has("socials", (b) => (b.links || []).some(Boolean)),
+    has("instagram", (b) => (b.posts || []).filter(Boolean).length >= 3),
+    has("gallery", (b) => (b.items || []).length > 0),
+    has("stats", (b) => (b.items || []).some((i) => i.value)),
+    has("rates", (b) => (b.items || []).some((i) => i.price)),
+    has("contact", (b) => b.email || b.whatsapp),
+    !!s.publishedAt,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
 function renderDashboard() {
@@ -363,112 +376,460 @@ function renderDashboard() {
     : `<div class="empty">No matches yet. New collabs are added every morning.</div>`;
 }
 
-// ---------- My Portfolio ----------
+// ---------- My Portfolio: block builder ----------
 
-const PF_FIELDS = ["displayName", "tagline", "bio", "niche", "city", "languages", "igHandle", "igFollowers", "ytHandle", "ytFollowers", "avgViews", "rateReel", "rateStory", "rateYt", "rateUgc", "brands", "samples", "email", "whatsapp"];
+const P = window.Portfolio;
+let site = store.get("cb_site");
+let selectedId = null;
+const newId = () => Math.random().toString(36).slice(2, 10);
+const slugify = (s = "") => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-").slice(0, 40);
 
-function renderKit() {
-  const p = portfolio;
-  const theme = p.theme || "violet";
-  const name = p.displayName || profile.name || "Your name";
-  const meta = [p.niche, p.city, p.languages].filter(Boolean).map(escapeHtml).join(" · ");
-
-  const stats = [
-    p.igFollowers && ["Instagram", formatCount(p.igFollowers)],
-    p.ytFollowers && ["YouTube", formatCount(p.ytFollowers)],
-    p.avgViews && ["Avg Reel views", formatCount(p.avgViews)],
-  ].filter(Boolean);
-
-  const rates = [
-    ["Instagram Reel", formatRupees(p.rateReel)],
-    ["Story", formatRupees(p.rateStory)],
-    ["YouTube video", formatRupees(p.rateYt)],
-    ["UGC video", formatRupees(p.rateUgc)],
-  ].filter(([, v]) => v);
-
-  const samples = (p.samples || "").split("\n").map((s) => s.trim()).filter((s) => /^https?:\/\//.test(s)).slice(0, 6);
-  const handles = [
-    p.igHandle && `Instagram ${escapeHtml(p.igHandle)}`,
-    p.ytHandle && `YouTube ${escapeHtml(p.ytHandle)}`,
-  ].filter(Boolean);
-
-  el("kit").className = `kit theme-${theme}`;
-  el("kit").innerHTML = `
-    <header class="kit-head">
-      ${p.photo ? `<img class="kit-photo" src="${p.photo}" alt="">` : `<div class="kit-photo kit-initial">${escapeHtml(name.charAt(0).toUpperCase())}</div>`}
-      <div>
-        <h2>${escapeHtml(name)}</h2>
-        ${p.tagline ? `<p class="kit-tagline">${escapeHtml(p.tagline)}</p>` : ""}
-        ${meta ? `<p class="kit-meta">${meta}</p>` : ""}
-      </div>
-    </header>
-    ${stats.length ? `<div class="kit-stats">${stats.map(([k, v]) => `<div><strong>${v}</strong><span>${k}</span></div>`).join("")}</div>` : ""}
-    ${p.bio ? `<section><h4>About</h4><p>${escapeHtml(p.bio)}</p></section>` : ""}
-    ${rates.length || p.openBarter ? `<section><h4>Rates</h4><ul class="kit-rates">${rates.map(([k, v]) => `<li><span>${k}</span><strong>${v}</strong></li>`).join("")}</ul>${p.openBarter ? `<p class="kit-note">Open to barter collaborations</p>` : ""}</section>` : ""}
-    ${p.brands ? `<section><h4>Brands I've worked with</h4><p>${escapeHtml(p.brands)}</p></section>` : ""}
-    ${samples.length ? `<section><h4>Best work</h4><ul class="kit-links">${samples.map((s) => `<li><a href="${escapeHtml(s)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s.replace(/^https?:\/\/(www\.)?/, "").slice(0, 60))}</a></li>`).join("")}</ul></section>` : ""}
-    <footer class="kit-contact">
-      ${[p.email && escapeHtml(p.email), p.whatsapp && `WhatsApp ${escapeHtml(p.whatsapp)}`, ...handles].filter(Boolean).join(" · ") || "Add your email or WhatsApp so brands can reach you"}
-    </footer>`;
+// First visit: start from the sign-up details (and the older form, if it was used).
+function starterSite() {
+  const old = portfolio || {};
+  const name = old.displayName || (profile && profile.name) || "";
+  const place = [old.city || (profile && profile.city), old.languages || (profile && profile.language)].filter(Boolean).join(" · ");
+  const ig = String(old.igHandle || (profile && profile.instagram) || "").replace(/^@/, "").trim();
+  const block = (type, extra = {}) => ({ id: newId(), type, ...P.BLOCKS[type].make(), ...extra });
+  return {
+    theme: old.theme || "violet",
+    slug: slugify(name),
+    blocks: [
+      block("profile", { name, tagline: old.tagline || "", location: place, photo: old.photo || "" }),
+      block("text", { text: old.bio || "Write a few lines about you, what you create and who watches you." }),
+      block("socials", { links: [ig ? `https://www.instagram.com/${ig}/` : ""] }),
+      block("stats", { items: [{ label: "Instagram followers", value: old.igFollowers || "" }, { label: "Average Reel views", value: old.avgViews || "" }] }),
+      block("instagram", { handle: ig, posts: ["", "", ""] }),
+      block("gallery"),
+      block("heading", { text: "Rates" }),
+      block("rates", { items: [{ label: "Instagram Reel", price: old.rateReel || "" }, { label: "Story", price: old.rateStory || "" }], barter: !!old.openBarter }),
+      block("contact", { email: old.email || "", whatsapp: old.whatsapp || "" }),
+    ],
+  };
 }
 
-function savePortfolio() {
-  store.set("cb_portfolio", portfolio);
-  renderKit();
+const findBlock = (id) => site.blocks.find((b) => b.id === id);
+
+function setPath(obj, path, value) {
+  const keys = path.split(".");
+  let o = obj;
+  for (const k of keys.slice(0, -1)) o = o[k];
+  o[keys.at(-1)] = value;
 }
 
-// Shrinks an uploaded photo so it fits in browser storage.
-function readPhoto(file) {
+function saveSite({ changed = true } = {}) {
+  if (changed) site.dirty = true;
+  store.set("cb_site", site);
+  renderShareBar();
+}
+
+function renderCanvas() {
+  el("canvas").innerHTML = P.renderPortfolio(site, { edit: true, selected: selectedId });
+}
+
+let canvasTimer;
+const renderCanvasSoon = () => { clearTimeout(canvasTimer); canvasTimer = setTimeout(renderCanvas, 250); };
+
+function selectBlock(id) {
+  selectedId = id;
+  document.querySelectorAll("#canvas .pb-editable").forEach((s) => s.classList.toggle("pb-selected", s.dataset.block === id));
+  renderEditPanel();
+  if (id) showPanel("edit");
+}
+
+function insertBlock(type, index) {
+  const b = { id: newId(), type, ...P.BLOCKS[type].make() };
+  const at = index ?? (selectedId ? site.blocks.findIndex((x) => x.id === selectedId) + 1 : site.blocks.length);
+  site.blocks.splice(at, 0, b);
+  saveSite();
+  renderCanvas();
+  selectBlock(b.id);
+  const node = document.querySelector(`#canvas [data-block="${b.id}"]`);
+  if (node) node.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+function moveBlock(id, to) {
+  const from = site.blocks.findIndex((b) => b.id === id);
+  if (from < 0) return;
+  const [b] = site.blocks.splice(from, 1);
+  site.blocks.splice(Math.max(0, Math.min(to > from ? to - 1 : to, site.blocks.length)), 0, b);
+  saveSite();
+  renderCanvas();
+}
+
+// ----- right panel -----
+
+function showPanel(name) {
+  document.querySelectorAll(".panel-tabs [data-panel]").forEach((b) => b.classList.toggle("active", b.dataset.panel === name));
+  for (const p of ["add", "edit", "look"]) el(`panel-${p}`).hidden = p !== name;
+}
+
+function renderPalette() {
+  el("palette").innerHTML = Object.entries(P.BLOCKS)
+    .map(([type, d]) => `<button type="button" class="pal-item" draggable="true" data-add="${type}"><strong>${escapeHtml(d.name)}</strong><span>${escapeHtml(d.hint)}</span></button>`)
+    .join("");
+}
+
+const field = (label, name, value, attrs = "") => `<label>${label}<input data-f="${name}" value="${escapeHtml(value ?? "")}" ${attrs}></label>`;
+const area = (label, name, value, rows = 4) => `<label>${label}<textarea data-f="${name}" rows="${rows}">${escapeHtml(value ?? "")}</textarea></label>`;
+
+function renderEditPanel() {
+  const b = selectedId && findBlock(selectedId);
+  const panel = el("panel-edit");
+  if (!b) {
+    panel.innerHTML = `<p class="fine">Click a block on your page to edit it. You can also type straight onto the page.</p>`;
+    return;
+  }
+  const title = `<p class="panel-label">${escapeHtml(P.BLOCKS[b.type].name)}</p>`;
+  const rows = (items, a, bKey, aLabel, bLabel) =>
+    items.map((it, i) => `<div class="row-edit"><input data-f="items.${i}.${a}" value="${escapeHtml(it[a] ?? "")}" placeholder="${aLabel}" aria-label="${aLabel}"><input data-f="items.${i}.${bKey}" value="${escapeHtml(it[bKey] ?? "")}" placeholder="${bLabel}" aria-label="${bLabel}"><button type="button" class="x" data-del-row="${i}" aria-label="Remove row">✕</button></div>`).join("") +
+    `<button type="button" class="btn small" data-add-row>+ Add row</button>`;
+  let body = "";
+  switch (b.type) {
+    case "profile":
+      body = `<label>Photo<input type="file" accept="image/*" data-upload="photo"></label>${b.photo ? `<button type="button" class="link-btn" data-clear="photo">Remove photo</button>` : ""}` +
+        field("Name", "name", b.name) + field("One line about you", "tagline", b.tagline) + field("City and languages", "location", b.location);
+      break;
+    case "heading":
+      body = field("Heading", "text", b.text);
+      break;
+    case "text":
+    case "brands":
+      body = area(b.type === "brands" ? "Brand names" : "Text", "text", b.text, 6);
+      break;
+    case "socials":
+      body = `<p class="fine">Paste the full link to each profile. We show the right name automatically.</p>` +
+        (b.links || []).map((u, i) => `<div class="row-edit one"><input data-f="links.${i}" value="${escapeHtml(u)}" placeholder="https://www.instagram.com/yourname" inputmode="url"><button type="button" class="x" data-del-link="${i}" aria-label="Remove link">✕</button></div>`).join("") +
+        `<button type="button" class="btn small" data-add-link>+ Add link</button>`;
+      break;
+    case "instagram":
+      body = field("Instagram username", "handle", b.handle, 'placeholder="@yourname"') +
+        `<p class="fine">Paste links to 3 or 4 of your best posts or reels. On Instagram, tap ••• on a post, then Copy link.</p>` +
+        (b.posts || []).map((u, i) => `<input data-f="posts.${i}" value="${escapeHtml(u)}" placeholder="https://www.instagram.com/reel/…" inputmode="url" aria-label="Post link ${i + 1}">`).join("") +
+        ((b.posts || []).length < 4 ? `<button type="button" class="btn small" data-add-post>+ Add post</button>` : "");
+      break;
+    case "gallery":
+      body = `<label>Add photos or videos<input type="file" accept="image/*,video/*" multiple data-upload="gallery"></label>
+        <p class="fine">${Cloud.ready ? "Videos up to 50 MB each." : "Photos work now. Video uploads turn on after sharing is set up."}</p>
+        <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="">`}<button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}</div>`;
+      break;
+    case "stats":
+      body = rows(b.items || [], "label", "value", "e.g. Instagram followers", "e.g. 12400");
+      break;
+    case "rates":
+      body = rows(b.items || [], "label", "price", "e.g. Instagram Reel", "₹ price") +
+        `<label class="check"><input type="checkbox" data-f="barter" ${b.barter ? "checked" : ""}> Open to barter collabs</label>`;
+      break;
+    case "button":
+      body = field("Button text", "label", b.label) + field("Link", "url", b.url, 'placeholder="https://…" inputmode="url"');
+      break;
+    case "contact":
+      body = field("Email", "email", b.email, 'type="email"') + field("WhatsApp number", "whatsapp", b.whatsapp, 'inputmode="tel"');
+      break;
+  }
+  panel.innerHTML = `${title}<div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
+}
+
+// Shrinks a photo before it is uploaded or kept in the draft.
+function shrinkImage(file, max) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      const size = 320;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
       const canvas = document.createElement("canvas");
-      canvas.width = canvas.height = size;
-      const s = Math.min(img.width, img.height);
-      canvas.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
       URL.revokeObjectURL(img.src);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
+      canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Could not read that image"))), "image/jpeg", 0.85);
     };
-    img.onerror = reject;
+    img.onerror = () => reject(new Error("Could not read that image"));
     img.src = URL.createObjectURL(file);
   });
 }
 
-function setupPortfolio() {
-  const form = el("pf-form");
-  fillSelect(form.niche, NICHES, "Choose niche");
-  // First visit: start from the sign-up details.
-  if (!Object.keys(portfolio).length && profile) {
-    portfolio = {
-      displayName: profile.name,
-      niche: profile.niche,
-      city: profile.city,
-      languages: profile.language,
-      igHandle: profile.instagram,
-      theme: "violet",
-    };
-  }
-  for (const k of PF_FIELDS) if (portfolio[k] !== undefined) form[k].value = portfolio[k];
-  form.openBarter.checked = !!portfolio.openBarter;
-  const theme = form.querySelector(`input[name="theme"][value="${portfolio.theme || "violet"}"]`);
-  if (theme) theme.checked = true;
+const blobToDataUrl = (blob) => new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
 
-  form.addEventListener("input", async (e) => {
-    const t = e.target;
-    if (t.name === "photo") {
-      if (t.files[0]) {
-        try { portfolio.photo = await readPhoto(t.files[0]); } catch { /* unreadable image */ }
-      }
-    } else if (t.name === "openBarter") {
-      portfolio.openBarter = t.checked;
-    } else if (t.name) {
-      portfolio[t.name] = t.value;
-    }
-    savePortfolio();
+async function uploadFile(file, maxSide) {
+  const isVideo = file.type.startsWith("video/");
+  if (isVideo) {
+    if (!Cloud.ready) throw new Error("Video uploads turn on after sharing is set up.");
+    return { type: "video", url: await Cloud.upload(file) };
+  }
+  const blob = await shrinkImage(file, maxSide);
+  if (!Cloud.ready) return { type: "image", url: await blobToDataUrl(await shrinkImage(file, Math.min(maxSide, 900))) };
+  const named = new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
+  return { type: "image", url: await Cloud.upload(named) };
+}
+
+function note(text, isError) {
+  const n = el("upload-note");
+  if (!n) return;
+  n.hidden = !text;
+  n.textContent = text || "";
+  n.classList.toggle("error", !!isError);
+}
+
+function setupPanel() {
+  const panel = el("panel-edit");
+  panel.addEventListener("input", (e) => {
+    const b = findBlock(selectedId);
+    const f = e.target.dataset.f;
+    if (!b || !f) return;
+    setPath(b, f, e.target.type === "checkbox" ? e.target.checked : e.target.value);
+    saveSite();
+    renderCanvasSoon();
   });
-  el("download").addEventListener("click", () => window.print());
-  renderKit();
+  panel.addEventListener("click", (e) => {
+    const b = findBlock(selectedId);
+    if (!b) return;
+    const t = e.target.closest("button");
+    if (!t) return;
+    if (t.dataset.addRow !== undefined) b.items.push({});
+    else if (t.dataset.delRow !== undefined) b.items.splice(Number(t.dataset.delRow), 1);
+    else if (t.dataset.addLink !== undefined) b.links.push("");
+    else if (t.dataset.delLink !== undefined) b.links.splice(Number(t.dataset.delLink), 1);
+    else if (t.dataset.addPost !== undefined) b.posts.push("");
+    else if (t.dataset.delItem !== undefined) b.items.splice(Number(t.dataset.delItem), 1);
+    else if (t.dataset.clear) b[t.dataset.clear] = "";
+    else return;
+    saveSite();
+    renderCanvas();
+    renderEditPanel();
+  });
+  panel.addEventListener("change", async (e) => {
+    const input = e.target;
+    if (!input.dataset.upload || !input.files.length) return;
+    const b = findBlock(selectedId);
+    const files = [...input.files];
+    note(`Uploading ${files.length > 1 ? `${files.length} files` : "your file"}…`);
+    try {
+      for (const file of files) {
+        const media = await uploadFile(file, input.dataset.upload === "photo" ? 600 : 1600);
+        if (input.dataset.upload === "photo") b.photo = media.url;
+        else b.items.push(media);
+      }
+      saveSite();
+      renderCanvas();
+      renderEditPanel();
+      note("");
+    } catch (err) {
+      note(err.message || "Upload failed. Please try again.", true);
+    }
+  });
+}
+
+// ----- canvas: select, type, move, drag and drop -----
+
+function setupCanvas() {
+  const canvas = el("canvas");
+
+  canvas.addEventListener("click", (e) => {
+    const block = e.target.closest(".pb-editable");
+    if (!block) return;
+    const id = block.dataset.block;
+    const t = e.target.closest("button");
+    if (t && t.dataset.move) {
+      const i = site.blocks.findIndex((b) => b.id === id);
+      const to = i + Number(t.dataset.move);
+      if (to < 0 || to >= site.blocks.length) return;
+      const [b] = site.blocks.splice(i, 1);
+      site.blocks.splice(to, 0, b);
+      saveSite();
+      renderCanvas();
+      return;
+    }
+    if (t && t.dataset.remove !== undefined) {
+      site.blocks = site.blocks.filter((b) => b.id !== id);
+      if (selectedId === id) selectedId = null;
+      saveSite();
+      renderCanvas();
+      renderEditPanel();
+      return;
+    }
+    if (e.target.closest("a")) e.preventDefault(); // links don't open while editing
+    if (selectedId !== id) selectBlock(id);
+  });
+
+  // Typing straight onto the page.
+  canvas.addEventListener("input", (e) => {
+    const f = e.target.dataset && e.target.dataset.edit;
+    const block = e.target.closest(".pb-editable");
+    if (!f || !block) return;
+    setPath(findBlock(block.dataset.block), f, e.target.innerText.replace(/\n$/, ""));
+    saveSite();
+  });
+  canvas.addEventListener("focusout", (e) => {
+    if (e.target.dataset && e.target.dataset.edit && selectedId) renderEditPanel();
+  });
+
+  // Drag and drop: new blocks from the palette, or existing ones by their handle.
+  const line = document.createElement("div");
+  line.className = "drop-line";
+  let dropIndex = null;
+
+  const indexAt = (y) => {
+    const blocks = [...canvas.querySelectorAll(".pb-editable")];
+    for (let i = 0; i < blocks.length; i++) {
+      const r = blocks[i].getBoundingClientRect();
+      if (y < r.top + r.height / 2) return i;
+    }
+    return blocks.length;
+  };
+
+  document.addEventListener("dragstart", (e) => {
+    const pal = e.target.closest && e.target.closest("[data-add]");
+    const grip = e.target.closest && e.target.closest(".pb-grip");
+    if (pal) e.dataTransfer.setData("text/plain", `new:${pal.dataset.add}`);
+    else if (grip) {
+      const block = grip.closest(".pb-editable");
+      e.dataTransfer.setData("text/plain", `move:${block.dataset.block}`);
+      e.dataTransfer.setDragImage(block, 20, 20);
+      block.classList.add("pb-dragging");
+    } else return;
+    e.dataTransfer.effectAllowed = "move";
+  });
+  document.addEventListener("dragend", () => {
+    line.remove();
+    canvas.querySelectorAll(".pb-dragging").forEach((b) => b.classList.remove("pb-dragging"));
+  });
+
+  canvas.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropIndex = indexAt(e.clientY);
+    const blocks = [...canvas.querySelectorAll(".pb-editable")];
+    const page = canvas.querySelector(".pb-page");
+    if (!blocks.length) page.appendChild(line);
+    else if (dropIndex < blocks.length) blocks[dropIndex].before(line);
+    else blocks.at(-1).after(line);
+  });
+  canvas.addEventListener("dragleave", (e) => { if (!canvas.contains(e.relatedTarget)) line.remove(); });
+  canvas.addEventListener("drop", (e) => {
+    e.preventDefault();
+    line.remove();
+    const data = e.dataTransfer.getData("text/plain");
+    if (data.startsWith("new:")) insertBlock(data.slice(4), dropIndex);
+    else if (data.startsWith("move:")) moveBlock(data.slice(5), dropIndex);
+  });
+
+  el("palette").addEventListener("click", (e) => {
+    const pal = e.target.closest("[data-add]");
+    if (pal) insertBlock(pal.dataset.add);
+  });
+}
+
+// ----- preview, device size, theme, link, publish -----
+
+function shareUrl() {
+  return `${location.origin}/p/${site.slug}`;
+}
+
+function renderShareBar() {
+  const bar = el("pf-share");
+  if (!bar) return;
+  if (!site.publishedAt) { bar.hidden = true; return; }
+  bar.hidden = false;
+  const url = shareUrl();
+  bar.innerHTML = `<span class="dot${site.dirty ? " pending" : ""}"></span>
+    <span>${site.dirty ? "You have changes that aren't public yet. Click Publish to update your link." : "Your portfolio is live:"}</span>
+    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url.replace(/^https?:\/\//, ""))}</a>
+    <button type="button" class="btn small" id="copy-link">Copy link</button>`;
+  el("copy-link").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(url); el("copy-link").textContent = "Copied"; } catch { prompt("Copy your link:", url); }
+  });
+}
+
+function validSlug(s) {
+  return /^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
+}
+
+async function publish() {
+  const btn = el("pf-publish");
+  const bar = el("pf-share");
+  if (!Cloud.ready) {
+    bar.hidden = false;
+    bar.innerHTML = `<span class="dot pending"></span><span>Public links turn on after the one-time Supabase setup. Use Preview to see your portfolio meanwhile.</span>`;
+    return;
+  }
+  if (!validSlug(site.slug || "")) {
+    showPanel("look");
+    el("pf-slug").focus();
+    el("slug-note").textContent = "Choose your link name first: at least 3 lowercase letters, numbers or dashes.";
+    el("slug-note").classList.add("error");
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "Publishing…";
+  try {
+    if (!(await Cloud.slugFree(site.slug))) throw new Error("That link name is taken. Try another.");
+    const { dirty, publishedAt, ...data } = site;
+    await Cloud.publish(site.slug, data);
+    site.publishedAt = new Date().toISOString();
+    site.dirty = false;
+    saveSite({ changed: false });
+  } catch (err) {
+    bar.hidden = false;
+    bar.innerHTML = `<span class="dot pending"></span><span class="error">${escapeHtml(err.message || "Could not publish. Please try again.")}</span>`;
+    if (/link name/.test(err.message || "")) showPanel("look");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Publish";
+  }
+}
+
+async function setupPortfolio() {
+  if (!site) site = starterSite();
+  // A published portfolio on this device's login wins over an empty draft.
+  if (Cloud.ready && !site.publishedAt) {
+    try {
+      const mine = await Cloud.loadMine();
+      if (mine) site = { ...mine.data, slug: mine.slug, publishedAt: mine.updated_at, dirty: false };
+    } catch { /* offline: keep the draft */ }
+  }
+  saveSite({ changed: false });
+
+  renderPalette();
+  renderCanvas();
+  renderEditPanel();
+  setupCanvas();
+  setupPanel();
+
+  document.querySelectorAll(".panel-tabs [data-panel]").forEach((b) => b.addEventListener("click", () => showPanel(b.dataset.panel)));
+
+  document.querySelectorAll(".seg [data-device]").forEach((b) => b.addEventListener("click", () => {
+    el("canvas").dataset.device = b.dataset.device;
+    document.querySelectorAll(".seg [data-device]").forEach((x) => {
+      x.classList.toggle("active", x === b);
+      x.setAttribute("aria-pressed", String(x === b));
+    });
+  }));
+
+  const markTheme = () => document.querySelectorAll("#themes [data-theme]").forEach((b) => b.classList.toggle("active", b.dataset.theme === (site.theme || "violet")));
+  markTheme();
+  el("themes").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-theme]");
+    if (!b) return;
+    site.theme = b.dataset.theme;
+    markTheme();
+    saveSite();
+    renderCanvas();
+  });
+
+  el("pf-slug").value = site.slug || "";
+  el("pf-slug").addEventListener("input", (e) => {
+    const clean = slugify(e.target.value);
+    if (clean !== e.target.value) e.target.value = clean;
+    site.slug = clean;
+    el("slug-note").classList.remove("error");
+    el("slug-note").textContent = validSlug(clean) ? `Your link: ${location.host}/p/${clean}` : "At least 3 lowercase letters, numbers or dashes.";
+    saveSite();
+  });
+
+  el("pf-preview").addEventListener("click", () => {
+    store.set("cb_site", site);
+    window.open("p.html?draft=1", "_blank", "noopener");
+  });
+  el("pf-publish").addEventListener("click", publish);
 }
 
 // ---------- sign-up ----------
@@ -544,6 +905,7 @@ el("reset").addEventListener("click", () => {
   if (!confirm("Remove your profile and portfolio from this device?")) return;
   store.remove("cb_profile");
   store.remove("cb_portfolio");
+  store.remove("cb_site");
   location.hash = "";
   location.reload();
 });

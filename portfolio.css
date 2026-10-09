@@ -1,0 +1,125 @@
+/* How a creator portfolio looks: used in the builder and on the public page.
+   The portfolio has its own fixed light colours so it looks the same for every visitor. */
+
+.pb-page {
+  --k: #5b4bd6;
+  --k-soft: #eeecfd;
+  --k-ink: #26215c;
+  --ink: #1c1c1a;
+  --soft: #6b6a65;
+  --line: #e9e7e0;
+  display: grid;
+  gap: 8px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 28px 56px;
+  color: var(--ink);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  line-height: 1.55;
+}
+.pb-theme-coral { --k: #d85a30; --k-soft: #faece7; --k-ink: #4a1b0c; }
+.pb-theme-teal { --k: #0f6e56; --k-soft: #e1f5ee; --k-ink: #04342c; }
+.pb-theme-ink { --k: #2c2c2a; --k-soft: #f1efe8; --k-ink: #1c1c1a; }
+
+.pb-block { position: relative; padding: 10px 0; }
+.pb-empty { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--soft); font-size: 14px; text-align: center; }
+
+.pb-profile { display: grid; justify-items: center; text-align: center; gap: 6px; padding-bottom: 8px; }
+.pb-avatar { width: 112px; height: 112px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.35); }
+.pb-initial { display: grid; place-items: center; background: var(--k-soft); color: var(--k); font-size: 44px; font-weight: 600; }
+.pb-profile h1 { margin: 8px 0 0; font-size: 32px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
+.pb-tagline { margin: 0; font-size: 17px; color: var(--ink); }
+.pb-location { margin: 0; font-size: 14px; color: var(--soft); }
+
+.pb-heading { margin: 14px 0 0; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--k); font-weight: 700; }
+.pb-text { margin: 0; font-size: 16px; white-space: pre-wrap; }
+.pb-brands { margin: 0; font-size: 16px; font-weight: 500; }
+
+.pb-socials { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.pb-socials a {
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: var(--k-soft);
+  color: var(--k-ink);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.pb-socials a:hover { transform: translateY(-1px); background: var(--k); color: #fff; }
+
+.pb-ig-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; color: var(--ink); text-decoration: none; font-weight: 600; }
+.pb-ig-logo { width: 28px; height: 28px; border-radius: 8px; background: radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.pb-ig-follow { margin-left: auto; padding: 6px 12px; border-radius: 8px; background: var(--k-soft); color: var(--k-ink); font-size: 13px; }
+.pb-ig-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.pb-ig-grid iframe { width: 100%; height: 480px; border: 1px solid var(--line); border-radius: 12px; background: #fff; }
+
+.pb-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.pb-gallery video, .pb-photo { width: 100%; aspect-ratio: 4 / 5; border-radius: 12px; background: #000; object-fit: cover; }
+.pb-photo { padding: 0; border: 0; overflow: hidden; cursor: zoom-in; }
+.pb-photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.35s ease; }
+.pb-photo:hover img { transform: scale(1.04); }
+
+.pb-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.pb-stats div { display: grid; padding: 16px; border-radius: 14px; background: var(--k-soft); text-align: center; }
+.pb-stats strong { font-size: 26px; color: var(--k); line-height: 1.2; }
+.pb-stats span { font-size: 13px; color: var(--soft); }
+
+.pb-rates { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.pb-rates li { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
+.pb-note { margin: 10px 0 0; font-size: 14px; color: var(--soft); }
+
+.pb-button-row { display: flex; justify-content: center; }
+.pb-button { display: inline-flex; padding: 14px 26px; border-radius: 12px; background: var(--k); color: #fff; font-weight: 600; text-decoration: none; box-shadow: 0 10px 24px -10px var(--k); }
+
+.pb-contact { padding: 22px; border-radius: 16px; background: var(--k-soft); text-align: center; }
+.pb-contact h3 { margin: 0 0 6px; font-size: 18px; color: var(--k-ink); }
+.pb-contact p { margin: 0; }
+.pb-contact a { color: var(--k-ink); font-weight: 600; }
+
+/* ---------- builder-only: tools, selection, typing hints, drop line ---------- */
+.pb-editable { border-radius: 12px; outline: 1px dashed transparent; outline-offset: 6px; transition: outline-color 0.15s ease; }
+.pb-editable:hover { outline-color: #c9c4ef; }
+.pb-selected, .pb-selected:hover { outline: 2px solid var(--k); }
+.pb-dragging { opacity: 0.4; }
+.pb-tools {
+  position: absolute;
+  top: -14px;
+  right: 6px;
+  z-index: 2;
+  display: none;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #1e1b4b;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+.pb-editable:hover .pb-tools, .pb-selected .pb-tools { display: flex; }
+.pb-tools button, .pb-grip {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 26px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #c4b5fd;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.pb-grip { cursor: grab; font-size: 15px; }
+.pb-tools button:hover, .pb-grip:hover { background: rgba(196, 181, 253, 0.18); }
+[data-edit] { outline: none; border-radius: 4px; cursor: text; }
+[data-edit]:focus { background: rgba(91, 75, 214, 0.08); }
+[data-edit]:empty::before { content: attr(data-placeholder); color: #aaa8a0; }
+.drop-line { height: 4px; margin: 2px 0; border-radius: 4px; background: #5b4bd6; box-shadow: 0 0 0 4px rgba(91, 75, 214, 0.18); }
+.pb-start { padding: 60px 18px; }
+
+@media (max-width: 560px) {
+  .pb-page { padding: 28px 18px 40px; }
+  .pb-profile h1 { font-size: 26px; }
+  .pb-ig-grid { grid-template-columns: 1fr 1fr; }
+  .pb-ig-grid iframe { height: 380px; }
+  .pb-gallery { grid-template-columns: 1fr 1fr; }
+}
