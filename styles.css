@@ -95,6 +95,7 @@ body {
 .tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .tag { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: var(--tag-bg); color: var(--tag-text); }
 .tag.paid { background: var(--paid-bg); color: var(--paid-text); font-weight: 500; }
+.tag.fit { background: var(--paid-bg); color: var(--paid-text); }
 .tag.barter { background: var(--barter-bg); color: var(--barter-text); font-weight: 500; }
 .apply {
   margin-top: auto;

@@ -41,7 +41,7 @@ function matches(l) {
   if (pay === "paid" && !l.pay.startsWith("Paid")) return false;
   if (pay === "Barter" && !l.pay.includes("arter")) return false;
   if (source && l.source !== source) return false;
-  if (followers && l.minFollowers && l.minFollowers > followers) return false;
+  if (followers && l.minFollowers > followers) return false;
   return true;
 }
 
@@ -52,7 +52,11 @@ function card(l) {
     ...l.niches.map((n) => `<span class="tag">${escapeHtml(n)}</span>`),
     ...l.platforms.filter((p) => p !== "Any").map((p) => `<span class="tag">${escapeHtml(p)}</span>`),
     ...l.languages.map((x) => `<span class="tag">${escapeHtml(x)}</span>`),
-    l.minFollowers ? `<span class="tag">${formatFollowers(l.minFollowers)} followers</span>` : "",
+    l.minFollowers === 0
+      ? `<span class="tag fit">No minimum followers</span>`
+      : l.minFollowers
+        ? `<span class="tag">${formatFollowers(l.minFollowers)} followers</span>`
+        : "",
   ].join("");
 
   return `<article class="card">
@@ -65,8 +69,17 @@ function card(l) {
 }
 
 function render() {
-  const shown = listings.filter(matches);
-  el("count").textContent = `${shown.length} of ${listings.length} opportunities`;
+  const followers = Number(el("followers").value);
+  let shown = listings.filter(matches);
+  let countText = `${shown.length} of ${listings.length} opportunities`;
+  if (followers) {
+    // Posts that state a requirement you meet come first; the rest don't say.
+    const fits = shown.filter((l) => l.minFollowers !== null && l.minFollowers !== undefined);
+    const unknown = shown.filter((l) => l.minFollowers === null || l.minFollowers === undefined);
+    shown = [...fits, ...unknown];
+    countText = `${fits.length} match your follower count · ${unknown.length} don't say a minimum`;
+  }
+  el("count").textContent = countText;
   el("grid").innerHTML = shown.length
     ? shown.map(card).join("")
     : `<div class="empty">${listings.length ? "No opportunities match these filters. Try clearing one." : "No opportunities yet. New ones are added automatically every morning."}</div>`;

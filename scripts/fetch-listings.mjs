@@ -14,15 +14,24 @@ const IS_TEST = process.argv.includes("--fixture");
 const OUT = join(ROOT, "data", IS_TEST ? "test-listings.json" : "listings.json");
 const MAX_AGE_DAYS = 30;
 
+// Social posts are where most brand calls live, so some searches look only there.
+const SOCIAL = ["instagram.com", "facebook.com", "threads.com", "linkedin.com", "docs.google.com", "forms.gle"];
+
 const QUERIES = [
-  '"influencer collaboration" form India',
-  '"collab with us" influencer docs.google.com/forms',
-  '"looking for creators" brand collaboration India',
-  '"looking for influencers" India campaign',
-  '"UGC creators" wanted India brand',
-  '"creator program" apply India brand',
-  '"influencer marketing" "apply now" India creators',
-  '"barter collaboration" influencers India',
+  { q: '"influencer collaboration" form India' },
+  { q: '"collab with us" influencer docs.google.com/forms' },
+  { q: '"looking for creators" brand collaboration India' },
+  { q: '"looking for influencers" India campaign' },
+  { q: '"UGC creators" wanted India brand' },
+  { q: '"barter collaboration" influencers India' },
+  { q: '"paid collaboration" creators fill the form India', domains: SOCIAL },
+  { q: '"nano influencers" wanted collaboration India', domains: SOCIAL },
+  { q: '"micro influencers" wanted brand campaign India', domains: SOCIAL },
+  { q: '"minimum followers" collab form India creators', domains: SOCIAL },
+  { q: 'beauty skincare brand "creators wanted" India', domains: SOCIAL },
+  { q: 'fashion brand "influencers wanted" India collab', domains: SOCIAL },
+  { q: 'food brand "looking for creators" India collab', domains: SOCIAL },
+  { q: 'tech gadget brand "looking for creators" India', domains: SOCIAL },
 ];
 
 // Anything asking the creator to pay is treated as a scam and dropped.
@@ -124,11 +133,25 @@ function detectPlatform(text) {
   return out.length ? out : ["Any"];
 }
 
+// Returns the minimum followers a post asks for, 0 when it says there is no minimum,
+// or null when it doesn't say.
+const NO_MINIMUM = /no (fixed )?minimum (follower|followers)|follower count (doesn'?t|does not) matter|don'?t worry about (your )?follower|all follower (counts|sizes)|any follower count|no follower (limit|requirement)/;
 function detectMinFollowers(text) {
-  const m = text.match(/(\d+(?:\.\d+)?)\s?(k|lakh|l)\+?\s?(?:followers|subscribers)/);
-  if (!m) return null;
-  const n = parseFloat(m[1]);
-  return m[2] === "k" ? n * 1000 : n * 100000;
+  if (NO_MINIMUM.test(text)) return 0;
+  const num = String.raw`(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s?(k|lakh|l|m)?\b\+?`;
+  const patterns = [
+    new RegExp(`${num}\\s*(?:\\+\\s*)?(?:followers|follower|subscribers|subs)`),
+    new RegExp(`(?:min(?:imum)?\\.?|at least|followers?\\s*[:\\-])\\s*(?:of\\s*)?${num}`),
+  ];
+  for (const re of patterns) {
+    const m = text.match(re);
+    if (!m) continue;
+    const n = parseFloat(m[1].replace(/,/g, ""));
+    const unit = m[2];
+    const value = unit === "k" ? n * 1000 : unit === "lakh" || unit === "l" ? n * 100000 : unit === "m" ? n * 1000000 : n;
+    if (value >= 100 && value <= 10000000) return Math.round(value);
+  }
+  return null;
 }
 
 function parseDate(result) {
@@ -149,6 +172,8 @@ function toListing(result, today) {
   let title = stripTags(result.title);
   if (GENERIC_TITLE.test(title)) title = titleFromText(description, hostname);
   const text = `${title} ${description}`.toLowerCase();
+  // The full page text (when available) holds details the short preview misses.
+  const fullText = `${text} ${stripTags(result.raw_content || "").slice(0, 6000)}`.toLowerCase();
 
   if (has(text, SCAM_WORDS)) return null;
   if (has(text, FOREIGN_PLACES) && !text.includes("india")) return null;
@@ -166,15 +191,15 @@ function toListing(result, today) {
     source: detectSource(hostname, url),
     niches: niches.length ? niches : ["General"],
     platforms: detectPlatform(text),
-    pay: detectPay(text),
-    minFollowers: detectMinFollowers(text),
+    pay: detectPay(fullText),
+    minFollowers: detectMinFollowers(fullText),
     languages,
     published: parseDate(result),
     firstSeen: today,
   };
 }
 
-async function tavilySearch(query, key) {
+async function tavilySearch({ q: query, domains }, key) {
   const res = await fetch("https://api.tavily.com/search", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
@@ -185,6 +210,8 @@ async function tavilySearch(query, key) {
       country: "india",
       time_range: "month",
       max_results: 20,
+      include_raw_content: "text",
+      ...(domains ? { include_domains: domains } : {}),
     }),
   });
   if (!res.ok) throw new Error(`Tavily API ${res.status} for "${query}": ${await res.text()}`);
@@ -219,7 +246,7 @@ async function main() {
     for (const q of QUERIES) {
       try {
         const r = await tavilySearch(q, key);
-        console.log(`${r.length} results for ${q}`);
+        console.log(`${r.length} results for ${q.q}`);
         results.push(...r);
       } catch (err) {
         console.error(err.message);
@@ -232,7 +259,10 @@ async function main() {
   for (const old of await loadExisting()) {
     // Re-check saved listings so new filter rules also clean up older ones.
     const again = toListing({ title: old.title, url: old.url, content: old.description, published_date: old.published }, old.firstSeen);
-    if (again) byId.set(again.id, again);
+    if (!again) continue;
+    if (again.minFollowers === null) again.minFollowers = old.minFollowers ?? null;
+    if (again.pay === "Not stated" && old.pay) again.pay = old.pay;
+    byId.set(again.id, again);
   }
   for (const r of results) {
     const l = toListing(r, today);
