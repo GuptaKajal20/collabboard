@@ -48,12 +48,14 @@
         try { data = (await window.Cloud.fetchPublic(slug) || {}).data; } catch { data = null; }
       }
 
+      data = window.Portfolio.migrate(data);
       if (!data || !data.blocks) {
         sheet.innerHTML = `<p class="message">${slug && !window.Cloud.ready ? "Public portfolios aren't switched on yet." : "This portfolio doesn't exist or isn't public yet."}</p>`;
         return;
       }
 
       sheet.innerHTML = window.Portfolio.renderPortfolio(data);
+      window.Portfolio.enhance(sheet);
       const profile = data.blocks.find((b) => b.type === "profile");
       if (profile && profile.name) document.title = `${profile.name} · Creator portfolio`;
 

@@ -28,7 +28,7 @@ const store = {
     try { return JSON.parse(localStorage.getItem(key)); } catch { return null; }
   },
   set(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* not saved */ }
+    try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; }
   },
   remove(key) {
     try { localStorage.removeItem(key); } catch { /* ignore */ }
@@ -100,8 +100,7 @@ function card(l, i = 0) {
 
   const isSaved = !!saved[l.id];
   const appliedOn = applied[l.id] && applied[l.id].at;
-  const opened = !appliedOn && clicked[l.id];
-  const ctaClass = appliedOn ? "apply done" : opened ? "apply opened" : "apply";
+  const ctaClass = appliedOn ? "apply done" : "apply";
   const ctaText = appliedOn ? `✓ Applied ${formatDate(appliedOn)}` : `Apply on ${escapeHtml(l.source)}`;
   // "Website" says little, so show the site's name instead.
   const where = l.source === "Website" ? l.hostname : l.source;
@@ -116,7 +115,7 @@ function card(l, i = 0) {
     <p>${escapeHtml(l.description)}</p>
     <div class="tags">${tags}</div>
     <div class="card-actions">
-      <a class="${ctaClass}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply title="${appliedOn ? "Open the post again" : opened ? "You opened this post" : ""}">${ctaText}</a>
+      <a class="${ctaClass}" href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" data-apply title="${appliedOn ? "Open the post again" : ""}">${ctaText}</a>
       ${appliedOn ? `<button type="button" class="undo" data-unapply title="Mark as not applied">Undo</button>` : ""}
     </div>
   </article>`;
@@ -184,8 +183,6 @@ document.addEventListener("click", (e) => {
     store.set(PENDING, { id, at: Date.now() });
     clicked[id] = today();
     store.set("cb_clicked", clicked);
-    const btn = e.target.closest("[data-apply]");
-    btn.classList.add("opened");
   }
 });
 
@@ -340,19 +337,18 @@ function fitsProfile(l) {
 }
 
 function portfolioCompletion() {
-  const s = store.get("cb_site");
+  const s = window.Portfolio.migrate(store.get("cb_site"));
   if (!s) return 0;
   const has = (type, test) => s.blocks.some((b) => b.type === type && test(b));
   const checks = [
-    has("profile", (b) => b.name && b.tagline),
+    has("profile", (b) => b.name && b.bio),
     has("profile", (b) => b.photo),
-    has("text", (b) => b.text && b.text.length > 40),
-    has("socials", (b) => (b.links || []).some(Boolean)),
-    has("instagram", (b) => (b.posts || []).filter(Boolean).length >= 3),
-    has("gallery", (b) => (b.items || []).length > 0),
+    has("text", (b) => (b.html || "").replace(/<[^>]+>/g, "").trim().length > 40),
+    has("socials", (b) => (b.items || []).some((i) => i.value)),
+    has("instagram", (b) => b.handle),
+    has("file", (b) => (b.items || []).length > 0),
     has("stats", (b) => (b.items || []).some((i) => i.value)),
     has("rates", (b) => (b.items || []).some((i) => i.price)),
-    has("contact", (b) => b.email || b.whatsapp),
     !!s.publishedAt,
   ];
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
@@ -376,39 +372,38 @@ function renderDashboard() {
     : `<div class="empty">No matches yet. New collabs are added every morning.</div>`;
 }
 
-// ---------- My Portfolio: block builder ----------
+// ---------- My Portfolio: module builder ----------
 
 const P = window.Portfolio;
-let site = store.get("cb_site");
+let site = P.migrate(store.get("cb_site"));
 let selectedId = null;
 const newId = () => Math.random().toString(36).slice(2, 10);
 const slugify = (s = "") => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-").slice(0, 40);
+const EMOJIS = ["😊", "😍", "🔥", "✨", "💯", "🙌", "❤️", "👍", "🙏", "🎉", "⭐", "📸", "🎥", "🎬", "💄", "👗", "👟", "🍲", "☕", "📱", "💻", "✈️", "🏖️", "💪", "🧘", "💰", "📈", "🤝", "🌸", "🌿", "🇮🇳", "📍"];
+const SIZES = [["14", "Small"], ["16", "Normal"], ["20", "Large"], ["26", "Extra large"], ["34", "Huge"]];
 
 // First visit: start from the sign-up details (and the older form, if it was used).
 function starterSite() {
   const old = portfolio || {};
   const name = old.displayName || (profile && profile.name) || "";
-  const place = [old.city || (profile && profile.city), old.languages || (profile && profile.language)].filter(Boolean).join(" · ");
   const ig = String(old.igHandle || (profile && profile.instagram) || "").replace(/^@/, "").trim();
   const block = (type, extra = {}) => ({ id: newId(), type, ...P.BLOCKS[type].make(), ...extra });
   return {
+    v: 2,
     theme: old.theme || "violet",
     slug: slugify(name),
     blocks: [
-      block("profile", { name, tagline: old.tagline || "", location: place, photo: old.photo || "" }),
-      block("text", { text: old.bio || "Write a few lines about you, what you create and who watches you." }),
-      block("socials", { links: [ig ? `https://www.instagram.com/${ig}/` : ""] }),
+      block("profile", { name, bio: old.tagline || "", photo: old.photo || "" }),
+      block("text", { html: old.bio ? P.esc(old.bio) : "" }),
+      block("socials", { items: ig ? [{ platform: "instagram", value: ig }] : [] }),
       block("stats", { items: [{ label: "Instagram followers", value: old.igFollowers || "" }, { label: "Average Reel views", value: old.avgViews || "" }] }),
-      block("instagram", { handle: ig, posts: ["", "", ""] }),
-      block("gallery"),
-      block("heading", { text: "Rates" }),
       block("rates", { items: [{ label: "Instagram Reel", price: old.rateReel || "" }, { label: "Story", price: old.rateStory || "" }], barter: !!old.openBarter }),
-      block("contact", { email: old.email || "", whatsapp: old.whatsapp || "" }),
     ],
   };
 }
 
 const findBlock = (id) => site.blocks.find((b) => b.id === id);
+const hasProfile = () => site.blocks.some((b) => b.type === "profile");
 
 function setPath(obj, path, value) {
   const keys = path.split(".");
@@ -419,16 +414,27 @@ function setPath(obj, path, value) {
 
 function saveSite({ changed = true } = {}) {
   if (changed) site.dirty = true;
-  store.set("cb_site", site);
+  const ok = store.set("cb_site", site);
+  if (ok === false) note("Your browser is out of space for this draft. Publish to keep big photos safe.", true);
   renderShareBar();
 }
 
 function renderCanvas() {
   el("canvas").innerHTML = P.renderPortfolio(site, { edit: true, selected: selectedId });
+  P.enhance(el("canvas"), { edit: true });
+  renderPalette();
 }
 
-let canvasTimer;
-const renderCanvasSoon = () => { clearTimeout(canvasTimer); canvasTimer = setTimeout(renderCanvas, 250); };
+// Redraws only one module, so the others (like an Instagram preview) don't reload.
+function renderOne(id) {
+  const b = findBlock(id);
+  const node = document.querySelector(`#canvas [data-block="${id}"]`);
+  if (!b || !node) return renderCanvas();
+  const tmp = document.createElement("div");
+  tmp.innerHTML = P.wrapBlock(b, true, selectedId);
+  node.replaceWith(tmp.firstElementChild);
+  P.enhance(el("canvas"), { edit: true });
+}
 
 function selectBlock(id) {
   selectedId = id;
@@ -438,8 +444,13 @@ function selectBlock(id) {
 }
 
 function insertBlock(type, index) {
+  if (P.BLOCKS[type].once && hasProfile()) {
+    const existing = site.blocks.find((b) => b.type === type);
+    return selectBlock(existing.id);
+  }
   const b = { id: newId(), type, ...P.BLOCKS[type].make() };
-  const at = index ?? (selectedId ? site.blocks.findIndex((x) => x.id === selectedId) + 1 : site.blocks.length);
+  // The profile header always goes first.
+  const at = type === "profile" ? 0 : index ?? (selectedId ? site.blocks.findIndex((x) => x.id === selectedId) + 1 : site.blocks.length);
   site.blocks.splice(at, 0, b);
   saveSite();
   renderCanvas();
@@ -466,71 +477,184 @@ function showPanel(name) {
 
 function renderPalette() {
   el("palette").innerHTML = Object.entries(P.BLOCKS)
-    .map(([type, d]) => `<button type="button" class="pal-item" draggable="true" data-add="${type}"><strong>${escapeHtml(d.name)}</strong><span>${escapeHtml(d.hint)}</span></button>`)
+    .map(([type, d]) => {
+      const off = d.once && hasProfile();
+      return `<button type="button" class="pal-item${off ? " off" : ""}" draggable="${!off}" data-add="${type}" ${off ? 'title="Already on your page. Click to edit it."' : ""}><strong>${escapeHtml(d.name)}</strong><span>${off ? "Already on your page" : escapeHtml(d.hint)}</span></button>`;
+    })
     .join("");
 }
 
 const field = (label, name, value, attrs = "") => `<label>${label}<input data-f="${name}" value="${escapeHtml(value ?? "")}" ${attrs}></label>`;
-const area = (label, name, value, rows = 4) => `<label>${label}<textarea data-f="${name}" rows="${rows}">${escapeHtml(value ?? "")}</textarea></label>`;
+const slider = (label, name, value, min, max, unit = "") => `<label class="slider">${label}<span class="slider-row"><input type="range" data-f="${name}" data-num min="${min}" max="${max}" value="${value}"><output>${value}${unit}</output></span></label>`;
 
 function renderEditPanel() {
   const b = selectedId && findBlock(selectedId);
   const panel = el("panel-edit");
   if (!b) {
-    panel.innerHTML = `<p class="fine">Click a block on your page to edit it. You can also type straight onto the page.</p>`;
+    panel.innerHTML = `<p class="fine">Click a module on your page to edit it, or add one from the Add tab.</p>`;
     return;
   }
-  const title = `<p class="panel-label">${escapeHtml(P.BLOCKS[b.type].name)}</p>`;
+  const title = `<p class="panel-label">${escapeHtml(P.BLOCKS[b.type] ? P.BLOCKS[b.type].name : "Module")}</p>`;
   const rows = (items, a, bKey, aLabel, bLabel) =>
     items.map((it, i) => `<div class="row-edit"><input data-f="items.${i}.${a}" value="${escapeHtml(it[a] ?? "")}" placeholder="${aLabel}" aria-label="${aLabel}"><input data-f="items.${i}.${bKey}" value="${escapeHtml(it[bKey] ?? "")}" placeholder="${bLabel}" aria-label="${bLabel}"><button type="button" class="x" data-del-row="${i}" aria-label="Remove row">✕</button></div>`).join("") +
     `<button type="button" class="btn small" data-add-row>+ Add row</button>`;
   let body = "";
   switch (b.type) {
     case "profile":
-      body = `<label>Photo<input type="file" accept="image/*" data-upload="photo"></label>${b.photo ? `<button type="button" class="link-btn" data-clear="photo">Remove photo</button>` : ""}` +
-        field("Name", "name", b.name) + field("One line about you", "tagline", b.tagline) + field("City and languages", "location", b.location);
-      break;
-    case "heading":
-      body = field("Heading", "text", b.text);
+      body = `<label>Profile photo<input type="file" accept="image/png,image/jpeg,image/webp" data-upload="photo"></label>` +
+        (b.photo
+          ? `<div class="crop-preview" style="border-radius:${b.radius ?? 50}%"><img src="${escapeHtml(P.safeMedia(b.photo))}" alt="" style="object-position:50% ${b.posY ?? 50}%;transform:scale(${(b.zoom ?? 100) / 100});transform-origin:50% ${b.posY ?? 50}%"></div>` +
+            slider("Zoom", "zoom", b.zoom ?? 100, 100, 250, "%") +
+            slider("Move up or down", "posY", b.posY ?? 50, 0, 100, "%") +
+            slider("Shape: square to circle", "radius", b.radius ?? 50, 0, 50, "") +
+            `<button type="button" class="link-btn" data-clear="photo">Remove photo</button>`
+          : "") +
+        field("Name", "name", b.name) +
+        `<label>Bio <span class="opt">Enter starts a new line</span><textarea data-f="bio" rows="4" placeholder="Skincare and makeup for Indian skin&#10;Pune · Hindi and English">${escapeHtml(b.bio || "")}</textarea></label>`;
       break;
     case "text":
-    case "brands":
-      body = area(b.type === "brands" ? "Brand names" : "Text", "text", b.text, 6);
+      body = `<div class="rte-bar" role="toolbar" aria-label="Text formatting">
+          <button type="button" data-cmd="bold" title="Bold" aria-label="Bold"><b>B</b></button>
+          <button type="button" data-cmd="italic" title="Italic" aria-label="Italic"><i>I</i></button>
+          <button type="button" data-cmd="normal" title="Normal text" aria-label="Normal text">Normal</button>
+          <select data-size aria-label="Text size"><option value="">Size</option>${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
+          <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
+        </div>
+        <div class="emoji-grid" hidden>${EMOJIS.map((e) => `<button type="button" data-emoji="${e}">${e}</button>`).join("")}</div>
+        <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here. Select words to make them bold, italic or bigger.">${P.cleanHtml(b.html || "")}</div>
+        <p class="fine">Select part of your text, then choose bold, italic or a size.</p>`;
       break;
-    case "socials":
-      body = `<p class="fine">Paste the full link to each profile. We show the right name automatically.</p>` +
-        (b.links || []).map((u, i) => `<div class="row-edit one"><input data-f="links.${i}" value="${escapeHtml(u)}" placeholder="https://www.instagram.com/yourname" inputmode="url"><button type="button" class="x" data-del-link="${i}" aria-label="Remove link">✕</button></div>`).join("") +
-        `<button type="button" class="btn small" data-add-link>+ Add link</button>`;
+    case "link": {
+      const missing = (v) => (!String(v || "").trim() ? `<span class="req">Required</span>` : "");
+      const badUrl = b.url && !P.safeUrl(b.url) ? `<span class="req">Check this address</span>` : "";
+      body = field(`Text ${missing(b.text)}`, "text", b.text, 'placeholder="Watch my latest campaign"') +
+        field(`Link ${missing(b.url) || badUrl}`, "url", b.url, 'placeholder="YouTube, PDF, Google Drive or any link" inputmode="url"') +
+        `<label>Image <span class="opt">optional</span><input type="file" accept="image/png,image/jpeg,image/webp" data-upload="image"></label>` +
+        (b.image
+          ? `<div class="seg wide" role="group" aria-label="Image side"><button type="button" data-side="left" class="${b.side !== "right" ? "active" : ""}">Image left</button><button type="button" data-side="right" class="${b.side === "right" ? "active" : ""}">Image right</button></div><button type="button" class="link-btn" data-clear="image">Remove image</button>`
+          : `<p class="fine">Without an image, the text is centred.</p>`);
       break;
-    case "instagram":
-      body = field("Instagram username", "handle", b.handle, 'placeholder="@yourname"') +
-        `<p class="fine">Paste links to 3 or 4 of your best posts or reels. On Instagram, tap ••• on a post, then Copy link.</p>` +
-        (b.posts || []).map((u, i) => `<input data-f="posts.${i}" value="${escapeHtml(u)}" placeholder="https://www.instagram.com/reel/…" inputmode="url" aria-label="Post link ${i + 1}">`).join("") +
-        ((b.posts || []).length < 4 ? `<button type="button" class="btn small" data-add-post>+ Add post</button>` : "");
-      break;
-    case "gallery":
-      body = `<label>Add photos or videos<input type="file" accept="image/*,video/*" multiple data-upload="gallery"></label>
-        <p class="fine">${Cloud.ready ? "Videos up to 50 MB each." : "Photos work now. Video uploads turn on after sharing is set up."}</p>
-        <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="">`}<button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}</div>`;
-      break;
+    }
     case "stats":
       body = rows(b.items || [], "label", "value", "e.g. Instagram followers", "e.g. 12400");
+      break;
+    case "file":
+      if (!b.kind) {
+        body = `<p class="fine">What do you want to add?</p><div class="choice">
+          <button type="button" data-kind="images"><strong>Images</strong><span>PNG or JPG, shown as a carousel</span></button>
+          <button type="button" data-kind="pdf"><strong>PDF</strong><span>A preview visitors can open and read</span></button></div>`;
+      } else if (b.kind === "images") {
+        body = `<label>Add photos<input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"></label>
+          <p class="fine">Select several at once. They show as a swipeable carousel.</p>
+          <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="">`}<button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}</div>`;
+      } else {
+        body = `<label>Add a PDF<input type="file" accept=".pdf,application/pdf" data-upload="pdf"></label>
+          <p class="fine">${Cloud.ready ? "Up to 50 MB. Visitors tap the preview to read it." : "PDF uploads turn on after sharing is set up."}</p>
+          ${(b.items || []).map((f, i) => `<div class="file-row"><span>📄 ${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}`;
+      }
+      if (b.kind && !(b.items || []).length) body += `<button type="button" class="link-btn" data-kind="">Change to ${b.kind === "pdf" ? "images" : "PDF"}</button>`;
+      break;
+    case "socials":
+      body = (b.items || []).map((it, i) => {
+        const p = P.platformById(it.platform);
+        return `<div class="social-row">${P.icon(p)}<label class="grow"><span class="sr">${escapeHtml(p.name)}</span><input data-f="items.${i}.value" value="${escapeHtml(it.value || "")}" placeholder="${escapeHtml(p.name)}: ${escapeHtml(p.hint)}"></label><button type="button" class="x" data-del-row="${i}" aria-label="Remove ${escapeHtml(p.name)}">✕</button></div>`;
+      }).join("") +
+        `<p class="panel-label">Add a platform</p>
+        <input type="search" data-search placeholder="Search Instagram, Facebook, Google Reviews…" aria-label="Search platforms">
+        <div class="platforms" id="platform-list">${platformButtons("")}</div>`;
       break;
     case "rates":
       body = rows(b.items || [], "label", "price", "e.g. Instagram Reel", "₹ price") +
         `<label class="check"><input type="checkbox" data-f="barter" ${b.barter ? "checked" : ""}> Open to barter collabs</label>`;
       break;
-    case "button":
-      body = field("Button text", "label", b.label) + field("Link", "url", b.url, 'placeholder="https://…" inputmode="url"');
-      break;
-    case "contact":
-      body = field("Email", "email", b.email, 'type="email"') + field("WhatsApp number", "whatsapp", b.whatsapp, 'inputmode="tel"');
+    case "instagram":
+      body = field("Instagram username", "handle", b.handle, 'placeholder="@yourname" autocapitalize="none"') +
+        `<p class="fine">Your account must be public. Instagram shows your photo, bio and latest posts; what appears is decided by Instagram.</p>`;
       break;
   }
   panel.innerHTML = `${title}<div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
+  if (b.type === "text") setupTextEditor(b);
 }
 
-// Shrinks a photo before it is uploaded or kept in the draft.
+function platformButtons(q) {
+  const s = q.trim().toLowerCase();
+  const list = P.PLATFORMS.filter((p) => !s || p.name.toLowerCase().includes(s) || p.id.includes(s));
+  return list.length
+    ? list.map((p) => `<button type="button" data-platform="${p.id}">${P.icon(p)}<span>${escapeHtml(p.name)}</span></button>`).join("")
+    : `<p class="fine">No match. Use "Website" for any other link.</p>`;
+}
+
+// ----- the text editor -----
+
+function setupTextEditor(b) {
+  const panel = el("panel-edit");
+  const editor = panel.querySelector(".rte");
+  let range = null;
+  const remember = () => {
+    const sel = getSelection();
+    if (sel.rangeCount && editor.contains(sel.anchorNode)) range = sel.getRangeAt(0).cloneRange();
+  };
+  const restore = () => {
+    editor.focus();
+    if (range) { const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+  };
+  const commit = () => {
+    b.html = P.cleanHtml(editor.innerHTML);
+    saveSite();
+    renderOne(b.id);
+  };
+  editor.addEventListener("input", commit);
+  editor.addEventListener("keyup", remember);
+  editor.addEventListener("mouseup", remember);
+  editor.addEventListener("blur", remember);
+  // Keep the text selection when the toolbar is clicked.
+  panel.querySelector(".rte-bar").addEventListener("mousedown", (e) => { if (e.target.closest("button")) e.preventDefault(); });
+  panel.querySelector(".emoji-grid").addEventListener("mousedown", (e) => e.preventDefault());
+
+  panel.querySelector(".rte-bar").addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    if (btn.dataset.emojiToggle !== undefined) {
+      const g = panel.querySelector(".emoji-grid");
+      g.hidden = !g.hidden;
+      return;
+    }
+    restore();
+    if (btn.dataset.cmd === "bold") document.execCommand("bold");
+    if (btn.dataset.cmd === "italic") document.execCommand("italic");
+    if (btn.dataset.cmd === "normal") document.execCommand("removeFormat");
+    remember();
+    commit();
+  });
+  panel.querySelector("[data-size]").addEventListener("change", (e) => {
+    const px = e.target.value;
+    e.target.value = "";
+    if (!px) return;
+    restore();
+    // The browser marks the selection with <font size="7">; we swap that for an exact size.
+    document.execCommand("styleWithCSS", false, false);
+    document.execCommand("fontSize", false, "7");
+    editor.querySelectorAll('font[size="7"]').forEach((f) => {
+      const span = document.createElement("span");
+      span.style.fontSize = `${px}px`;
+      span.append(...f.childNodes);
+      f.replaceWith(span);
+    });
+    remember();
+    commit();
+  });
+  panel.querySelector(".emoji-grid").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-emoji]");
+    if (!btn) return;
+    restore();
+    document.execCommand("insertText", false, btn.dataset.emoji);
+    remember();
+    commit();
+  });
+}
+
+// ----- uploads -----
+
 function shrinkImage(file, max) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -550,16 +674,18 @@ function shrinkImage(file, max) {
 
 const blobToDataUrl = (blob) => new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(blob); });
 
-async function uploadFile(file, maxSide) {
-  const isVideo = file.type.startsWith("video/");
-  if (isVideo) {
-    if (!Cloud.ready) throw new Error("Video uploads turn on after sharing is set up.");
-    return { type: "video", url: await Cloud.upload(file) };
-  }
+async function uploadImage(file, maxSide) {
+  if (!/^image\/(png|jpe?g|webp)$/.test(file.type)) throw new Error("Please choose a PNG or JPG image.");
+  // Before sharing is set up, small copies are kept in this browser's draft.
+  if (!Cloud.ready) return blobToDataUrl(await shrinkImage(file, Math.min(maxSide, 900)));
   const blob = await shrinkImage(file, maxSide);
-  if (!Cloud.ready) return { type: "image", url: await blobToDataUrl(await shrinkImage(file, Math.min(maxSide, 900))) };
-  const named = new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" });
-  return { type: "image", url: await Cloud.upload(named) };
+  return Cloud.upload(new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", { type: "image/jpeg" }));
+}
+
+async function uploadPdf(file) {
+  if (!/\.pdf$/i.test(file.name) || (file.type && file.type !== "application/pdf")) throw new Error("Please choose a .pdf file.");
+  if (!Cloud.ready) throw new Error("PDF uploads turn on after sharing is set up.");
+  return Cloud.upload(file);
 }
 
 function note(text, isError) {
@@ -574,45 +700,77 @@ function setupPanel() {
   const panel = el("panel-edit");
   panel.addEventListener("input", (e) => {
     const b = findBlock(selectedId);
+    if (!b) return;
+    if (e.target.dataset.search !== undefined) {
+      el("platform-list").innerHTML = platformButtons(e.target.value);
+      return;
+    }
     const f = e.target.dataset.f;
-    if (!b || !f) return;
-    setPath(b, f, e.target.type === "checkbox" ? e.target.checked : e.target.value);
+    if (!f) return;
+    const v = e.target.type === "checkbox" ? e.target.checked : e.target.dataset.num !== undefined ? Number(e.target.value) : e.target.value;
+    setPath(b, f, v);
+    if (e.target.type === "range") {
+      e.target.nextElementSibling.textContent = `${v}${f === "radius" ? "" : "%"}`;
+      const prev = panel.querySelector(".crop-preview");
+      if (prev) {
+        prev.style.borderRadius = `${b.radius}%`;
+        const img = prev.querySelector("img");
+        img.style.objectPosition = `50% ${b.posY}%`;
+        img.style.transform = `scale(${b.zoom / 100})`;
+        img.style.transformOrigin = `50% ${b.posY}%`;
+      }
+    }
     saveSite();
-    renderCanvasSoon();
+    renderOne(b.id);
+    // Show or hide "Required" hints without moving the cursor.
+    if (b.type === "link") {
+      panel.querySelectorAll("label").forEach((l) => {
+        const input = l.querySelector('[data-f="text"],[data-f="url"]');
+        if (!input) return;
+        let req = l.querySelector(".req");
+        const msg = !input.value.trim() ? "Required" : input.dataset.f === "url" && !P.safeUrl(input.value) ? "Check this address" : "";
+        if (msg && !req) { req = document.createElement("span"); req.className = "req"; input.before(req); }
+        if (req) { if (msg) req.textContent = msg; else req.remove(); }
+      });
+    }
   });
   panel.addEventListener("click", (e) => {
     const b = findBlock(selectedId);
-    if (!b) return;
     const t = e.target.closest("button");
-    if (!t) return;
+    if (!b || !t) return;
     if (t.dataset.addRow !== undefined) b.items.push({});
     else if (t.dataset.delRow !== undefined) b.items.splice(Number(t.dataset.delRow), 1);
-    else if (t.dataset.addLink !== undefined) b.links.push("");
-    else if (t.dataset.delLink !== undefined) b.links.splice(Number(t.dataset.delLink), 1);
-    else if (t.dataset.addPost !== undefined) b.posts.push("");
     else if (t.dataset.delItem !== undefined) b.items.splice(Number(t.dataset.delItem), 1);
     else if (t.dataset.clear) b[t.dataset.clear] = "";
+    else if (t.dataset.kind !== undefined) b.kind = t.dataset.kind;
+    else if (t.dataset.side) b.side = t.dataset.side;
+    else if (t.dataset.platform) b.items.push({ platform: t.dataset.platform, value: "" });
     else return;
     saveSite();
-    renderCanvas();
+    renderOne(b.id);
     renderEditPanel();
+    if (t.dataset.platform) {
+      const inputs = panel.querySelectorAll('.social-row input');
+      if (inputs.length) inputs[inputs.length - 1].focus();
+    }
   });
   panel.addEventListener("change", async (e) => {
     const input = e.target;
     if (!input.dataset.upload || !input.files.length) return;
     const b = findBlock(selectedId);
     const files = [...input.files];
+    const kind = input.dataset.upload;
     note(`Uploading ${files.length > 1 ? `${files.length} files` : "your file"}…`);
     try {
       for (const file of files) {
-        const media = await uploadFile(file, input.dataset.upload === "photo" ? 600 : 1600);
-        if (input.dataset.upload === "photo") b.photo = media.url;
-        else b.items.push(media);
+        if (kind === "photo") { b.photo = await uploadImage(file, 600); b.zoom = 100; b.posY = 50; }
+        else if (kind === "image") b.image = await uploadImage(file, 800);
+        else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name });
+        else if (kind === "pdf") b.items.push({ type: "pdf", url: await uploadPdf(file), name: file.name });
       }
       saveSite();
-      renderCanvas();
+      renderOne(b.id);
       renderEditPanel();
-      note("");
     } catch (err) {
       note(err.message || "Upload failed. Please try again.", true);
     }
@@ -651,23 +809,22 @@ function setupCanvas() {
     if (selectedId !== id) selectBlock(id);
   });
 
-  // Typing straight onto the page.
+  // Typing straight onto the page (name, bio, numbers, rates).
   canvas.addEventListener("input", (e) => {
     const f = e.target.dataset && e.target.dataset.edit;
     const block = e.target.closest(".pb-editable");
     if (!f || !block) return;
-    setPath(findBlock(block.dataset.block), f, e.target.innerText.replace(/\n$/, ""));
+    const b = findBlock(block.dataset.block);
+    setPath(b, f, e.target.innerText.replace(/\n$/, ""));
     saveSite();
-  });
-  canvas.addEventListener("focusout", (e) => {
-    if (e.target.dataset && e.target.dataset.edit && selectedId) renderEditPanel();
+    // Keep the panel in step with what's typed on the page.
+    const twin = el("panel-edit").querySelector(`[data-f="${f}"]`);
+    if (twin && twin !== document.activeElement) twin.value = e.target.innerText.replace(/\n$/, "");
   });
 
-  // Drag and drop: new blocks from the palette, or existing ones by their handle.
   const line = document.createElement("div");
   line.className = "drop-line";
   let dropIndex = null;
-
   const indexAt = (y) => {
     const blocks = [...canvas.querySelectorAll(".pb-editable")];
     for (let i = 0; i < blocks.length; i++) {
@@ -680,8 +837,10 @@ function setupCanvas() {
   document.addEventListener("dragstart", (e) => {
     const pal = e.target.closest && e.target.closest("[data-add]");
     const grip = e.target.closest && e.target.closest(".pb-grip");
-    if (pal) e.dataTransfer.setData("text/plain", `new:${pal.dataset.add}`);
-    else if (grip) {
+    if (pal) {
+      if (pal.classList.contains("off")) return e.preventDefault();
+      e.dataTransfer.setData("text/plain", `new:${pal.dataset.add}`);
+    } else if (grip) {
       const block = grip.closest(".pb-editable");
       e.dataTransfer.setData("text/plain", `move:${block.dataset.block}`);
       e.dataTransfer.setDragImage(block, 20, 20);
@@ -693,7 +852,6 @@ function setupCanvas() {
     line.remove();
     canvas.querySelectorAll(".pb-dragging").forEach((b) => b.classList.remove("pb-dragging"));
   });
-
   canvas.addEventListener("dragover", (e) => {
     e.preventDefault();
     dropIndex = indexAt(e.clientY);
@@ -739,9 +897,7 @@ function renderShareBar() {
   });
 }
 
-function validSlug(s) {
-  return /^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
-}
+const validSlug = (s) => /^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
 
 async function publish() {
   const btn = el("pf-publish");
@@ -779,16 +935,14 @@ async function publish() {
 
 async function setupPortfolio() {
   if (!site) site = starterSite();
-  // A published portfolio on this device's login wins over an empty draft.
   if (Cloud.ready && !site.publishedAt) {
     try {
       const mine = await Cloud.loadMine();
-      if (mine) site = { ...mine.data, slug: mine.slug, publishedAt: mine.updated_at, dirty: false };
+      if (mine) site = { ...P.migrate(mine.data), slug: mine.slug, publishedAt: mine.updated_at, dirty: false };
     } catch { /* offline: keep the draft */ }
   }
   saveSite({ changed: false });
 
-  renderPalette();
   renderCanvas();
   renderEditPanel();
   setupCanvas();

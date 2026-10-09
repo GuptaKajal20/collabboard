@@ -28,9 +28,9 @@ drop policy if exists "Owners delete their portfolio" on public.portfolios;
 create policy "Owners delete their portfolio" on public.portfolios
   for delete to authenticated using (owner = auth.uid());
 
--- Photos and videos: public to view, 50 MB per file, images and videos only.
+-- Photos, videos and PDFs: public to view, 50 MB per file.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('portfolio-media', 'portfolio-media', true, 52428800, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm'])
+values ('portfolio-media', 'portfolio-media', true, 52428800, array['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'video/mp4', 'video/quicktime', 'video/webm', 'application/pdf'])
 on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
 
 drop policy if exists "Media is public" on storage.objects;
