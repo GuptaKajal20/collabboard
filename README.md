@@ -16,7 +16,7 @@ Free platform for influencers and content creators in India: discover brand coll
 ## Update the website
 
 1. Edit `site/content.mjs` (features, FAQs, steps, menus, site URL, GA4 ID, Search Console code).
-2. Run `npm run build` to regenerate the pages, `sitemap.xml`, `robots.txt` and `cp-config.js`.
+2. Run `npm run site` to regenerate the pages, `sitemap.xml`, `robots.txt` and `cp-config.js`.
 3. Commit and push. Vercel deploys automatically.
 
 ## Run locally

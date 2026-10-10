@@ -1,5 +1,5 @@
 // Everything the website says about Collab Pro lives here: settings, menus, features,
-// steps and FAQs. Edit this file, run `npm run build`, and every page updates.
+// steps and FAQs. Edit this file, run `npm run site`, and every page updates.
 
 export const SITE = {
   name: "Collab Pro",

@@ -5,7 +5,7 @@
   "scripts": {
     "fetch": "node scripts/fetch-listings.mjs",
     "test": "node scripts/fetch-listings.mjs --fixture scripts/fixture.json",
-    "build": "node site/build.mjs",
-    "serve": "node site/serve.mjs"
+    "serve": "node site/serve.mjs",
+    "site": "node site/build.mjs"
   }
 }

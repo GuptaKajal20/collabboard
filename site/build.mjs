@@ -1,5 +1,5 @@
 // Builds the Collab Pro website pages (plain HTML, ready for search engines) from
-// site/content.mjs. Run: npm run build. Output goes to the project root.
+// site/content.mjs. Run: npm run site. Output goes to the project root.
 
 import { writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -662,6 +662,6 @@ ${PAGES.map((p) => `  <url><loc>${abs(p.path)}</loc><lastmod>${today}</lastmod><
 </urlset>
 `;
 await writeFile(join(ROOT, "sitemap.xml"), sitemap);
-await writeFile(join(ROOT, "cp-config.js"), `// Generated from site/content.mjs by npm run build.\nwindow.CP_CONFIG = ${JSON.stringify({ ga4Id: SITE.ga4Id })};\n`);
+await writeFile(join(ROOT, "cp-config.js"), `// Generated from site/content.mjs by npm run site.\nwindow.CP_CONFIG = ${JSON.stringify({ ga4Id: SITE.ga4Id })};\n`);
 await writeFile(join(ROOT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${SITE.url}/sitemap.xml\n`);
 console.log(`Built ${pages.length} pages, sitemap.xml and robots.txt`);
