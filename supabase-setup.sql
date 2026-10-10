@@ -68,3 +68,20 @@ create policy "Owners add their data" on public.creator_state
 drop policy if exists "Owners update their data" on public.creator_state;
 create policy "Owners update their data" on public.creator_state
   for update to authenticated using (owner = auth.uid()) with check (owner = auth.uid());
+
+-- Contact form messages from the website. Anyone can send one; nobody can read them
+-- through the website (view them in Supabase → Table Editor → contact_messages).
+create table if not exists public.contact_messages (
+  id bigint generated always as identity primary key,
+  name text not null check (char_length(name) between 1 and 120),
+  email text not null check (char_length(email) between 3 and 200),
+  topic text check (char_length(topic) <= 60),
+  message text not null check (char_length(message) between 1 and 5000),
+  created_at timestamptz not null default now()
+);
+
+alter table public.contact_messages enable row level security;
+
+drop policy if exists "Anyone can send a message" on public.contact_messages;
+create policy "Anyone can send a message" on public.contact_messages
+  for insert to anon, authenticated with check (true);

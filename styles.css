@@ -89,7 +89,10 @@ h2 { font-size: 18px; margin: 0; font-weight: 600; }
 h3 { font-size: 16px; margin: 0; font-weight: 600; }
 .sub { margin: 0 0 24px; color: var(--muted); }
 .logo { font-weight: 600; font-size: 18px; color: var(--text); text-decoration: none; }
-.logo span { color: var(--accent); }
+.logo { display: inline-flex; align-items: center; gap: 8px; }
+.logo img { border-radius: 8px; flex: none; }
+.logo span { font-family: Sora, Inter, sans-serif; font-weight: 700; letter-spacing: -0.02em; color: var(--text); }
+.logo b { margin-left: 4px; padding: 0 7px 1px; border-radius: 999px; background: var(--cta-bg); color: var(--cta-text); font-size: 13px; vertical-align: 2px; }
 .link { color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; }
 .link-btn { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; text-decoration: underline; }
 .opt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }

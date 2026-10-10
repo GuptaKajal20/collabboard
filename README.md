@@ -1,32 +1,34 @@
-# CollabBoard
+# Collab Pro
 
-A free board of brand collaboration opportunities for Indian creators. Every morning a script searches the web (Tavily Search API), removes scams, junk and old posts, tags each result, and saves `data/listings.json`. The website reads that file. No login, no database, no admin.
+Free platform for influencers and content creators in India: discover brand collaboration openings every day and build a shareable portfolio.
 
-## Files
+## What's where
 
-| File | What it does |
+| Path | What it is |
 | --- | --- |
-| `index.html`, `styles.css`, `app.js` | The website: filters, cards, Apply button |
-| `scripts/fetch-listings.mjs` | Searches, cleans and tags listings |
-| `data/listings.json` | The listings the website shows |
-| `.github/workflows/fetch-listings.yml` | Runs the script every day at 7:00 IST |
+| `/` and the other website pages | Generated from `site/content.mjs` by `site/build.mjs`; styles in `site.css`, behaviour in `site.js` |
+| `/signup`, `/signin`, `/forgot-password`, `/reset-password` | Account pages (`site-auth.js`), kept out of search |
+| `/app` | The creator app (`app.html`, `app.js`, `styles.css`) |
+| `/p/<name>` | Public portfolio pages (`p.html`, `portfolio.js`, `portfolio.css`) |
+| `scripts/fetch-listings.mjs` | Daily search for collaboration openings (GitHub Action, Tavily) |
+| `supabase-setup.sql` | Database, storage and security rules. Safe to run again. |
 
-## Go live (about 20 minutes)
+## Update the website
 
-1. **Get a Tavily key:** sign up free at https://tavily.com (no card needed) and copy your API key.
-2. **Put the code on GitHub:** create a new repository and upload this `collabboard` folder.
-3. **Add the key:** in the repository, go to Settings → Secrets and variables → Actions → New repository secret. Name it `TAVILY_API_KEY` and paste the key.
-4. **Fill it for the first time:** go to the Actions tab → "Fetch listings" → Run workflow.
-5. **Publish the site:** sign in to https://vercel.com (or Netlify) with GitHub, import the repository, and deploy. No settings needed. Every daily update redeploys the site automatically.
+1. Edit `site/content.mjs` (features, FAQs, steps, menus, site URL, GA4 ID, Search Console code).
+2. Run `npm run build` to regenerate the pages, `sitemap.xml`, `robots.txt` and `cp-config.js`.
+3. Commit and push. Vercel deploys automatically.
 
-## Run on your computer
+## Run locally
 
 ```bash
-npm test                                # offline test with sample data
-python3 -m http.server 8080             # then open http://localhost:8080/?test=1
-TAVILY_API_KEY=your_key npm run fetch    # real search, updates data/listings.json
+npm run serve          # http://localhost:8766 (clean URLs like Vercel)
 ```
 
-## Change what it finds
+Open `http://localhost:8766/app?offline` to try the app without an account.
 
-Edit the lists at the top of `scripts/fetch-listings.mjs`: `QUERIES` (what to search), `SCAM_WORDS` and `NOISE_WORDS` (what to drop), and `NICHES` (how listings are tagged).
+## Analytics and Search Console
+
+- Put the GA4 measurement ID in `SITE.ga4Id` and rebuild. Analytics loads only after a visitor accepts the cookie notice.
+- Tracked events: `sign_up_click`, `sign_up`, `login`, `profile_complete`, `collab_apply`, `portfolio_publish`, `contact_submit`.
+- For Search Console, add the HTML-tag verification code to `SITE.searchConsoleVerification`, rebuild, verify, then submit `/sitemap.xml`.

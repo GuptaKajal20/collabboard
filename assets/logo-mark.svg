@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Collab Pro">
+  <defs>
+    <linearGradient id="cp-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7C5CFF"/>
+      <stop offset="0.55" stop-color="#E04FD3"/>
+      <stop offset="1" stop-color="#FF9F43"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#cp-g)"/>
+  <circle cx="25" cy="36" r="11.5" fill="none" stroke="#fff" stroke-width="5"/>
+  <path d="M33.2 27.9A11.5 11.5 0 1 1 30.1 43.6" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M48 8.5l2.1 5.4 5.4 2.1-5.4 2.1L48 23.5l-2.1-5.4-5.4-2.1 5.4-2.1z" fill="#fff"/>
+</svg>

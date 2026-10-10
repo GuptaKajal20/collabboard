@@ -1,217 +1,353 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-IN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>CollabBoard</title>
-  <meta name="description" content="Find brand collaborations and build your creator portfolio. Free for Indian creators.">
+  <title>Collab Pro: Find brand collaborations and build your free creator portfolio</title>
+  <meta name="description" content="Collab Pro helps influencers and content creators in India discover brand collaboration opportunities every day and build a free, shareable portfolio, all in one place.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://collabboard-blush.vercel.app/">
+  <meta name="theme-color" content="#0c0a1d">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Collab Pro">
+  <meta property="og:locale" content="en_IN">
+  <meta property="og:title" content="Collab Pro: Find brand collaborations and build your free creator portfolio">
+  <meta property="og:description" content="Collab Pro helps influencers and content creators in India discover brand collaboration opportunities every day and build a free, shareable portfolio, all in one place.">
+  <meta property="og:url" content="https://collabboard-blush.vercel.app/">
+  <meta property="og:image" content="https://collabboard-blush.vercel.app/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Collab Pro: find brand collabs and build your portfolio, free">
+  <meta name="twitter:card" content="summary_large_image">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="portfolio.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Collab Pro","url":"https://collabboard-blush.vercel.app","logo":"https://collabboard-blush.vercel.app/assets/logo-mark.svg","description":"Collab Pro is a free platform for influencers and content creators in India: discover brand collaboration opportunities every day and build a professional portfolio you can share with brands."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Collab Pro","url":"https://collabboard-blush.vercel.app","inLanguage":"en-IN","description":"Collab Pro is a free platform for influencers and content creators in India: discover brand collaboration opportunities every day and build a professional portfolio you can share with brands."}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Collab Pro free?","acceptedAnswer":{"@type":"Answer","text":"Yes. Creating an account, discovering collaborations and building and publishing your portfolio are free. There are no paid plans right now."}},{"@type":"Question","name":"Where do the collaboration openings come from?","acceptedAnswer":{"@type":"Answer","text":"Every morning Collab Pro searches the public web for brand collaboration openings: brand application forms, public posts and creator calls. We collect them in one feed and link to the original source."}},{"@type":"Question","name":"Are the openings verified?","acceptedAnswer":{"@type":"Answer","text":"Not yet. Openings are found automatically and are not checked by a person. Always read the original post, and never pay a brand or agency to join a campaign."}},{"@type":"Question","name":"Do you take a commission on deals?","acceptedAnswer":{"@type":"Answer","text":"No. You apply directly on the brand's own post or form. Collab Pro is not part of the deal and does not handle payments."}},{"@type":"Question","name":"Do I need a minimum number of followers?","acceptedAnswer":{"@type":"Answer","text":"No. Collab Pro is for creators of every size. When an opening states a follower minimum, we show it so you can filter for openings that fit you."}},{"@type":"Question","name":"What can I add to my portfolio?","acceptedAnswer":{"@type":"Answer","text":"A profile header with your photo, text with formatting, links, numbers like followers and views, image carousels, PDFs such as a media kit, social links, your rates, and a live preview of your Instagram, Facebook, YouTube or LinkedIn."}}]}</script>
+  <script>document.documentElement.classList.add("js");if(location.hash.startsWith("#/"))location.replace("/app"+location.hash);</script>
+  <script src="/cp-config.js"></script>
 </head>
-<body>
-  <!-- Sign-up: shown until the creator has a profile -->
-  <div id="onboarding" class="onboarding" hidden>
-    <div class="onb-intro">
-      <a class="logo" href="./">Collab<span>Board</span></a>
-      <h1>Find brand collabs and build your portfolio, free</h1>
-      <p>We search the web every day for Indian brands looking for creators. Tell us about you and we'll show the ones that fit.</p>
-      <ul class="onb-points">
-        <li>Fresh collab openings every morning</li>
-        <li>Filter by niche, paid or barter, and your follower count</li>
-        <li>A portfolio page with its own link to share with brands</li>
+<body class="home">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap nav-wrap">
+    <a class="brand" href="/" aria-label="Collab Pro home">
+  <img src="/assets/logo-mark.svg" alt="" width="34" height="34">
+  <span class="wordmark">collab<span>pro</span></span>
+</a>
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul><li><a href="/discover-collaborations">Discover collabs</a></li><li><a href="/creator-portfolio">Portfolio</a></li><li><a href="/features">Features</a></li><li><a href="/how-it-works">How it works</a></li><li><a href="/faq">FAQ</a></li></ul>
+      <div class="nav-cta">
+        <a class="btn btn-ghost" href="/signin">Sign in</a>
+        <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
+      </div>
+    </nav>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span><span></span></button>
+  </div>
+</header>
+<main id="main">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow" data-reveal><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg> For influencers and content creators</p>
+      <h1 data-reveal>Find brand collabs.<br><span class="grad">Build your portfolio.</span><br>All in one place.</h1>
+      <p class="lead" data-reveal>Collab Pro collects fresh brand collaboration openings from across the web every morning and gives you a free portfolio builder, so you can find the right deals and pitch with a link brands love to open.</p>
+      <div class="cta-row" data-reveal>
+        <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="hero">Sign up free</a>
+        <a class="btn btn-ghost btn-lg" href="/signin">Sign in</a>
+      </div>
+      <ul class="hero-points" data-reveal><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> Free portfolio</li><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> No commission</li><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> Works on any phone</li></ul>
+    </div>
+    <div class="hero-visual" aria-label="Product preview: a creator portfolio next to brand collaboration openings" role="img">
+  <div class="hv-glow" aria-hidden="true"></div>
+  <div class="hv-portfolio float-a"><div class="mock-portfolio theme-violet" >
+  <span class="tag-example">Product preview</span>
+  <div class="mp-head">
+    <div class="mp-avatar" aria-hidden="true">Y</div>
+    <div>
+      <p class="mp-name">Your name</p>
+      <p class="mp-bio">Skincare and everyday makeup for Indian skin</p>
+    </div>
+  </div>
+  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
+  <div class="mp-stats"><div><strong>12.4k</strong><span>Instagram followers</span></div><div><strong>8k</strong><span>Avg Reel views</span></div></div>
+  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
+  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹5,000</strong></li><li><span>Story</span><strong>₹1,500</strong></li></ul>
+</div></div>
+  <div class="hv-collabs">
+    <div class="float-b"><div class="mock-collab">
+  <div class="mc-top"><span>Instagram · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
+  <p>Skincare brand looking for Reels creators</p>
+  <div class="mc-tags"><span class="t paid">Paid</span><span class="t">Instagram</span></div>
+  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
+</div></div>
+    <div class="float-c"><div class="mock-collab">
+  <div class="mc-top"><span>Google Form · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
+  <p>Café in Pune inviting food creators</p>
+  <div class="mc-tags"><span class="t barter">Barter</span><span class="t">Instagram</span></div>
+  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
+</div></div>
+    <div class="float-d"><div class="mock-collab">
+  <div class="mc-top"><span>LinkedIn · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
+  <p>D2C fashion label wants UGC videos</p>
+  <div class="mc-tags"><span class="t paid">Paid</span><span class="t">Instagram</span></div>
+  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
+</div></div>
+  </div>
+</div>
+  </div>
+</section>
+
+<section class="section" id="problem">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>The problem</p>
+    <h2 class="h2" data-reveal>Creators spend more time searching than creating.</h2>
+    <div class="cards-3"><article class="card" data-reveal><h3>Openings are scattered</h3><p>Brand calls are spread across apps, Instagram stories, LinkedIn posts, Telegram groups and Google Forms. Finding them means checking everywhere, every day.</p></article><article class="card" data-reveal><h3>Hard to tell paid from barter</h3><p>Many offers are product-only barter deals, and small creators also see fake collaboration offers. It&#39;s slow to sort what&#39;s worth applying to.</p></article><article class="card" data-reveal><h3>Portfolios live somewhere else</h3><p>Brands ask for a media kit or portfolio, so creators build one in a design tool or website builder, separately from where they find work.</p></article></div>
+  </div>
+</section>
+
+<section class="section alt" id="solution">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow" data-reveal>Our solution</p>
+      <h2 class="h2" data-reveal>One home for your creator workflow.</h2>
+      <p class="lead" data-reveal>Collab Pro brings discovery, tracking and your portfolio together. Find an opening, apply at the source, track it, and send your portfolio link, without switching between five apps.</p>
+      <ul class="ticks" data-reveal>
+        <li><svg class="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg> A daily feed of brand openings, filtered for you</li>
+        <li><svg class="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg> Saved and Applied lists that stay in sync on every device</li>
+        <li><svg class="ic" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 9h17M9 9v11.5"/></svg> A drag-and-drop portfolio with your own public link</li>
       </ul>
     </div>
-    <div class="onb-card">
-      <div class="onb-switch" id="auth-switch" role="tablist" hidden>
-        <button type="button" data-auth="signup" class="active" role="tab">Sign up</button>
-        <button type="button" data-auth="login" role="tab">Log in</button>
-      </div>
-
-      <form id="signup" class="onb-form" novalidate>
-        <h2>Create your profile</h2>
-        <label>Your name<input name="name" required autocomplete="name" placeholder="Riya Sharma"></label>
-        <div class="account-fields" hidden>
-          <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com"></label>
-          <label>Password <span class="opt">at least 8 characters</span><input name="password" type="password" autocomplete="new-password" minlength="8"></label>
-        </div>
-        <label>Instagram handle <span class="opt">optional</span><input name="instagram" placeholder="@riyacreates"></label>
-        <label>Main niche
-          <select name="niche" required></select>
-        </label>
-        <label>Followers on your biggest platform
-          <select name="followers" required></select>
-        </label>
-        <div class="two">
-          <label>City<input name="city" placeholder="Pune"></label>
-          <label>Language
-            <select name="language"></select>
-          </label>
-        </div>
-        <p class="form-error" id="signup-error" hidden></p>
-        <button class="btn primary" type="submit">Create my profile</button>
-        <p class="fine" id="signup-fine">No password needed. Your details stay on this device.</p>
-      </form>
-
-      <form id="login" class="onb-form" novalidate hidden>
-        <h2>Welcome back</h2>
-        <label>Email<input name="email" type="email" autocomplete="email" placeholder="you@email.com"></label>
-        <label>Password<input name="password" type="password" autocomplete="current-password"></label>
-        <p class="form-error" id="login-error" hidden></p>
-        <button class="btn primary" type="submit">Log in</button>
-        <button class="link-btn" id="forgot" type="button">Forgot your password?</button>
-      </form>
-
-      <form id="newpass" class="onb-form" novalidate hidden>
-        <h2>Set a new password</h2>
-        <label>New password <span class="opt">at least 8 characters</span><input name="password" type="password" autocomplete="new-password" minlength="8"></label>
-        <p class="form-error" id="newpass-error" hidden></p>
-        <button class="btn primary" type="submit">Save password</button>
-      </form>
-
-      <p class="form-ok" id="auth-note" hidden></p>
+    <div class="flow" data-reveal aria-hidden="true">
+      <div class="flow-node"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg><span>Discover</span></div><div class="flow-line"></div>
+      <div class="flow-node"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg><span>Apply</span></div><div class="flow-line"></div>
+      <div class="flow-node"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg><span>Track</span></div><div class="flow-line"></div>
+      <div class="flow-node"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Share portfolio</span></div>
     </div>
   </div>
+</section>
 
-  <!-- Main app: left menu + pages -->
-  <div id="app" class="app" hidden>
-    <aside class="side">
-      <div class="side-top">
-        <a class="logo" href="#/dashboard">Collab<span>Board</span></a>
-        <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Close menu" aria-expanded="true" title="Close menu">«</button>
-      </div>
-      <nav class="menu" aria-label="Main menu">
-        <a href="#/dashboard" data-page="dashboard">Dashboard</a>
-        <a href="#/collabs" data-page="collabs">Find Collabs</a>
-        <a href="#/portfolio" data-page="portfolio">My Portfolio</a>
-      </nav>
-      <div class="side-foot">
-        <span id="side-name"></span>
-        <button class="link-btn" id="reset" type="button">Reset profile</button>
-        <button class="link-btn" id="logout" type="button" hidden>Log out</button>
-      </div>
-    </aside>
-
-    <main class="main">
-      <button class="menu-open" id="menu-open" type="button" aria-label="Open menu" hidden><span aria-hidden="true">☰</span> Menu</button>
-      <!-- Dashboard -->
-      <section class="page" id="page-dashboard">
-        <h1 id="hello"></h1>
-        <p class="sub">Here's what's new for you today.</p>
-        <div class="stats">
-          <a class="stat" href="#/collabs"><span class="stat-num" id="stat-matches">0</span><span class="stat-label">collabs that fit you</span></a>
-          <a class="stat" href="#/collabs/saved"><span class="stat-num" id="stat-saved">0</span><span class="stat-label">saved for later</span></a>
-          <a class="stat" href="#/collabs/applied"><span class="stat-num" id="stat-applied">0</span><span class="stat-label">applied</span></a>
-          <a class="stat" href="#/portfolio"><span class="stat-num" id="stat-portfolio">0%</span><span class="stat-label">portfolio complete</span></a>
-        </div>
-        <div class="section-head">
-          <h2>Best matches for you</h2>
-          <a href="#/collabs" class="link">See all collabs</a>
-        </div>
-        <div class="grid" id="dash-grid"></div>
-        <div class="callout" id="portfolio-callout">
-          <div>
-            <h3>Finish your portfolio</h3>
-            <p>Brands ask for a media kit before they reply. Build yours in a few minutes.</p>
-          </div>
-          <a class="btn primary" href="#/portfolio">Build portfolio</a>
-        </div>
-      </section>
-
-      <!-- Find Collabs -->
-      <section class="page" id="page-collabs">
-        <h1>Find Collabs</h1>
-        <p class="sub">Brand collaboration openings found on the web every morning. <span id="updated"></span></p>
-        <div class="tabs" role="tablist" aria-label="Show">
-          <button type="button" role="tab" data-view="all" class="active">All</button>
-          <button type="button" role="tab" data-view="saved">Saved <span class="tab-count" id="count-saved">0</span></button>
-          <button type="button" role="tab" data-view="applied">Applied <span class="tab-count" id="count-applied">0</span></button>
-        </div>
-        <div class="filters" aria-label="Filters">
-          <input id="q" type="search" placeholder="Search brand, niche or keyword" aria-label="Search">
-          <select id="niche" aria-label="Niche"><option value="">All niches</option></select>
-          <select id="pay" aria-label="Payment">
-            <option value="">Paid or barter</option>
-            <option value="paid">Paid only</option>
-            <option value="Barter">Barter only</option>
-          </select>
-          <select id="source" aria-label="Source"><option value="">All sources</option></select>
-          <select id="followers" aria-label="Your followers"></select>
-        </div>
-        <p class="notice">Listings are found automatically and not checked by a person. Never pay a brand to join a campaign.</p>
-        <p class="count" id="count"></p>
-        <div class="grid" id="grid" aria-live="polite"></div>
-        <nav class="pager" id="pager" aria-label="Pages"></nav>
-      </section>
-
-      <!-- My Portfolio -->
-      <section class="page" id="page-portfolio">
-        <div class="pf-top">
-          <div>
-            <h1>My Portfolio</h1>
-            <p class="sub">Add modules, type straight onto the page, then publish and share your link with brands.</p>
-          </div>
-          <div class="pf-actions">
-            <div class="seg" role="group" aria-label="Preview size">
-              <button type="button" data-device="desktop" class="active" aria-pressed="true" aria-label="Desktop preview" title="Desktop preview"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></button>
-              <button type="button" data-device="mobile" aria-pressed="false" aria-label="Mobile preview" title="Mobile preview"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></button>
-            </div>
-            <button type="button" class="btn" id="pf-preview" title="Open full-screen preview in a new tab">Preview <span aria-hidden="true">↗</span></button>
-            <button type="button" class="btn primary" id="pf-publish">Publish</button>
-          </div>
-        </div>
-        <div class="pf-share" id="pf-share" hidden></div>
-        <div class="builder">
-          <div class="canvas-wrap">
-            <div class="canvas" id="canvas" data-device="desktop"></div>
-          </div>
-          <aside class="panel">
-            <div class="panel-tabs" role="tablist">
-              <button type="button" data-panel="add" class="active" role="tab">Add</button>
-              <button type="button" data-panel="edit" role="tab">Edit Blocks</button>
-              <button type="button" data-panel="look" role="tab">Designs</button>
-            </div>
-            <div class="panel-body" id="panel-add">
-              <p class="fine">Drag a module onto your page, or click it to add it below the selected one.</p>
-              <div class="palette" id="palette"></div>
-            </div>
-            <div class="panel-body" id="panel-edit" hidden></div>
-            <div class="panel-body" id="panel-look" hidden>
-              <p class="panel-label">Colour</p>
-              <div class="themes" id="themes">
-                <button type="button" data-theme="violet"><span class="swatch violet"></span>Violet</button>
-                <button type="button" data-theme="coral"><span class="swatch coral"></span>Coral</button>
-                <button type="button" data-theme="teal"><span class="swatch teal"></span>Teal</button>
-                <button type="button" data-theme="ink"><span class="swatch ink"></span>Ink</button>
-              </div>
-              <p class="panel-label">Your link</p>
-              <label class="slug">collabboard-blush.vercel.app/p/<input id="pf-slug" maxlength="40" placeholder="your-name" autocomplete="off"></label>
-              <p class="fine" id="slug-note">Lowercase letters, numbers and dashes.</p>
-            </div>
-          </aside>
-        </div>
-      </section>
-    </main>
+<section class="section" id="discover">
+  <div class="wrap">
+    <div class="section-head">
+      <div><p class="eyebrow" data-reveal>Discover brand collaborations</p>
+      <h2 class="h2" data-reveal>Today's openings, straight from the source.</h2></div>
+      <a class="link-arrow" href="/discover-collaborations">How discovery works <svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    </div>
+    <div class="live-collabs" data-live-collabs="6">
+  <noscript><p class="muted">Turn on JavaScript to see today's openings, or sign up to browse the full feed.</p></noscript>
+  <p class="muted live-loading">Loading today's openings…</p>
+</div>
+<p class="fine center">Openings are found automatically on the public web and aren't checked by a person. Never pay to join a campaign.</p>
   </div>
+</section>
 
-  <!-- Asked when the creator comes back after clicking Apply -->
-  <div class="ask" id="ask" hidden role="dialog" aria-modal="true" aria-labelledby="ask-title">
-    <div class="ask-box">
-      <h2 id="ask-title">Did you apply?</h2>
-      <p id="ask-text"></p>
-      <div class="ask-actions">
-        <button class="btn primary" id="ask-yes" type="button">Yes, mark as applied</button>
-        <button class="btn" id="ask-save" type="button">Not yet, save for later</button>
-        <button class="link-btn" id="ask-no" type="button">No thanks</button>
-      </div>
+<section class="section alt" id="portfolio">
+  <div class="wrap">
+    <div class="section-head">
+      <div><p class="eyebrow" data-reveal>Build your free portfolio</p>
+      <h2 class="h2" data-reveal>A portfolio brands can open in one tap.</h2></div>
+      <a class="link-arrow" href="/creator-portfolio">See everything it can do <svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    </div>
+    <div class="pf-demo" data-reveal>
+  <div class="pf-demo-controls" role="group" aria-label="Try the portfolio styles">
+    <p class="ctl-label">Colour</p>
+    <div class="chips" data-demo="theme">
+      <button type="button" class="chip on" data-val="violet"><span class="sw violet"></span>Violet</button>
+      <button type="button" class="chip" data-val="coral"><span class="sw coral"></span>Coral</button>
+      <button type="button" class="chip" data-val="teal"><span class="sw teal"></span>Teal</button>
+      <button type="button" class="chip" data-val="ink"><span class="sw ink"></span>Ink</button>
+    </div>
+    <p class="ctl-label">Layout</p>
+    <div class="chips" data-demo="layout">
+      <button type="button" class="chip on" data-val="stack">Image on top</button>
+      <button type="button" class="chip" data-val="side">Side by side</button>
+    </div>
+    <p class="fine">This is a live preview of the real builder's styles. In the app you also drag modules, type on the page, crop photos and publish.</p>
+  </div>
+  <div class="pf-demo-stage"><div class="mock-portfolio theme-violet" id="demo-portfolio">
+  <span class="tag-example">Try it</span>
+  <div class="mp-head">
+    <div class="mp-avatar" aria-hidden="true">Y</div>
+    <div>
+      <p class="mp-name">Your name</p>
+      <p class="mp-bio">Skincare and everyday makeup for Indian skin</p>
     </div>
   </div>
+  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
+  <div class="mp-stats"><div><strong>12.4k</strong><span>Instagram followers</span></div><div><strong>8k</strong><span>Avg Reel views</span></div></div>
+  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
+  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹5,000</strong></li><li><span>Story</span><strong>₹1,500</strong></li></ul>
+</div></div>
+</div>
+  </div>
+</section>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="supabase-config.js"></script>
-  <script src="cloud.js"></script>
-  <script src="portfolio.js"></script>
-  <script src="app.js"></script>
+<section class="section" id="how">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow" data-reveal>How it works</p>
+      <h2 class="h2" data-reveal>From sign-up to your first pitch in minutes.</h2>
+      <a class="link-arrow" href="/how-it-works">Read the full guide <svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    </div>
+    <ol class="steps"><li data-reveal><span class="step-n">01</span><div><h3>Create your free account</h3><p>Sign up with your email, then tell us your niche, follower range, city and language.</p></div></li><li data-reveal><span class="step-n">02</span><div><h3>Discover collaborations</h3><p>Browse fresh openings every morning. Filter by niche, paid or barter, and follower requirements.</p></div></li><li data-reveal><span class="step-n">03</span><div><h3>Apply at the source</h3><p>Tap Apply to open the brand&#39;s own post or form. Star openings to come back to, and track what you&#39;ve applied to.</p></div></li><li data-reveal><span class="step-n">04</span><div><h3>Build your portfolio</h3><p>Drag in modules for your bio, numbers, rates, photos, PDFs and social previews. Edit everything in place.</p></div></li><li data-reveal><span class="step-n">05</span><div><h3>Publish and share</h3><p>Publish to your own link and send it to brands in DMs, emails and pitches. Update it whenever you like.</p></div></li></ol>
+  </div>
+</section>
+
+<section class="section alt" id="why">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Why Collab Pro</p>
+    <h2 class="h2" data-reveal>Built around how creators actually work.</h2>
+    <div class="cards-4">
+      <article class="card" data-reveal><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 5h10M7 9h10M7 5h3.5a4 4 0 0 1 0 8H7l7 7"/></svg><h3>Free, no commission</h3><p>Your portfolio is free, and you apply directly to brands. We're never in the middle of your deal.</p></article>
+      <article class="card" data-reveal><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg><h3>Fresh every morning</h3><p>New openings are collected every day, so the feed doesn't go stale.</p></article>
+      <article class="card" data-reveal><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg><h3>Made for every size</h3><p>Filter by your follower count and see openings with no minimum.</p></article>
+      <article class="card" data-reveal><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="2.5" y="5" width="14" height="10" rx="2"/><path d="M6 19h7"/><rect x="17.5" y="9" width="4" height="10" rx="1.2"/></svg><h3>Phone-first</h3><p>Everything works in your phone's browser, from finding collabs to publishing your portfolio.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div><p class="eyebrow" data-reveal>Explore features</p>
+      <h2 class="h2" data-reveal>Everything in one place, and more on the way.</h2></div>
+      <a class="link-arrow" href="/features">All features <svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+    </div>
+    <div class="features"><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><path d="M12 12l6-6"/></svg></div>
+  <h3>Daily collab discovery</h3>
+  <p>Fresh brand collaboration openings, found across the web every morning.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg></div>
+  <h3>Filters that fit you</h3>
+  <p>Filter by niche, paid or barter, source and your follower count.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></div>
+  <h3>Apply at the source</h3>
+  <p>Every opening links straight to the original post or form.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></div>
+  <h3>Save and track</h3>
+  <p>Star openings for later and track the ones you&#39;ve applied to.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="M3.5 9h17M9 9v11.5"/></svg></div>
+  <h3>Drag-and-drop portfolio</h3>
+  <p>Eight modules you can drag, drop and edit in place.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></div>
+  <h3>Your own public link</h3>
+  <p>Publish once and share one link with every brand.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg></div>
+  <h3>Verified brand openings <span class="pill soon">Coming next</span></h3>
+  <p>Openings checked by a person, marked clearly.</p>
+</article><article class="feature" data-reveal>
+  <div class="feature-ic"><svg class="ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M7 5h10M7 9h10M7 5h3.5a4 4 0 0 1 0 8H7l7 7"/></svg></div>
+  <h3>&quot;Did this brand pay?&quot; ratings <span class="pill soon">Coming next</span></h3>
+  <p>Creators share whether brands paid, and how fast.</p>
+</article></div>
+  </div>
+</section>
+
+<section class="section alt" id="showcase">
+  <div class="wrap">
+    <p class="eyebrow" data-reveal>Creator showcase</p>
+    <h2 class="h2" data-reveal>Portfolios that look as good as your content.</h2>
+    <div class="showcase">
+  <div class="mock-portfolio theme-coral" >
+  <span class="tag-example">Example portfolio</span>
+  <div class="mp-head">
+    <div class="mp-avatar" aria-hidden="true">S</div>
+    <div>
+      <p class="mp-name">Skincare creator · Mumbai</p>
+      <p class="mp-bio">Honest reviews for oily, Indian skin</p>
+    </div>
+  </div>
+  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
+  <div class="mp-stats"><div><strong>12.4k</strong><span>Instagram followers</span></div><div><strong>8k</strong><span>Avg Reel views</span></div></div>
+  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
+  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹5,000</strong></li><li><span>Story</span><strong>₹1,500</strong></li></ul>
+</div>
+  <div class="mock-portfolio theme-teal" >
+  <span class="tag-example">Example portfolio</span>
+  <div class="mp-head">
+    <div class="mp-avatar" aria-hidden="true">H</div>
+    <div>
+      <p class="mp-name">Home chef · Hyderabad</p>
+      <p class="mp-bio">Quick Telugu recipes, 30 minutes or less</p>
+    </div>
+  </div>
+  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
+  <div class="mp-stats"><div><strong>6.1k</strong><span>Instagram followers</span></div><div><strong>15k</strong><span>Avg Reel views</span></div></div>
+  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
+  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹3,000</strong></li><li><span>Story</span><strong>₹900</strong></li></ul>
+</div>
+  <div class="mock-portfolio theme-ink" >
+  <span class="tag-example">Example portfolio</span>
+  <div class="mp-head">
+    <div class="mp-avatar" aria-hidden="true">T</div>
+    <div>
+      <p class="mp-name">Tech reviewer · Bengaluru</p>
+      <p class="mp-bio">Budget phones and gadgets, explained simply</p>
+    </div>
+  </div>
+  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
+  <div class="mp-stats"><div><strong>28k</strong><span>Instagram followers</span></div><div><strong>40k</strong><span>Avg Reel views</span></div></div>
+  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
+  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹12,000</strong></li><li><span>Story</span><strong>₹3,000</strong></li></ul>
+</div>
+</div>
+<p class="fine center">These are illustrative example portfolios, not real creators. Yours will show your own details.</p>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap narrow">
+    <p class="eyebrow" data-reveal>FAQ</p>
+    <h2 class="h2" data-reveal>Questions creators ask.</h2>
+    <div class="faq"><details data-reveal><summary><h3>Is Collab Pro free?</h3><span class="plus" aria-hidden="true"></span></summary><p>Yes. Creating an account, discovering collaborations and building and publishing your portfolio are free. There are no paid plans right now.</p></details><details data-reveal><summary><h3>Where do the collaboration openings come from?</h3><span class="plus" aria-hidden="true"></span></summary><p>Every morning Collab Pro searches the public web for brand collaboration openings: brand application forms, public posts and creator calls. We collect them in one feed and link to the original source.</p></details><details data-reveal><summary><h3>Are the openings verified?</h3><span class="plus" aria-hidden="true"></span></summary><p>Not yet. Openings are found automatically and are not checked by a person. Always read the original post, and never pay a brand or agency to join a campaign.</p></details><details data-reveal><summary><h3>Do you take a commission on deals?</h3><span class="plus" aria-hidden="true"></span></summary><p>No. You apply directly on the brand&#39;s own post or form. Collab Pro is not part of the deal and does not handle payments.</p></details><details data-reveal><summary><h3>Do I need a minimum number of followers?</h3><span class="plus" aria-hidden="true"></span></summary><p>No. Collab Pro is for creators of every size. When an opening states a follower minimum, we show it so you can filter for openings that fit you.</p></details><details data-reveal><summary><h3>What can I add to my portfolio?</h3><span class="plus" aria-hidden="true"></span></summary><p>A profile header with your photo, text with formatting, links, numbers like followers and views, image carousels, PDFs such as a media kit, social links, your rates, and a live preview of your Instagram, Facebook, YouTube or LinkedIn.</p></details></div>
+    <p class="center"><a class="link-arrow" href="/faq">See all questions <svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></a></p>
+  </div>
+</section>
+<section class="cta-band">
+  <div class="wrap cta-inner" data-reveal>
+    <h2>Your next collab could be one tap away.</h2>
+    <p>Create a free account, find openings that fit you, and publish a portfolio brands can open from anywhere.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="cta-band">Sign up free</a>
+      <a class="btn btn-ghost btn-lg" href="/signin">I already have an account</a>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <a class="brand" href="/" aria-label="Collab Pro home">
+  <img src="/assets/logo-mark.svg" alt="" width="34" height="34">
+  <span class="wordmark">collab<span>pro</span></span>
+</a>
+      <p>Find brand collabs. Build your portfolio. All in one place.</p>
+      <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="footer">Create your free account</a>
+    </div>
+    <nav aria-label="Product"><h2>Product</h2><ul><li><a href="/discover-collaborations">Discover collaborations</a></li><li><a href="/creator-portfolio">Creator portfolio</a></li><li><a href="/features">Features</a></li><li><a href="/how-it-works">How it works</a></li></ul></nav><nav aria-label="Company"><h2>Company</h2><ul><li><a href="/about">About us</a></li><li><a href="/contact">Contact us</a></li><li><a href="/faq">FAQ</a></li></ul></nav><nav aria-label="Legal"><h2>Legal</h2><ul><li><a href="/privacy-policy">Privacy policy</a></li><li><a href="/terms-of-service">Terms of service</a></li></ul></nav>
+  </div>
+  <div class="wrap foot-bottom">
+    <span>© 2026 Collab Pro. Made for creators in India.</span>
+    <button type="button" class="link" data-open-consent hidden>Cookie settings</button>
+  </div>
+</footer>
+<div class="consent" id="consent" role="dialog" aria-live="polite" aria-label="Cookie notice" hidden>
+  <p>We'd like to use analytics cookies to understand how creators use Collab Pro. Nothing is collected unless you agree.</p>
+  <div><button type="button" class="btn btn-ghost" data-consent="no">No thanks</button><button type="button" class="btn btn-primary" data-consent="yes">Allow analytics</button></div>
+</div>
+<div class="cursor" aria-hidden="true"></div>
+
+<script src="/site.js" defer></script>
 </body>
 </html>

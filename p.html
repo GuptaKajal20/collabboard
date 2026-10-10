@@ -3,8 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Creator portfolio · CollabBoard</title>
-  <meta name="description" content="Creator portfolio on CollabBoard.">
+  <title>Creator portfolio · Collab Pro</title>
+  <meta name="description" content="A creator portfolio made with Collab Pro.">
+  <meta name="robots" content="index, follow, max-image-preview:large" id="robots">
+  <link rel="canonical" id="canonical">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="Collab Pro">
+  <meta property="og:image" content="/assets/og-image.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/portfolio.css">
@@ -15,6 +21,8 @@
     .draft-bar { margin-bottom: 16px; padding: 10px 14px; border-radius: 12px; background: #fdf6e7; color: #7a5a12; font: 14px Inter, system-ui, sans-serif; }
     .foot { margin-top: 18px; text-align: center; font: 13px Inter, system-ui, sans-serif; color: #8a887f; }
     .foot a { color: #5b4bd6; text-decoration: none; font-weight: 600; }
+    .foot .made { display: inline-flex; align-items: center; gap: 6px; }
+    .foot .made img { border-radius: 5px; }
     .message { padding: 80px 24px; text-align: center; font: 16px Inter, system-ui, sans-serif; color: #6b6a65; }
     .zoom { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: 20px; background: rgba(10, 10, 20, 0.85); cursor: zoom-out; }
     .zoom img { max-width: 100%; max-height: 100%; border-radius: 12px; }
@@ -25,7 +33,7 @@
   <div class="wrap">
     <div class="draft-bar" id="draft-bar" hidden>Preview of your draft. Brands see this after you click Publish.</div>
     <main class="sheet" id="sheet"><p class="message">Loading…</p></main>
-    <p class="foot">Made with <a href="/">CollabBoard</a>, free portfolios for creators</p>
+    <p class="foot"><a href="/" class="made"><img src="/assets/logo-mark.svg" alt="" width="18" height="18"> Made with Collab Pro</a> · <a href="/creator-portfolio">Build your free portfolio</a></p>
   </div>
   <div class="zoom" id="zoom" hidden><img alt=""></div>
 
@@ -44,12 +52,15 @@
       if (params.has("draft")) {
         try { data = JSON.parse(localStorage.getItem("cb_site")); } catch { data = null; }
         document.getElementById("draft-bar").hidden = !data;
+        document.getElementById("robots").content = "noindex, nofollow";
       } else if (slug && window.Cloud.ready) {
         try { data = (await window.Cloud.fetchPublic(slug) || {}).data; } catch { data = null; }
       }
 
       data = window.Portfolio.migrate(data);
       if (!data || !data.blocks) {
+        document.getElementById("robots").content = "noindex, nofollow";
+        document.getElementById("canonical").remove();
         sheet.innerHTML = `<p class="message">${slug && !window.Cloud.ready ? "Public portfolios aren't switched on yet." : "This portfolio doesn't exist or isn't public yet."}</p>`;
         return;
       }
@@ -57,7 +68,13 @@
       sheet.innerHTML = window.Portfolio.renderPortfolio(data);
       window.Portfolio.enhance(sheet);
       const profile = data.blocks.find((b) => b.type === "profile");
-      if (profile && profile.name) document.title = `${profile.name} · Creator portfolio`;
+      if (slug && !params.has("draft")) document.getElementById("canonical").href = `${location.origin}/p/${slug}`;
+      else document.getElementById("canonical").remove();
+      if (profile && profile.name) {
+        document.title = `${profile.name} · Creator portfolio | Collab Pro`;
+        const bio = String(profile.bio || "").replace(/\s+/g, " ").trim();
+        document.querySelector('meta[name="description"]').content = `${profile.name}'s creator portfolio${bio ? `: ${bio}` : ""}`.slice(0, 160);
+      }
 
       // Tap a photo to see it large.
       const zoom = document.getElementById("zoom");

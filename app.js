@@ -184,6 +184,7 @@ document.addEventListener("click", (e) => {
   else if (e.target.closest("[data-unapply]")) markApplied(id, false);
   else if (e.target.closest("[data-markapplied]")) markApplied(id, true);
   else if (e.target.closest("[data-apply]") && !applied[id]) {
+    if (window.cpTrack) window.cpTrack("collab_apply", { location: "app" });
     store.set(PENDING, { id, at: Date.now() });
     clicked[id] = today();
     store.set("cb_clicked", clicked);
@@ -973,6 +974,7 @@ async function publish() {
     if (!(await Cloud.slugFree(site.slug))) throw new Error("That link name is taken. Try another.");
     const { dirty, publishedAt, ...data } = site;
     await Cloud.publish(site.slug, data);
+    if (!site.publishedAt && window.cpTrack) window.cpTrack("portfolio_publish", { first: true });
     site.publishedAt = new Date().toISOString();
     site.dirty = false;
     saveSite({ changed: false });
@@ -1022,6 +1024,7 @@ async function setupPortfolio() {
     renderCanvas();
   });
 
+  el("slug-host").textContent = location.host;
   el("pf-slug").value = site.slug || "";
   el("pf-slug").addEventListener("input", (e) => {
     const clean = slugify(e.target.value);
@@ -1162,6 +1165,8 @@ function setupSignup() {
         btn.textContent = "Create my profile";
       }
     } else if (signedIn) {
+      try { localStorage.removeItem("cb_pending_name"); } catch { /* ignore */ }
+      if (window.cpTrack) window.cpTrack("profile_complete", {});
       await syncNow();
     }
     startApp();
@@ -1235,8 +1240,7 @@ el("logout").addEventListener("click", async () => {
   await syncNow();
   await Cloud.logOut();
   for (const k of ["cb_profile", "cb_saved", "cb_applied", "cb_clicked", "cb_site", "cb_portfolio", "cb_pending_apply"]) store.remove(k);
-  location.hash = "";
-  location.reload();
+  location.href = "/";
 });
 
 // ---------- menu and pages ----------
@@ -1304,10 +1308,17 @@ async function init() {
     const user = await Cloud.user().catch(() => null);
     if (user) {
       await loadAccount(user);
-      if (!profile) signupMode = "complete";
+      if (!profile) {
+        // Just signed up: ask for niche, followers and the rest, with the name filled in.
+        signupMode = "complete";
+        let pending = null;
+        try { pending = JSON.parse(localStorage.getItem("cb_pending_name")); } catch { pending = null; }
+        el("signup").name.value = pending || (user.user_metadata && user.user_metadata.name) || "";
+      }
     } else {
-      // Logged out: nothing personal is shown until they log in.
-      profile = null;
+      // Logged out: the website's sign-in page handles it.
+      location.replace(`/signin?next=${encodeURIComponent("/app" + (location.hash || ""))}`);
+      return;
     }
   }
   if (profile && (!ACCOUNTS || signedIn)) startApp();

@@ -37,7 +37,7 @@
     const { data, error } = await client.auth.signUp({
       email,
       password,
-      options: { data: { name: profile.name }, emailRedirectTo: location.origin },
+      options: { data: { name: profile.name }, emailRedirectTo: `${location.origin}/signin` },
     });
     if (error) fail(error);
     // When email confirmation is on there is no session yet.
@@ -55,7 +55,7 @@
   }
 
   async function sendReset(email) {
-    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: location.origin });
+    const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/reset-password` });
     if (error) fail(error);
   }
 
@@ -67,6 +67,12 @@
   // Calls back with "recovery" when someone arrives from a reset-password email.
   function onRecovery(callback) {
     client.auth.onAuthStateChange((event) => { if (event === "PASSWORD_RECOVERY") callback(); });
+  }
+
+  // Contact form messages (anyone can send; only the team can read them in Supabase).
+  async function sendContact(message) {
+    const { error } = await client.from("contact_messages").insert(message);
+    if (error) throw error;
   }
 
   // ---------- private data ----------
@@ -127,5 +133,5 @@
     return client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
-  window.Cloud = { ready, user, signUp, logIn, logOut, sendReset, setPassword, onRecovery, loadState, saveState, loadMine, slugFree, publish, fetchPublic, upload };
+  window.Cloud = { ready, sendContact, user, signUp, logIn, logOut, sendReset, setPassword, onRecovery, loadState, saveState, loadMine, slugFree, publish, fetchPublic, upload };
 })();
