@@ -30,6 +30,14 @@
 .pb-initial { display: grid; place-items: center; color: var(--k); font-size: 46px; font-weight: 600; }
 .pb-profile h1 { margin: 10px 0 0; font-size: 32px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
 .pb-bio { margin: 0; max-width: 520px; font-size: 16px; color: #3d3c38; white-space: pre-wrap; }
+.pb-profile-text { display: grid; gap: 6px; justify-items: inherit; }
+.pb-profile.pb-side { display: flex; align-items: center; gap: 24px; text-align: left; justify-items: start; }
+.pb-profile.pb-side.pb-flip { flex-direction: row-reverse; text-align: right; }
+.pb-profile.pb-side.pb-flip .pb-bio { margin-left: auto; }
+.pb-profile.pb-side .pb-profile-text { justify-items: start; flex: 1; min-width: 0; }
+.pb-profile.pb-side.pb-flip .pb-profile-text { justify-items: end; }
+.pb-profile.pb-side h1 { margin-top: 0; }
+.pb-avatar { flex: none; }
 
 .pb-rich { font-size: 16px; overflow-wrap: anywhere; }
 .pb-rich div { min-height: 1em; }
@@ -51,7 +59,8 @@
 a.pb-link[href]:hover { transform: translateY(-2px); border-color: var(--k); box-shadow: 0 12px 28px -14px var(--k); }
 .pb-link.has-img { flex-direction: row; align-items: center; gap: 16px; text-align: left; padding: 12px; }
 .pb-link.img-right { flex-direction: row-reverse; }
-.pb-link img { width: 120px; height: 90px; flex: none; border-radius: 12px; object-fit: cover; }
+.pb-link-img { width: 120px; height: 90px; flex: none; overflow: hidden; border-radius: 12px; background: #111; }
+.pb-link-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pb-link-text { display: grid; gap: 2px; min-width: 0; flex: 1; }
 .pb-link-text strong { font-size: 17px; color: var(--k-ink); }
 .pb-link-text small { font-size: 13px; color: var(--soft); }
@@ -59,7 +68,7 @@ a.pb-link[href]:hover { transform: translateY(-2px); border-color: var(--k); box
 .pb-carousel { position: relative; }
 .pb-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; border-radius: 16px; scrollbar-width: none; }
 .pb-track::-webkit-scrollbar { display: none; }
-.pb-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 4 / 3; background: #111; }
+.pb-slide { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: var(--ar, 4 / 3); overflow: hidden; background: #111; }
 .pb-slide video, .pb-photo { width: 100%; height: 100%; display: block; object-fit: contain; background: #111; }
 .pb-photo { padding: 0; border: 0; cursor: zoom-in; }
 .pb-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -147,6 +156,15 @@ a.pb-link[href]:hover { transform: translateY(-2px); border-color: var(--k); box
 
 .pb-igp { display: grid; gap: 10px; }
 .pb-igp iframe { width: 100%; max-width: 540px; height: 620px; margin: 0 auto; border: 1px solid var(--line); border-radius: 16px; background: #fff; }
+.pb-social-card { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: #fff; color: var(--ink); text-decoration: none; transition: border-color 0.2s ease, transform 0.2s ease; }
+a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1px); }
+.pb-social-card span { display: grid; }
+.pb-social-card strong { font-size: 16px; }
+.pb-social-card small { font-size: 13px; color: var(--soft); }
+.pb-igp .pb-social-card { justify-self: center; width: 100%; max-width: 540px; }
+.pb-video { position: relative; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: #000; }
+.pb-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+.pb-igp iframe.pb-li { height: 560px; }
 .pb-ig-link { display: inline-flex; align-items: center; gap: 10px; justify-self: center; color: var(--k-ink); font-weight: 600; text-decoration: none; }
 .pb-ig-link .pb-ic { width: 30px; height: 30px; }
 .pb-ig-link .pb-ic::after { width: 16px; height: 16px; }
@@ -210,7 +228,9 @@ a.pb-link[href]:hover { transform: translateY(-2px); border-color: var(--k); box
 @media (max-width: 560px) {
   .pb-page { padding: 28px 18px 40px; }
   .pb-profile h1 { font-size: 26px; }
-  .pb-link img { width: 88px; height: 72px; }
+  .pb-link-img { width: 88px; height: 72px; }
+  .pb-profile.pb-side { gap: 14px; }
+  .pb-profile.pb-side .pb-avatar { width: 84px; height: 84px; }
   .pb-igp iframe { height: 540px; }
   .pb-modal-box { width: 100%; min-width: 0; height: 88vh; }
 }

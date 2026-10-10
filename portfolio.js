@@ -116,6 +116,14 @@
     try { return new URL(safeUrl(url)).hostname.replace(/^www\./, ""); } catch { return "Link"; }
   }
 
+  // Zoom and up/down position for any cropped image.
+  const cropStyle = (zoom, posY) => {
+    const z = Math.max(100, Math.min(250, Number(zoom ?? 100)));
+    const y = Math.max(0, Math.min(100, Number(posY ?? 50)));
+    return `object-position:50% ${y}%;transform:scale(${z / 100});transform-origin:50% ${y}%`;
+  };
+  const ASPECTS = { portrait: "4 / 5", square: "1 / 1", landscape: "4 / 3", wide: "16 / 9" };
+
   const isPdf = (f) => /\.pdf$/i.test(String(f.name || "").trim()) || /\.pdf(\?|#|$)/i.test(String(f.url || ""));
 
   const formatCount = (n) => {
@@ -133,14 +141,14 @@
   // ---------- modules ----------
 
   const BLOCKS = {
-    profile: { name: "Profile header", hint: "Photo, name and a short bio", once: true, make: () => ({ photo: "", name: "", bio: "", radius: 50, posY: 50, zoom: 100 }) },
+    profile: { name: "Profile header", hint: "Photo, name and a short bio", once: true, make: () => ({ photo: "", photoName: "", name: "", bio: "", radius: 50, posY: 50, zoom: 100, layout: "stack", flip: false }) },
     text: { name: "Text", hint: "Write with bold, italic, sizes and emojis", make: () => ({ html: "" }) },
-    link: { name: "Link", hint: "Text, a link and an optional image", make: () => ({ text: "", url: "", image: "", side: "left" }) },
+    link: { name: "Link", hint: "Text, a link and an optional image", make: () => ({ text: "", url: "", image: "", imageName: "", side: "left", imgZoom: 100, imgPosY: 50 }) },
     stats: { name: "Number", hint: "Followers, views, engagement", make: () => ({ items: [{ label: "Instagram followers", value: "" }, { label: "Average Reel views", value: "" }] }) },
-    file: { name: "File", hint: "A photo carousel or a PDF", make: () => ({ kind: "", items: [] }) },
+    file: { name: "File", hint: "A photo carousel or a PDF", make: () => ({ kind: "", items: [], size: "landscape" }) },
     socials: { name: "Social links", hint: "Icons for Instagram, Facebook, Threads and more", make: () => ({ items: [] }) },
     rates: { name: "Rates", hint: "What you charge", make: () => ({ items: [{ label: "Instagram Reel", price: "" }, { label: "Story", price: "" }], barter: false }) },
-    instagram: { name: "Instagram preview", hint: "Your profile, bio and latest posts", make: () => ({ handle: "" }) },
+    instagram: { name: "Social preview", hint: "A live look at your Instagram, Facebook, YouTube or LinkedIn", make: () => ({ platform: "instagram", value: "" }) },
   };
 
   // Older portfolios used other block types; convert them once.
@@ -203,11 +211,14 @@
         const zoom = Math.max(100, Math.min(250, Number(b.zoom ?? 100)));
         const initial = esc((b.name || "?").trim().charAt(0).toUpperCase() || "?");
         const avatar = photo
-          ? `<div class="pb-avatar" style="border-radius:${radius}%"><img src="${esc(photo)}" alt="" style="object-position:50% ${posY}%;transform:scale(${zoom / 100});transform-origin:50% ${posY}%"></div>`
+          ? `<div class="pb-avatar" style="border-radius:${radius}%"><img src="${esc(photo)}" alt="" style="${cropStyle(zoom, posY)}"></div>`
           : `<div class="pb-avatar pb-initial" style="border-radius:${radius}%">${initial}</div>`;
-        return `<header class="pb-profile">${avatar}
-          <h1${ed("name", "Your name")}>${esc(b.name)}</h1>
-          ${b.bio || edit ? `<p class="pb-bio"${ed("bio", "A short bio. Press Enter for a new line.")}>${esc(b.bio)}</p>` : ""}
+        const layout = b.layout === "side" ? ` pb-side${b.flip ? " pb-flip" : ""}` : "";
+        return `<header class="pb-profile${layout}">${avatar}
+          <div class="pb-profile-text">
+            <h1${ed("name", "Your name")}>${esc(b.name)}</h1>
+            ${b.bio || edit ? `<p class="pb-bio"${ed("bio", "A short bio")}>${esc(b.bio)}</p>` : ""}
+          </div>
         </header>`;
       }
       case "text": {
@@ -220,7 +231,7 @@
         if (!b.text || !url) return empty("Add the link text and address in the panel on the right.");
         const attrs = edit ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`;
         return `<a class="pb-link${img ? ` has-img img-${b.side === "right" ? "right" : "left"}` : ""}" ${attrs}>
-          ${img ? `<img src="${esc(img)}" alt="">` : ""}
+          ${img ? `<span class="pb-link-img"><img src="${esc(img)}" alt="" style="${cropStyle(b.imgZoom, b.imgPosY)}"></span>` : ""}
           <span class="pb-link-text"><strong>${esc(b.text)}</strong><small>${esc(linkKind(url))} ↗</small></span>
         </a>`;
       }
@@ -244,10 +255,10 @@
           const slides = items
             .map((m) => m.type === "video"
               ? `<div class="pb-slide"><video src="${esc(safeMedia(m.url))}" controls playsinline preload="metadata"></video></div>`
-              : `<div class="pb-slide"><button type="button" class="pb-photo"><img src="${esc(safeMedia(m.url))}" alt="" loading="lazy"></button></div>`)
+              : `<div class="pb-slide"><button type="button" class="pb-photo"><img src="${esc(safeMedia(m.url))}" alt="" loading="lazy" style="${cropStyle(m.zoom, m.posY)}"></button></div>`)
             .join("");
           const many = items.length > 1;
-          return `<div class="pb-carousel" data-carousel>
+          return `<div class="pb-carousel" data-carousel style="--ar:${ASPECTS[b.size] || ASPECTS.landscape}">
             <div class="pb-track">${slides}</div>
             ${many ? `<button type="button" class="pb-nav prev" data-car="-1" aria-label="Previous photo">‹</button><button type="button" class="pb-nav next" data-car="1" aria-label="Next photo">›</button>
             <div class="pb-dots">${items.map((_, i) => `<span class="${i ? "" : "on"}"></span>`).join("")}</div>` : ""}
@@ -265,12 +276,37 @@
         return `<ul class="pb-rates">${items.map((r, i) => `<li><span${ed(`items.${i}.label`, "What")}>${esc(r.label)}</span><strong${ed(`items.${i}.price`, "₹ price")}>${edit ? esc(r.price) : formatRupees(r.price)}</strong></li>`).join("")}</ul>${b.barter ? `<p class="pb-note">Open to barter collaborations</p>` : ""}`;
       }
       case "instagram": {
-        const h = handleOf(b.handle).replace(/[^\w.]/g, "");
-        if (!h) return empty("Type your Instagram username in the panel on the right.");
-        return `<div class="pb-igp">
-          <iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>
-          <a class="pb-ig-link" ${edit ? "" : `href="https://www.instagram.com/${esc(h)}/" target="_blank" rel="noopener noreferrer"`}>${icon(platformById("instagram"))}View @${esc(h)} on Instagram</a>
-        </div>`;
+        // "Social preview": what each platform lets other sites show.
+        const plat = b.platform || "instagram";
+        const raw = String(b.value ?? b.handle ?? "").trim();
+        if (!raw) return empty("Add your profile in the panel on the right.");
+        const p = platformById(plat);
+        const fromUrl = (re) => (raw.match(re) || [])[1];
+        const card = (url, label) => `<a class="pb-social-card" ${edit || !url ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`}>${icon(p)}<span><strong>${esc(label)}</strong><small>View on ${esc(p.name)} ↗</small></span></a>`;
+        if (plat === "instagram") {
+          const h = (fromUrl(/instagram\.com\/([\w.]+)/i) || handleOf(raw)).replace(/[^\w.]/g, "");
+          if (!h) return empty("Add your Instagram username.");
+          return `<div class="pb-igp"><iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>${card(`https://www.instagram.com/${h}/`, `@${h}`)}</div>`;
+        }
+        if (plat === "facebook") {
+          const page = safeUrl(/facebook\.com/i.test(raw) ? raw : `https://www.facebook.com/${handleOf(raw)}`);
+          if (!page) return empty("Add your Facebook page link.");
+          const src = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(page)}&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
+          return `<div class="pb-igp"><iframe src="${esc(src)}" loading="lazy" title="Facebook page" scrolling="no" allow="encrypted-media"></iframe>${card(page, "Facebook page")}</div>`;
+        }
+        if (plat === "youtube") {
+          const vid = fromUrl(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
+          const channel = safeUrl(/youtube\.com|youtu\.be/i.test(raw) ? raw : `https://www.youtube.com/@${handleOf(raw)}`);
+          if (!vid) return card(channel, raw.startsWith("@") ? raw : "YouTube channel");
+          return `<div class="pb-video"><iframe src="https://www.youtube-nocookie.com/embed/${esc(vid)}" loading="lazy" title="YouTube video" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+        }
+        if (plat === "linkedin") {
+          const act = fromUrl(/(?:urn:li:activity:|activity[-:])(\d{10,})/);
+          if (act) return `<div class="pb-igp"><iframe class="pb-li" src="https://www.linkedin.com/embed/feed/update/urn:li:activity:${esc(act)}" loading="lazy" title="LinkedIn post"></iframe></div>`;
+          const url = safeUrl(/linkedin\.com/i.test(raw) ? raw : `https://www.linkedin.com/in/${handleOf(raw)}`);
+          return card(url, "LinkedIn profile");
+        }
+        return card(socialUrl({ platform: plat, value: raw }), raw.replace(/^https?:\/\/(www\.)?/, ""));
       }
       default:
         return "";
@@ -397,5 +433,5 @@
     pdfThumbs(root);
   }
 
-  window.Portfolio = { BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
+  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
 })();

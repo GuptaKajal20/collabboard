@@ -441,6 +441,7 @@ function renderOne(id) {
 }
 
 function selectBlock(id) {
+  if (id !== selectedId) cropOpen = null;
   selectedId = id;
   document.querySelectorAll("#canvas .pb-editable").forEach((s) => s.classList.toggle("pb-selected", s.dataset.block === id));
   renderEditPanel();
@@ -488,8 +489,55 @@ function renderPalette() {
     .join("");
 }
 
+const REQ = `<span class="star" aria-hidden="true">*</span>`;
 const field = (label, name, value, attrs = "") => `<label>${label}<input data-f="${name}" value="${escapeHtml(value ?? "")}" ${attrs}></label>`;
 const slider = (label, name, value, min, max, unit = "") => `<label class="slider">${label}<span class="slider-row"><input type="range" data-f="${name}" data-num min="${min}" max="${max}" value="${value}"><output>${value}${unit}</output></span></label>`;
+// A row of choices that sets one field, e.g. layout or image side.
+const seg = (fieldName, current, options, attrs = "") =>
+  `<div class="seg wide" role="group" ${attrs}>${options.map(([v, label, disabled]) => `<button type="button" data-set="${fieldName}" data-val="${v}" class="${String(current) === String(v) ? "active" : ""}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
+
+// Which crop editor is open: "photo", "image" or "items.<n>".
+let cropOpen = null;
+
+// Zoom and position fields for each kind of image.
+function cropFields(key) {
+  if (key === "photo") return { zoom: "zoom", posY: "posY" };
+  if (key === "image") return { zoom: "imgZoom", posY: "imgPosY" };
+  return { zoom: `${key}.zoom`, posY: `${key}.posY` };
+}
+const getPath = (obj, path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+
+function cropEditor(b, key, url, ratio, radius) {
+  const f = cropFields(key);
+  const zoom = getPath(b, f.zoom) ?? 100;
+  const posY = getPath(b, f.posY) ?? 50;
+  return `<div class="crop-box">
+    <div class="crop-frame" data-crop-preview="${key}" style="aspect-ratio:${ratio};${radius != null ? `border-radius:${radius}%;` : ""}"><img src="${escapeHtml(P.safeMedia(url))}" alt="" style="${P.cropStyle(zoom, posY)}"></div>
+    ${slider("Zoom", f.zoom, zoom, 100, 250, "%")}
+    ${slider("Up / down", f.posY, posY, 0, 100, "%")}
+  </div>`;
+}
+
+// One image slot: "+ Add image" when empty, otherwise thumbnail, file name, Crop and ✕.
+function imagePicker(label, url, name, uploadKey, cropKey, required = false) {
+  const head = `<span class="lbl">${label}${required ? REQ : ""}</span>`;
+  if (!url) return `<div class="pick-field">${head}<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp" data-upload="${uploadKey}"><span>＋ Add image</span></label></div>`;
+  return `<div class="pick-field">${head}<div class="picked">
+    <img src="${escapeHtml(P.safeMedia(url))}" alt="">
+    <span class="fname">${escapeHtml(name || "Image")}</span>
+    <button type="button" class="mini${cropOpen === cropKey ? " on" : ""}" data-crop="${cropKey}">Crop</button>
+    <button type="button" class="x" data-clear="${uploadKey}" aria-label="Remove image">✕</button>
+  </div></div>`;
+}
+
+const SOCIAL_PREVIEW = [
+  ["instagram", "Username", "@yourname"],
+  ["facebook", "Page link", "https://www.facebook.com/yourpage"],
+  ["youtube", "Video or channel link", "https://youtu.be/…"],
+  ["linkedin", "Post or profile link", "https://www.linkedin.com/…"],
+  ["threads", "Username", "@yourname"],
+  ["x", "Username", "@yourname"],
+];
 
 function renderEditPanel() {
   const b = selectedId && findBlock(selectedId);
@@ -498,23 +546,19 @@ function renderEditPanel() {
     panel.innerHTML = `<p class="fine">Click a module on your page to edit it, or add one from the Add tab.</p>`;
     return;
   }
-  const title = `<p class="panel-label">${escapeHtml(P.BLOCKS[b.type] ? P.BLOCKS[b.type].name : "Module")}</p>`;
   const rows = (items, a, bKey, aLabel, bLabel) =>
     items.map((it, i) => `<div class="row-edit"><input data-f="items.${i}.${a}" value="${escapeHtml(it[a] ?? "")}" placeholder="${aLabel}" aria-label="${aLabel}"><input data-f="items.${i}.${bKey}" value="${escapeHtml(it[bKey] ?? "")}" placeholder="${bLabel}" aria-label="${bLabel}"><button type="button" class="x" data-del-row="${i}" aria-label="Remove row">✕</button></div>`).join("") +
     `<button type="button" class="btn small" data-add-row>+ Add row</button>`;
   let body = "";
   switch (b.type) {
     case "profile":
-      body = `<label>Profile photo<input type="file" accept="image/png,image/jpeg,image/webp" data-upload="photo"></label>` +
-        (b.photo
-          ? `<div class="crop-preview" style="border-radius:${b.radius ?? 50}%"><img src="${escapeHtml(P.safeMedia(b.photo))}" alt="" style="object-position:50% ${b.posY ?? 50}%;transform:scale(${(b.zoom ?? 100) / 100});transform-origin:50% ${b.posY ?? 50}%"></div>` +
-            slider("Zoom", "zoom", b.zoom ?? 100, 100, 250, "%") +
-            slider("Move up or down", "posY", b.posY ?? 50, 0, 100, "%") +
-            slider("Shape: square to circle", "radius", b.radius ?? 50, 0, 50, "") +
-            `<button type="button" class="link-btn" data-clear="photo">Remove photo</button>`
-          : "") +
-        field("Name", "name", b.name) +
-        `<label>Bio <span class="opt">Enter starts a new line</span><textarea data-f="bio" rows="4" placeholder="Skincare and makeup for Indian skin&#10;Pune · Hindi and English">${escapeHtml(b.bio || "")}</textarea></label>`;
+      body = imagePicker("Profile photo", b.photo, b.photoName, "photo", "photo") +
+        (b.photo && cropOpen === "photo" ? cropEditor(b, "photo", b.photo, "1 / 1", b.radius ?? 50) : "") +
+        (b.photo ? slider("Radius", "radius", b.radius ?? 50, 0, 50, "") : "") +
+        `<div class="pick-field"><span class="lbl">Layout</span>${seg("layout", b.layout || "stack", [["stack", "Image on top"], ["side", "Side by side"]])}</div>` +
+        (b.layout === "side" ? seg("flip", !!b.flip, [[false, "Text on right"], [true, "Text on left"]]) : "") +
+        field(`Name${REQ}`, "name", b.name, 'aria-required="true"') +
+        `<label>Bio<textarea data-f="bio" rows="4">${escapeHtml(b.bio || "")}</textarea></label>`;
       break;
     case "text":
       body = `<div class="rte-bar" role="toolbar" aria-label="Text formatting">
@@ -525,59 +569,70 @@ function renderEditPanel() {
           <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
         </div>
         <div class="emoji-grid" hidden>${EMOJIS.map((e) => `<button type="button" data-emoji="${e}">${e}</button>`).join("")}</div>
-        <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here. Select words to make them bold, italic or bigger.">${P.cleanHtml(b.html || "")}</div>
-        <p class="fine">Select part of your text, then choose bold, italic or a size.</p>`;
+        <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here">${P.cleanHtml(b.html || "")}</div>`;
       break;
-    case "link": {
-      const missing = (v) => (!String(v || "").trim() ? `<span class="req">Required</span>` : "");
-      const badUrl = b.url && !P.safeUrl(b.url) ? `<span class="req">Check this address</span>` : "";
-      body = field(`Text ${missing(b.text)}`, "text", b.text, 'placeholder="Watch my latest campaign"') +
-        field(`Link ${missing(b.url) || badUrl}`, "url", b.url, 'placeholder="YouTube, PDF, Google Drive or any link" inputmode="url"') +
-        `<label>Image <span class="opt">optional</span><input type="file" accept="image/png,image/jpeg,image/webp" data-upload="image"></label>` +
-        (b.image
-          ? `<div class="seg wide" role="group" aria-label="Image side"><button type="button" data-side="left" class="${b.side !== "right" ? "active" : ""}">Image left</button><button type="button" data-side="right" class="${b.side === "right" ? "active" : ""}">Image right</button></div><button type="button" class="link-btn" data-clear="image">Remove image</button>`
-          : `<p class="fine">Without an image, the text is centred.</p>`);
+    case "link":
+      body = field(`Text${REQ}`, "text", b.text, 'placeholder="Watch my latest campaign" aria-required="true"') +
+        field(`Link${REQ}`, "url", b.url, `placeholder="YouTube, PDF, Google Drive or any link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
+        imagePicker("Image", b.image, b.imageName, "image", "image") +
+        (b.image && cropOpen === "image" ? cropEditor(b, "image", b.image, "4 / 3") : "") +
+        (b.image ? seg("side", b.side === "right" ? "right" : "left", [["left", "Image left"], ["right", "Image right"]]) : "");
       break;
-    }
     case "stats":
       body = rows(b.items || [], "label", "value", "e.g. Instagram followers", "e.g. 12400");
       break;
-    case "file":
-      if (!b.kind) {
-        body = `<p class="fine">What do you want to add?</p><div class="choice">
-          <button type="button" data-kind="images"><strong>Images</strong><span>PNG or JPG, shown as a carousel</span></button>
-          <button type="button" data-kind="pdf"><strong>PDF</strong><span>A preview visitors can open and read</span></button></div>`;
-      } else if (b.kind === "images") {
-        body = `<label>Add photos<input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"></label>
-          <p class="fine">Select several at once. They show as a swipeable carousel.</p>
-          <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="">`}<button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}</div>`;
-      } else {
-        body = `<label>Add a PDF<input type="file" accept=".pdf,application/pdf" data-upload="pdf"></label>
-          <p class="fine">${Cloud.ready ? "Up to 50 MB. Visitors tap the preview to read it." : "PDF uploads turn on after sharing is set up."}</p>
-          ${(b.items || []).map((f, i) => `<div class="file-row"><span>📄 ${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove">✕</button></div>`).join("")}`;
+    case "file": {
+      const has = (b.items || []).length > 0;
+      body = seg("kind", b.kind || "", [["images", "Images", has && b.kind !== "images"], ["pdf", "PDF", has && b.kind !== "pdf"]], 'aria-label="File type"');
+      if (b.kind === "images") {
+        const sel = /^items\.(\d+)$/.test(cropOpen || "") ? Number(cropOpen.split(".")[1]) : -1;
+        body += `<div class="pick-field"><span class="lbl">Size</span>${seg("size", b.size || "landscape", [["portrait", "4:5"], ["square", "1:1"], ["landscape", "4:3"], ["wide", "16:9"]])}</div>
+          <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb${sel === i ? " on" : ""}">
+              <button type="button" class="thumb-btn" data-crop="items.${i}" title="Crop ${escapeHtml(m.name || "photo")}">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="${escapeHtml(m.name || "")}">`}</button>
+              <button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(m.name || "photo")}">✕</button>
+            </div>`).join("")}
+            <label class="thumb add" title="Add images"><input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"><span aria-hidden="true">＋</span><span class="sr">Add images</span></label>
+          </div>` +
+          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"]) : "");
+      } else if (b.kind === "pdf") {
+        body += (b.items || []).map((f, i) => `<div class="picked"><span class="pdf-ic" aria-hidden="true">PDF</span><span class="fname">${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(f.name || "PDF")}">✕</button></div>`).join("") +
+          `<label class="pick"><input type="file" accept=".pdf,application/pdf" data-upload="pdf"><span>＋ Add PDF</span></label>`;
       }
-      if (b.kind && !(b.items || []).length) body += `<button type="button" class="link-btn" data-kind="">Change to ${b.kind === "pdf" ? "images" : "PDF"}</button>`;
       break;
+    }
     case "socials":
       body = (b.items || []).map((it, i) => {
         const p = P.platformById(it.platform);
         return `<div class="social-row">${P.icon(p)}<label class="grow"><span class="sr">${escapeHtml(p.name)}</span><input data-f="items.${i}.value" value="${escapeHtml(it.value || "")}" placeholder="${escapeHtml(p.name)}: ${escapeHtml(p.hint)}"></label><button type="button" class="x" data-del-row="${i}" aria-label="Remove ${escapeHtml(p.name)}">✕</button></div>`;
       }).join("") +
-        `<p class="panel-label">Add a platform</p>
-        <input type="search" data-search placeholder="Search Instagram, Facebook, Google Reviews…" aria-label="Search platforms">
+        `<input type="search" data-search placeholder="Search Instagram, Facebook, Google Reviews…" aria-label="Search platforms">
         <div class="platforms" id="platform-list">${platformButtons("")}</div>`;
       break;
     case "rates":
       body = rows(b.items || [], "label", "price", "e.g. Instagram Reel", "₹ price") +
         `<label class="check"><input type="checkbox" data-f="barter" ${b.barter ? "checked" : ""}> Open to barter collabs</label>`;
       break;
-    case "instagram":
-      body = field("Instagram username", "handle", b.handle, 'placeholder="@yourname" autocapitalize="none"') +
-        `<p class="fine">Your account must be public. Instagram shows your photo, bio and latest posts; what appears is decided by Instagram.</p>`;
+    case "instagram": {
+      const plat = b.platform || "instagram";
+      const [, label, ph] = SOCIAL_PREVIEW.find(([id]) => id === plat) || SOCIAL_PREVIEW[0];
+      body = `<div class="plat-pick" role="group" aria-label="Platform">${SOCIAL_PREVIEW.map(([id]) => {
+          const p = P.platformById(id);
+          return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}" title="${escapeHtml(p.name)}" aria-label="${escapeHtml(p.name)}">${P.icon(p)}</button>`;
+        }).join("")}</div>` +
+        field(`${label}${REQ}`, "value", b.value ?? b.handle ?? "", `placeholder="${escapeHtml(ph)}" autocapitalize="none" aria-required="true"`);
       break;
+    }
   }
-  panel.innerHTML = `${title}<div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
+  panel.innerHTML = `<div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
   if (b.type === "text") setupTextEditor(b);
+}
+
+function updateCropPreviews(b) {
+  el("panel-edit").querySelectorAll("[data-crop-preview]").forEach((frame) => {
+    const f = cropFields(frame.dataset.cropPreview);
+    frame.querySelector("img").setAttribute("style", P.cropStyle(getPath(b, f.zoom), getPath(b, f.posY)));
+    if (frame.dataset.cropPreview === "photo") frame.style.borderRadius = `${b.radius ?? 50}%`;
+  });
 }
 
 function platformButtons(q) {
@@ -715,46 +770,37 @@ function setupPanel() {
     setPath(b, f, v);
     if (e.target.type === "range") {
       e.target.nextElementSibling.textContent = `${v}${f === "radius" ? "" : "%"}`;
-      const prev = panel.querySelector(".crop-preview");
-      if (prev) {
-        prev.style.borderRadius = `${b.radius}%`;
-        const img = prev.querySelector("img");
-        img.style.objectPosition = `50% ${b.posY}%`;
-        img.style.transform = `scale(${b.zoom / 100})`;
-        img.style.transformOrigin = `50% ${b.posY}%`;
-      }
+      updateCropPreviews(b);
     }
+    if (f === "url") e.target.classList.toggle("invalid", !!e.target.value.trim() && !P.safeUrl(e.target.value));
     saveSite();
     renderOne(b.id);
-    // Show or hide "Required" hints without moving the cursor.
-    if (b.type === "link") {
-      panel.querySelectorAll("label").forEach((l) => {
-        const input = l.querySelector('[data-f="text"],[data-f="url"]');
-        if (!input) return;
-        let req = l.querySelector(".req");
-        const msg = !input.value.trim() ? "Required" : input.dataset.f === "url" && !P.safeUrl(input.value) ? "Check this address" : "";
-        if (msg && !req) { req = document.createElement("span"); req.className = "req"; input.before(req); }
-        if (req) { if (msg) req.textContent = msg; else req.remove(); }
-      });
-    }
   });
   panel.addEventListener("click", (e) => {
     const b = findBlock(selectedId);
     const t = e.target.closest("button");
-    if (!b || !t) return;
+    if (!b || !t || t.disabled) return;
     if (t.dataset.addRow !== undefined) b.items.push({});
     else if (t.dataset.delRow !== undefined) b.items.splice(Number(t.dataset.delRow), 1);
-    else if (t.dataset.delItem !== undefined) b.items.splice(Number(t.dataset.delItem), 1);
-    else if (t.dataset.clear) b[t.dataset.clear] = "";
-    else if (t.dataset.kind !== undefined) b.kind = t.dataset.kind;
-    else if (t.dataset.side) b.side = t.dataset.side;
-    else if (t.dataset.platform) b.items.push({ platform: t.dataset.platform, value: "" });
+    else if (t.dataset.delItem !== undefined) {
+      b.items.splice(Number(t.dataset.delItem), 1);
+      cropOpen = null;
+    } else if (t.dataset.clear) {
+      const key = t.dataset.clear;
+      b[key] = "";
+      b[`${key}Name`] = "";
+      if (cropOpen === key) cropOpen = null;
+    } else if (t.dataset.crop) cropOpen = cropOpen === t.dataset.crop ? null : t.dataset.crop;
+    else if (t.dataset.set) {
+      const raw = t.dataset.val;
+      b[t.dataset.set] = raw === "true" ? true : raw === "false" ? false : raw;
+    } else if (t.dataset.platform) b.items.push({ platform: t.dataset.platform, value: "" });
     else return;
     saveSite();
     renderOne(b.id);
     renderEditPanel();
     if (t.dataset.platform) {
-      const inputs = panel.querySelectorAll('.social-row input');
+      const inputs = panel.querySelectorAll(".social-row input");
       if (inputs.length) inputs[inputs.length - 1].focus();
     }
   });
@@ -767,11 +813,14 @@ function setupPanel() {
     note(`Uploading ${files.length > 1 ? `${files.length} files` : "your file"}…`);
     try {
       for (const file of files) {
-        if (kind === "photo") { b.photo = await uploadImage(file, 600); b.zoom = 100; b.posY = 50; }
-        else if (kind === "image") b.image = await uploadImage(file, 800);
-        else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name });
+        if (kind === "photo") Object.assign(b, { photo: await uploadImage(file, 600), photoName: file.name, zoom: 100, posY: 50 });
+        else if (kind === "image") Object.assign(b, { image: await uploadImage(file, 800), imageName: file.name, imgZoom: 100, imgPosY: 50 });
+        else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name, zoom: 100, posY: 50 });
         else if (kind === "pdf") b.items.push({ type: "pdf", url: await uploadPdf(file), name: file.name });
       }
+      // Open the crop tools straight away for a newly chosen image.
+      if (kind === "photo" || kind === "image") cropOpen = kind;
+      if (kind === "images") cropOpen = `items.${b.items.length - 1}`;
       saveSite();
       renderOne(b.id);
       renderEditPanel();

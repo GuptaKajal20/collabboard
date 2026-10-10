@@ -4,7 +4,9 @@
 
 (function () {
   const cfg = window.CB_SUPABASE || {};
-  const ready = !!(cfg.url && cfg.anonKey && window.supabase);
+  // For local testing only: http://localhost…/?offline runs without accounts.
+  const offline = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).has("offline");
+  const ready = !offline && !!(cfg.url && cfg.anonKey && window.supabase);
   const client = ready ? window.supabase.createClient(cfg.url, cfg.anonKey) : null;
   const BUCKET = "portfolio-media";
 
