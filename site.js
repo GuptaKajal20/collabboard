@@ -48,11 +48,24 @@
     if (t) window.cpTrack(t.dataset.track, { location: t.dataset.trackWhere || "" });
   });
 
+  // ---------- header: see-through on the photo, solid after scrolling ----------
+  const head = $(".site-header.on-photo");
+  if (head) {
+    const onScroll = () => head.classList.toggle("scrolled", scrollY > 60 || document.querySelector(".nav.open"));
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
   // ---------- mobile menu ----------
   const menuBtn = $(".menu-btn");
   const nav = $("#site-nav");
   if (menuBtn && nav) {
-    const set = (open) => { nav.classList.toggle("open", open); menuBtn.setAttribute("aria-expanded", String(open)); menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu"); };
+    const set = (open) => {
+      nav.classList.toggle("open", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      if (head) head.classList.toggle("scrolled", open || scrollY > 60);
+    };
     menuBtn.addEventListener("click", () => set(!nav.classList.contains("open")));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") set(false); });
     nav.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
@@ -100,7 +113,7 @@
           <span class="lc-meta">${esc(where(l))}${l.published ? ` · Posted ${new Date(l.published + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short" })}` : ""}</span>
           <h3>${esc(l.title)}</h3>
           <div class="lc-tags"><span class="t ${l.pay.startsWith("Paid") ? "paid" : "barter"}">${esc(l.pay)}</span>${l.niches.filter((x) => x !== "General").slice(0, 2).map((x) => `<span class="t">${esc(x)}</span>`).join("")}</div>
-          <a class="btn btn-primary" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer nofollow" data-track="collab_apply" data-track-where="website">Apply on ${esc(where(l))} ↗</a>
+          <a class="pill" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer nofollow" data-track="collab_apply" data-track-where="website">Apply on ${esc(where(l))} ↗</a>
         </article>`).join("");
       $$(".lc", box).forEach((el) => el.classList.add("in"));
     } catch {

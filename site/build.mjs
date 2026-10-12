@@ -30,9 +30,26 @@ const ICONS = {
 const icon = (name, size = 22) => `<svg class="ic" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${ICONS[name] || ICONS.spark}</svg>`;
 
 const logo = `<a class="brand" href="/" aria-label="Collab Pro home">
-  <img src="/assets/logo-mark.svg" alt="" width="34" height="34">
-  <span class="wordmark">collab<span>pro</span></span>
+  <img src="/assets/logo-mark.svg" alt="" width="38" height="38">
+  <span class="wordmark">Collab <em>Pro</em></span>
 </a>`;
+
+// ---------- photos (Unsplash, see assets/photos/CREDITS.md) ----------
+const DIMS = { "hero-mustard": [2000, 1333], kurta: [1200, 960], dupatta: [1200, 1800], "smile-bw": [1200, 1800], "portrait-bw": [1200, 1800], saree: [1200, 1798], moody: [1200, 1600] };
+const photo = (name, alt, cls = "", sizes = "(max-width: 860px) 100vw, 50vw", eager = false) => {
+  const [w, h] = DIMS[name];
+  const small = name === "hero-mustard" ? 1000 : 600;
+  return `<img class="${cls}" src="/assets/photos/${name}-${small}.jpg" srcset="/assets/photos/${name}-${small}.jpg ${small}w, /assets/photos/${name}-${w}.jpg ${w}w" sizes="${sizes}" width="${w}" height="${h}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+};
+
+// Diagonal moving ribbons.
+const RIBBON_A = ["Find your next collab", "Build your portfolio", "Apply at the source", "Free for creators"];
+const RIBBON_B = ["Don't let great collabs pass you by", "One link for every brand", "Made for creators in India"];
+const ribbonText = (items) => Array(4).fill(items).flat().map((t) => `<span>${esc(t)}</span><i aria-hidden="true">✷</i>`).join("");
+const ribbons = `<div class="ribbons" aria-hidden="true">
+  <div class="ribbon r1"><div class="ribbon-track">${ribbonText(RIBBON_A)}</div></div>
+  <div class="ribbon r2"><div class="ribbon-track">${ribbonText(RIBBON_B)}</div></div>
+</div>`;
 
 // ---------- page frame ----------
 function head(p) {
@@ -58,7 +75,7 @@ function head(p) {
   <meta name="description" content="${esc(p.description)}">
   <meta name="robots" content="${p.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}">
   ${p.noindex ? "" : `<link rel="canonical" href="${canonical}">`}
-  <meta name="theme-color" content="#0c0a1d">
+  <meta name="theme-color" content="#ebe8de">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${SITE.name}">
@@ -74,7 +91,8 @@ function head(p) {
   ${SITE.searchConsoleVerification ? `<meta name="google-site-verification" content="${esc(SITE.searchConsoleVerification)}">` : ""}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  ${p.path === "/" ? '<link rel="preload" as="image" href="/assets/photos/hero-mustard-1000.jpg" imagesrcset="/assets/photos/hero-mustard-1000.jpg 1000w, /assets/photos/hero-mustard-2000.jpg 2000w" imagesizes="100vw">' : ""}
   <link rel="stylesheet" href="/site.css">
   ${ld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n  ")}
   <script>document.documentElement.classList.add("js");${p.path === "/" ? 'if(location.hash.startsWith("#/"))location.replace("/app"+location.hash);' : ""}</script>
@@ -82,16 +100,16 @@ function head(p) {
 </head>`;
 }
 
-function header(active) {
+function header(active, onPhoto) {
   return `<a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header${onPhoto ? " on-photo" : ""}">
   <div class="wrap nav-wrap">
     ${logo}
     <nav class="nav" id="site-nav" aria-label="Main">
       <ul>${NAV.map((n) => `<li><a href="${n.href}"${n.href === active ? ' aria-current="page"' : ""}>${esc(n.label)}</a></li>`).join("")}</ul>
       <div class="nav-cta">
-        <a class="btn btn-ghost" href="/signin">Sign in</a>
-        <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
+        <a class="nav-login" href="/signin">Sign in</a>
+        <a class="pill" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
       </div>
     </nav>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span><span></span></button>
@@ -105,24 +123,24 @@ function footer() {
     <div class="foot-brand">
       ${logo}
       <p>${esc(SITE.tagline)}</p>
-      <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="footer">Create your free account</a>
+      <a class="pill" href="/signup" data-track="sign_up_click" data-track-where="footer">Create your free account <span aria-hidden="true">→</span></a>
     </div>
     ${FOOTER.map((c) => `<nav aria-label="${esc(c.title)}"><h2>${esc(c.title)}</h2><ul>${c.links.map(([h, l]) => `<li><a href="${h}">${esc(l)}</a></li>`).join("")}</ul></nav>`).join("")}
   </div>
   <div class="wrap foot-bottom">
-    <span>© ${new Date().getFullYear()} ${SITE.name}. Made for creators in India.</span>
+    <span>© ${new Date().getFullYear()} ${SITE.name}. Made for creators in India. Photos from <a href="https://unsplash.com" rel="noopener">Unsplash</a>, showing models, not Collab Pro users.</span>
     <button type="button" class="link" data-open-consent hidden>Cookie settings</button>
   </div>
 </footer>
 <div class="consent" id="consent" role="dialog" aria-live="polite" aria-label="Cookie notice" hidden>
   <p>We'd like to use analytics cookies to understand how creators use Collab Pro. Nothing is collected unless you agree.</p>
-  <div><button type="button" class="btn btn-ghost" data-consent="no">No thanks</button><button type="button" class="btn btn-primary" data-consent="yes">Allow analytics</button></div>
+  <div><button type="button" class="pill cream" data-consent="no">No thanks</button><button type="button" class="pill" data-consent="yes">Allow analytics</button></div>
 </div>`;
 }
 
 const page = (p, body) => `${head(p)}
 <body class="${p.bodyClass || ""}">
-${p.bare ? "" : header(p.path)}
+${p.bare ? "" : header(p.path, p.path === "/")}
 <main id="main">
 ${body}
 </main>
@@ -135,22 +153,26 @@ ${(p.scripts || []).map((s) => `<script src="${s}"></script>`).join("\n")}
 `;
 
 // ---------- shared sections ----------
-const pageHero = (eyebrow, h1, lead, extra = "") => `<section class="page-hero">
-  <div class="wrap">
-    <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>${esc(eyebrow)}</span></nav>
-    <h1 data-reveal>${h1}</h1>
-    <p class="lead" data-reveal>${lead}</p>
-    ${extra}
+const pageHero = (eyebrow, h1, lead, extra = "", img = null) => `<section class="page-hero${img ? " with-photo" : ""}">
+  <div class="${img ? "ph-grid" : "wrap"}">
+    <div class="ph-copy">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><span>${esc(eyebrow)}</span></nav>
+      <h1 data-reveal>${h1}</h1>
+      <p class="lead" data-reveal>${lead}</p>
+      ${extra}
+    </div>
+    ${img ? `<div class="ph-photo">${photo(img[0], img[1], "", "(max-width: 860px) 100vw, 45vw", true)}</div>` : ""}
   </div>
-</section>`;
+</section>
+${img ? ribbons : ""}`;
 
 const ctaBand = (h = "Your next collab could be one tap away.", t = "Create a free account, find openings that fit you, and publish a portfolio brands can open from anywhere.") => `<section class="cta-band">
   <div class="wrap cta-inner" data-reveal>
     <h2>${h}</h2>
     <p>${t}</p>
     <div class="cta-row">
-      <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="cta-band">Sign up free</a>
-      <a class="btn btn-ghost btn-lg" href="/signin">I already have an account</a>
+      <a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="cta-band">Sign up free <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg cream" href="/signin">I already have an account</a>
     </div>
   </div>
 </section>`;
@@ -169,7 +191,7 @@ const faqList = (items) => `<div class="faq">${items.map((f) => `<details data-r
 const portfolioMock = (o = {}) => `<div class="mock-portfolio theme-${o.theme || "violet"}${o.side ? " side" : ""}" ${o.id ? `id="${o.id}"` : ""}>
   <span class="tag-example">${o.label || "Example portfolio"}</span>
   <div class="mp-head">
-    <div class="mp-avatar" aria-hidden="true">${o.initial || "Y"}</div>
+    ${o.photo ? `<div class="mp-avatar has-photo">${photo(o.photo, "", "", "120px")}</div>` : `<div class="mp-avatar" aria-hidden="true">${o.initial || "Y"}</div>`}
     <div>
       <p class="mp-name">${esc(o.name || "Your name")}</p>
       <p class="mp-bio">${esc(o.bio || "Skincare and everyday makeup for Indian skin")}</p>
@@ -224,11 +246,11 @@ const portfolioDemo = `<div class="pf-demo" data-reveal>
 </div>`;
 
 const showcase = `<div class="showcase">
-  ${portfolioMock({ theme: "coral", name: "Skincare creator · Mumbai", bio: "Honest reviews for oily, Indian skin", initial: "S" })}
-  ${portfolioMock({ theme: "teal", name: "Home chef · Hyderabad", bio: "Quick Telugu recipes, 30 minutes or less", initial: "H", s1: "6.1k", s2: "15k", r1: "₹3,000", r2: "₹900" })}
-  ${portfolioMock({ theme: "ink", name: "Tech reviewer · Bengaluru", bio: "Budget phones and gadgets, explained simply", initial: "T", s1: "28k", s2: "40k", r1: "₹12,000", r2: "₹3,000" })}
+  ${portfolioMock({ theme: "coral", name: "Skincare creator · Mumbai", bio: "Honest reviews for oily, Indian skin", photo: "dupatta" })}
+  ${portfolioMock({ theme: "teal", name: "Home chef · Hyderabad", bio: "Quick Telugu recipes, 30 minutes or less", photo: "kurta", s1: "6.1k", s2: "15k", r1: "₹3,000", r2: "₹900" })}
+  ${portfolioMock({ theme: "ink", name: "Tech reviewer · Bengaluru", bio: "Budget phones and gadgets, explained simply", photo: "portrait-bw", s1: "28k", s2: "40k", r1: "₹12,000", r2: "₹3,000" })}
 </div>
-<p class="fine center">These are illustrative example portfolios, not real creators. Yours will show your own details.</p>`;
+<p class="fine center">Illustrative example portfolios using stock photos of models, not real creators. Yours will show your own details.</p>`;
 
 // ---------- pages ----------
 const live = FEATURES.filter((f) => f.status === "live");
@@ -240,18 +262,50 @@ pages.push({
   description: "Collab Pro helps influencers and content creators in India discover brand collaboration opportunities every day and build a free, shareable portfolio, all in one place.",
   faqLd: FAQS.slice(0, 6),
   body: `<section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow" data-reveal>${icon("spark", 16)} For influencers and content creators</p>
-      <h1 data-reveal>Find brand collabs.<br><span class="grad">Build your portfolio.</span><br>All in one place.</h1>
-      <p class="lead" data-reveal>Collab Pro collects fresh brand collaboration openings from across the web every morning and gives you a free portfolio builder, so you can find the right deals and pitch with a link brands love to open.</p>
-      <div class="cta-row" data-reveal>
-        <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="hero">Sign up free</a>
-        <a class="btn btn-ghost btn-lg" href="/signin">Sign in</a>
-      </div>
-      <ul class="hero-points" data-reveal><li>${icon("check", 18)} Free portfolio</li><li>${icon("check", 18)} No commission</li><li>${icon("check", 18)} Works on any phone</li></ul>
+  ${photo("hero-mustard", "A creator in a mustard shirt looking to the side", "hero-bg", "100vw", true)}
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <p class="hero-kicker" data-reveal>Meet</p>
+    <h1 class="hero-title" data-reveal><span class="ht-big">Collab <em>Pro</em></span><span class="ht-sub">Brand collaborations and a free creator portfolio, in one place</span></h1>
+    <div class="hero-pills" data-reveal>
+      <a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="hero">Sign up free <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg cream" href="/how-it-works">How it works <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg" href="/discover-collaborations">Discover collabs <span aria-hidden="true">→</span></a>
     </div>
-    ${heroVisual}
+  </div>
+</section>
+${ribbons}
+
+<section class="lined" id="intro">
+  <div class="lined-grid">
+    <div class="lined-cell">
+      <h2 class="display" data-reveal>A free home for <span class="grad">Content Creators</span> &amp; Brand Collabs</h2>
+      <p class="body-copy" data-reveal>Collab Pro collects fresh brand collaboration openings from across the web every morning and gives you a free portfolio builder, so you can find the right deals and pitch with a link brands love to open. No commission, no middleman, and it works on any phone.</p>
+      <p class="hero-sign" data-reveal>Already a member? <a href="/signin">Sign in</a></p>
+    </div>
+    <div class="lined-cell collage-cell">
+      <div class="collage" data-reveal>
+        ${photo("kurta", "A creator in a pale yellow kurta", "c1", "(max-width: 860px) 60vw, 30vw")}
+        ${photo("smile-bw", "A smiling creator in a dupatta, black and white", "c2", "(max-width: 860px) 30vw, 14vw")}
+        ${photo("dupatta", "A creator in a yellow dupatta", "c3", "(max-width: 860px) 60vw, 30vw")}
+      </div>
+      <a class="pill" href="/about">Learn more <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="lined" id="offer">
+  <div class="lined-grid offer-grid">
+    <div class="offer-photo">
+      ${photo("saree", "A creator in an orange and white saree by a window", "", "(max-width: 860px) 100vw, 40vw")}
+      <h2 class="offer-title" data-reveal>What<br>We<br>Offer</h2>
+      <p class="offer-note">Everything a creator needs to land the next brand deal, in one free account.</p>
+    </div>
+    <div class="lined-cell offer-cards">
+      <a class="offer-card" href="/discover-collaborations" data-reveal><h3><em>Discover</em> Collaborations</h3><p>A fresh feed of brand openings every morning, filtered by niche, paid or barter, and your follower count.</p><span class="more">Learn more →</span></a>
+      <a class="offer-card" href="/creator-portfolio" data-reveal><h3><em>Build</em> Your Portfolio</h3><p>Drag-and-drop modules, photo carousels, PDF media kits and social previews, published to your own link.</p><span class="more">Learn more →</span></a>
+      <a class="offer-card" href="/features" data-reveal><h3><em>Track</em> Every Application</h3><p>Star openings for later and keep an Applied list that follows you to every device.</p><span class="more">Learn more →</span></a>
+    </div>
   </div>
 </section>
 
@@ -363,7 +417,7 @@ ${ctaBand()}`,
 pages.push({
   path: "/about", file: "about.html", title: "About us",
   description: "Why we're building Collab Pro: one place for creators in India to discover brand collaborations and build a professional portfolio.",
-  body: `${pageHero("About us", "We're building the home base for <span class=\"grad\">creator careers.</span>", "Collab Pro exists so creators spend less time searching and more time creating.")}
+  body: `${pageHero("About us", "We're building the home base for <span class=\"grad\">creator careers.</span>", "Collab Pro exists so creators spend less time searching and more time creating.", "", ["kurta", "A creator in a pale yellow kurta against a cream wall"])}
 <section class="section"><div class="wrap narrow prose">
   <h2>Our mission</h2>
   <p>Make it simple for every creator in India, at any follower count, to find real brand opportunities and present their work professionally.</p>
@@ -385,7 +439,7 @@ ${ctaBand()}`,
 pages.push({
   path: "/discover-collaborations", file: "discover-collaborations.html", title: "Discover brand collaborations",
   description: "Find brand collaboration opportunities for influencers in India: a daily feed of paid and barter openings from brand forms and public posts, with filters by niche and follower count.",
-  body: `${pageHero("Discover collaborations", "Brand collaboration opportunities, <span class=\"grad\">found for you daily.</span>", "Stop checking ten places. Collab Pro searches the public web every morning for brands looking for creators and puts every opening in one feed.", `<div class="cta-row"><a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="discover-hero">Browse the full feed</a></div>`)}
+  body: `${pageHero("Discover collaborations", "Brand collaboration opportunities, <span class=\"grad\">found for you daily.</span>", "Stop checking ten places. Collab Pro searches the public web every morning for brands looking for creators and puts every opening in one feed.", `<div class="cta-row"><a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="discover-hero">Browse the full feed <span aria-hidden="true">→</span></a></div>`, ["dupatta", "A creator in a yellow dupatta"])}
 <section class="section"><div class="wrap">
   <h2 class="h2" data-reveal>A sample of today's openings</h2>
   ${liveCollabs(9)}
@@ -409,7 +463,7 @@ ${ctaBand("Find your next brand collaboration.", "Sign up free to browse every o
 pages.push({
   path: "/creator-portfolio", file: "creator-portfolio.html", title: "Free creator portfolio builder",
   description: "Build a free influencer portfolio website with Collab Pro: drag-and-drop modules, photo carousels, PDF media kits, social previews and rates, published to your own shareable link.",
-  body: `${pageHero("Creator portfolio", "A free portfolio <span class=\"grad\">that works as hard as you do.</span>", "Drag in modules, type straight onto the page, and publish to your own link. No design skills, no website builder, no cost.", `<div class="cta-row"><a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="portfolio-hero">Build my portfolio</a></div>`)}
+  body: `${pageHero("Creator portfolio", "A free portfolio <span class=\"grad\">that works as hard as you do.</span>", "Drag in modules, type straight onto the page, and publish to your own link. No design skills, no website builder, no cost.", `<div class="cta-row"><a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="portfolio-hero">Build my portfolio <span aria-hidden="true">→</span></a></div>`, ["smile-bw", "A smiling creator in a dupatta, black and white"])}
 <section class="section"><div class="wrap">${portfolioDemo}</div></section>
 <section class="section alt"><div class="wrap">
   <h2 class="h2" data-reveal>Eight modules, endless combinations</h2>
@@ -432,7 +486,7 @@ ${ctaBand("Make a portfolio brands remember.", "It's free and takes a few minute
 pages.push({
   path: "/features", file: "features.html", title: "Features",
   description: "Every Collab Pro feature for creators: daily brand collaboration discovery, filters, save and apply tracking, a drag-and-drop portfolio builder, public links and what's coming next.",
-  body: `${pageHero("Features", "Everything a creator needs, <span class=\"grad\">in one place.</span>", "Discovery, tracking and your portfolio, working together, with more tools on the way.")}
+  body: `${pageHero("Features", "Everything a creator needs, <span class=\"grad\">in one place.</span>", "Discovery, tracking and your portfolio, working together, with more tools on the way.", "", ["portrait-bw", "A creator with arms crossed, black and white"])}
 ${["Discover", "Portfolio", "Workflow"].map((g, i) => `<section class="section${i % 2 ? " alt" : ""}"><div class="wrap">
   <h2 class="h2" data-reveal>${g === "Discover" ? "Discover collaborations" : g === "Portfolio" ? "Build your portfolio" : "Your workflow"}</h2>
   <div class="feature-rows">${FEATURES.filter((f) => f.group === g).map((f) => `<article class="feature-row" data-reveal><div class="feature-ic">${icon(f.icon)}</div><div><h3>${esc(f.title)}</h3><p>${esc(f.long)}</p></div></article>`).join("")}</div>
@@ -448,7 +502,7 @@ ${ctaBand()}`,
 pages.push({
   path: "/how-it-works", file: "how-it-works.html", title: "How it works",
   description: "How Collab Pro works for creators: sign up free, discover brand collaborations, apply at the source, build your portfolio and share your public link.",
-  body: `${pageHero("How it works", "From sign-up to your <span class=\"grad\">first pitch.</span>", "Five simple steps, all in your browser.")}
+  body: `${pageHero("How it works", "From sign-up to your <span class=\"grad\">first pitch.</span>", "Five simple steps, all in your browser.", "", ["moody", "A creator sitting by a building in soft light"])}
 <section class="section"><div class="wrap narrow">${stepsList()}</div></section>
 <section class="section alt"><div class="wrap narrow prose">
   <h2>Tips for better results</h2>
@@ -484,7 +538,7 @@ pages.push({
     <div class="field"><label for="c-topic">Topic</label><select id="c-topic" name="topic"><option>General question</option><option>Feedback or idea</option><option>Report a listing</option><option>Brand or partnership</option><option>My account</option></select></div>
     <div class="field"><label for="c-msg">Message <span class="req">*</span></label><textarea id="c-msg" name="message" rows="6" required></textarea></div>
     <p class="form-msg" id="contact-msg" role="status" hidden></p>
-    <button class="btn btn-primary btn-lg" type="submit">Send message</button>
+    <button class="pill pill-lg" type="submit">Send message</button>
   </form>
   <aside class="contact-side">
     <h2>Before you write</h2>
@@ -596,9 +650,9 @@ const authShell = (inner, aside) => `<section class="auth">
     ${inner}
   </div>
 </section>`;
-const authAside = `<h2>Find brand collabs.<br><span class="grad">Build your portfolio.</span></h2>
-  <ul class="ticks"><li>${icon("radar", 20)} Fresh openings every morning</li><li>${icon("layout", 20)} Free drag-and-drop portfolio</li><li>${icon("lock", 20)} One account on every device</li></ul>
-  <div class="auth-preview">${portfolioMock({ label: "Product preview" })}</div>`;
+const authAside = `${photo("moody", "A creator sitting by a building in soft light", "auth-photo", "50vw", true)}
+  <div class="auth-copy"><h2>Find brand collabs.<br><em>Build your portfolio.</em></h2>
+  <ul class="ticks"><li>${icon("radar", 20)} Fresh openings every morning</li><li>${icon("layout", 20)} Free drag-and-drop portfolio</li><li>${icon("lock", 20)} One account on every device</li></ul></div>`;
 
 pages.push({
   path: "/signup", file: "signup.html", title: "Sign up", noindex: true, bare: true, bodyClass: "auth-page", scripts: authScripts,
@@ -611,7 +665,7 @@ pages.push({
     ${pw("su-pass", "Password", "new-password", "At least 8 characters.")}
     <label class="check"><input type="checkbox" name="terms" required> I agree to the <a href="/terms-of-service" target="_blank">Terms</a> and <a href="/privacy-policy" target="_blank">Privacy policy</a></label>
     <p class="form-msg" role="alert" hidden></p>
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Create account</button>
+    <button class="pill pill-lg pill-block" type="submit">Create account</button>
   </form>`, authAside),
 });
 
@@ -625,7 +679,7 @@ pages.push({
     ${pw("si-pass", "Password", "current-password")}
     <p class="row-end"><a href="/forgot-password">Forgot password?</a></p>
     <p class="form-msg" role="alert" hidden></p>
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Sign in</button>
+    <button class="pill pill-lg pill-block" type="submit">Sign in</button>
   </form>`, authAside),
 });
 
@@ -637,7 +691,7 @@ pages.push({
     <p class="muted">Enter your account email and we'll send you a link to choose a new password.</p>
     <div class="field"><label for="fp-email">Email <span class="req">*</span></label><input id="fp-email" name="email" type="email" autocomplete="email" required></div>
     <p class="form-msg" role="alert" hidden></p>
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Send reset link</button>
+    <button class="pill pill-lg pill-block" type="submit">Send reset link</button>
     <p class="muted center"><a href="/signin">Back to sign in</a></p>
   </form>`, authAside),
 });
@@ -649,7 +703,7 @@ pages.push({
     <h1>Choose a new password</h1>
     ${pw("rp-pass", "New password", "new-password", "At least 8 characters.")}
     <p class="form-msg" role="alert" hidden></p>
-    <button class="btn btn-primary btn-lg btn-block" type="submit">Save new password</button>
+    <button class="pill pill-lg pill-block" type="submit">Save new password</button>
   </form>`, authAside),
 });
 

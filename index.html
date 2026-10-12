@@ -7,7 +7,7 @@
   <meta name="description" content="Collab Pro helps influencers and content creators in India discover brand collaboration opportunities every day and build a free, shareable portfolio, all in one place.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://collabboard-blush.vercel.app/">
-  <meta name="theme-color" content="#0c0a1d">
+  <meta name="theme-color" content="#ebe8de">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Collab Pro">
@@ -23,7 +23,8 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="/assets/photos/hero-mustard-1000.jpg" imagesrcset="/assets/photos/hero-mustard-1000.jpg 1000w, /assets/photos/hero-mustard-2000.jpg 2000w" imagesizes="100vw">
   <link rel="stylesheet" href="/site.css">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Collab Pro","url":"https://collabboard-blush.vercel.app","logo":"https://collabboard-blush.vercel.app/assets/logo-mark.svg","description":"Collab Pro is a free platform for influencers and content creators in India: discover brand collaboration opportunities every day and build a professional portfolio you can share with brands."}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Collab Pro","url":"https://collabboard-blush.vercel.app","inLanguage":"en-IN","description":"Collab Pro is a free platform for influencers and content creators in India: discover brand collaboration opportunities every day and build a professional portfolio you can share with brands."}</script>
@@ -33,17 +34,17 @@
 </head>
 <body class="home">
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
+<header class="site-header on-photo">
   <div class="wrap nav-wrap">
     <a class="brand" href="/" aria-label="Collab Pro home">
-  <img src="/assets/logo-mark.svg" alt="" width="34" height="34">
-  <span class="wordmark">collab<span>pro</span></span>
+  <img src="/assets/logo-mark.svg" alt="" width="38" height="38">
+  <span class="wordmark">Collab <em>Pro</em></span>
 </a>
     <nav class="nav" id="site-nav" aria-label="Main">
       <ul><li><a href="/discover-collaborations">Discover collabs</a></li><li><a href="/creator-portfolio">Portfolio</a></li><li><a href="/features">Features</a></li><li><a href="/how-it-works">How it works</a></li><li><a href="/faq">FAQ</a></li></ul>
       <div class="nav-cta">
-        <a class="btn btn-ghost" href="/signin">Sign in</a>
-        <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
+        <a class="nav-login" href="/signin">Sign in</a>
+        <a class="pill" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
       </div>
     </nav>
     <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu"><span></span><span></span></button>
@@ -51,54 +52,53 @@
 </header>
 <main id="main">
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <p class="eyebrow" data-reveal><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg> For influencers and content creators</p>
-      <h1 data-reveal>Find brand collabs.<br><span class="grad">Build your portfolio.</span><br>All in one place.</h1>
-      <p class="lead" data-reveal>Collab Pro collects fresh brand collaboration openings from across the web every morning and gives you a free portfolio builder, so you can find the right deals and pitch with a link brands love to open.</p>
-      <div class="cta-row" data-reveal>
-        <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="hero">Sign up free</a>
-        <a class="btn btn-ghost btn-lg" href="/signin">Sign in</a>
-      </div>
-      <ul class="hero-points" data-reveal><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> Free portfolio</li><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> No commission</li><li><svg class="ic" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/></svg> Works on any phone</li></ul>
-    </div>
-    <div class="hero-visual" aria-label="Product preview: a creator portfolio next to brand collaboration openings" role="img">
-  <div class="hv-glow" aria-hidden="true"></div>
-  <div class="hv-portfolio float-a"><div class="mock-portfolio theme-violet" >
-  <span class="tag-example">Product preview</span>
-  <div class="mp-head">
-    <div class="mp-avatar" aria-hidden="true">Y</div>
-    <div>
-      <p class="mp-name">Your name</p>
-      <p class="mp-bio">Skincare and everyday makeup for Indian skin</p>
+  <img class="hero-bg" src="/assets/photos/hero-mustard-1000.jpg" srcset="/assets/photos/hero-mustard-1000.jpg 1000w, /assets/photos/hero-mustard-2000.jpg 2000w" sizes="100vw" width="2000" height="1333" alt="A creator in a mustard shirt looking to the side" fetchpriority="high" decoding="async">
+  <div class="hero-shade" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <p class="hero-kicker" data-reveal>Meet</p>
+    <h1 class="hero-title" data-reveal><span class="ht-big">Collab <em>Pro</em></span><span class="ht-sub">Brand collaborations and a free creator portfolio, in one place</span></h1>
+    <div class="hero-pills" data-reveal>
+      <a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="hero">Sign up free <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg cream" href="/how-it-works">How it works <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg" href="/discover-collaborations">Discover collabs <span aria-hidden="true">→</span></a>
     </div>
   </div>
-  <div class="mp-socials" aria-hidden="true"><span class="s ig"></span><span class="s yt"></span><span class="s li"></span></div>
-  <div class="mp-stats"><div><strong>12.4k</strong><span>Instagram followers</span></div><div><strong>8k</strong><span>Avg Reel views</span></div></div>
-  <div class="mp-gallery" aria-hidden="true"><span></span><span></span><span></span></div>
-  <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹5,000</strong></li><li><span>Story</span><strong>₹1,500</strong></li></ul>
-</div></div>
-  <div class="hv-collabs">
-    <div class="float-b"><div class="mock-collab">
-  <div class="mc-top"><span>Instagram · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
-  <p>Skincare brand looking for Reels creators</p>
-  <div class="mc-tags"><span class="t paid">Paid</span><span class="t">Instagram</span></div>
-  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
-</div></div>
-    <div class="float-c"><div class="mock-collab">
-  <div class="mc-top"><span>Google Form · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
-  <p>Café in Pune inviting food creators</p>
-  <div class="mc-tags"><span class="t barter">Barter</span><span class="t">Instagram</span></div>
-  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
-</div></div>
-    <div class="float-d"><div class="mock-collab">
-  <div class="mc-top"><span>LinkedIn · Example</span><span class="mc-star" aria-hidden="true"><svg class="ic" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg></span></div>
-  <p>D2C fashion label wants UGC videos</p>
-  <div class="mc-tags"><span class="t paid">Paid</span><span class="t">Instagram</span></div>
-  <span class="mc-apply" aria-hidden="true">Apply on Instagram</span>
-</div></div>
-  </div>
+</section>
+<div class="ribbons" aria-hidden="true">
+  <div class="ribbon r1"><div class="ribbon-track"><span>Find your next collab</span><i aria-hidden="true">✷</i><span>Build your portfolio</span><i aria-hidden="true">✷</i><span>Apply at the source</span><i aria-hidden="true">✷</i><span>Free for creators</span><i aria-hidden="true">✷</i><span>Find your next collab</span><i aria-hidden="true">✷</i><span>Build your portfolio</span><i aria-hidden="true">✷</i><span>Apply at the source</span><i aria-hidden="true">✷</i><span>Free for creators</span><i aria-hidden="true">✷</i><span>Find your next collab</span><i aria-hidden="true">✷</i><span>Build your portfolio</span><i aria-hidden="true">✷</i><span>Apply at the source</span><i aria-hidden="true">✷</i><span>Free for creators</span><i aria-hidden="true">✷</i><span>Find your next collab</span><i aria-hidden="true">✷</i><span>Build your portfolio</span><i aria-hidden="true">✷</i><span>Apply at the source</span><i aria-hidden="true">✷</i><span>Free for creators</span><i aria-hidden="true">✷</i></div></div>
+  <div class="ribbon r2"><div class="ribbon-track"><span>Don&#39;t let great collabs pass you by</span><i aria-hidden="true">✷</i><span>One link for every brand</span><i aria-hidden="true">✷</i><span>Made for creators in India</span><i aria-hidden="true">✷</i><span>Don&#39;t let great collabs pass you by</span><i aria-hidden="true">✷</i><span>One link for every brand</span><i aria-hidden="true">✷</i><span>Made for creators in India</span><i aria-hidden="true">✷</i><span>Don&#39;t let great collabs pass you by</span><i aria-hidden="true">✷</i><span>One link for every brand</span><i aria-hidden="true">✷</i><span>Made for creators in India</span><i aria-hidden="true">✷</i><span>Don&#39;t let great collabs pass you by</span><i aria-hidden="true">✷</i><span>One link for every brand</span><i aria-hidden="true">✷</i><span>Made for creators in India</span><i aria-hidden="true">✷</i></div></div>
 </div>
+
+<section class="lined" id="intro">
+  <div class="lined-grid">
+    <div class="lined-cell">
+      <h2 class="display" data-reveal>A free home for <span class="grad">Content Creators</span> &amp; Brand Collabs</h2>
+      <p class="body-copy" data-reveal>Collab Pro collects fresh brand collaboration openings from across the web every morning and gives you a free portfolio builder, so you can find the right deals and pitch with a link brands love to open. No commission, no middleman, and it works on any phone.</p>
+      <p class="hero-sign" data-reveal>Already a member? <a href="/signin">Sign in</a></p>
+    </div>
+    <div class="lined-cell collage-cell">
+      <div class="collage" data-reveal>
+        <img class="c1" src="/assets/photos/kurta-600.jpg" srcset="/assets/photos/kurta-600.jpg 600w, /assets/photos/kurta-1200.jpg 1200w" sizes="(max-width: 860px) 60vw, 30vw" width="1200" height="960" alt="A creator in a pale yellow kurta" loading="lazy" decoding="async">
+        <img class="c2" src="/assets/photos/smile-bw-600.jpg" srcset="/assets/photos/smile-bw-600.jpg 600w, /assets/photos/smile-bw-1200.jpg 1200w" sizes="(max-width: 860px) 30vw, 14vw" width="1200" height="1800" alt="A smiling creator in a dupatta, black and white" loading="lazy" decoding="async">
+        <img class="c3" src="/assets/photos/dupatta-600.jpg" srcset="/assets/photos/dupatta-600.jpg 600w, /assets/photos/dupatta-1200.jpg 1200w" sizes="(max-width: 860px) 60vw, 30vw" width="1200" height="1800" alt="A creator in a yellow dupatta" loading="lazy" decoding="async">
+      </div>
+      <a class="pill" href="/about">Learn more <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="lined" id="offer">
+  <div class="lined-grid offer-grid">
+    <div class="offer-photo">
+      <img class="" src="/assets/photos/saree-600.jpg" srcset="/assets/photos/saree-600.jpg 600w, /assets/photos/saree-1200.jpg 1200w" sizes="(max-width: 860px) 100vw, 40vw" width="1200" height="1798" alt="A creator in an orange and white saree by a window" loading="lazy" decoding="async">
+      <h2 class="offer-title" data-reveal>What<br>We<br>Offer</h2>
+      <p class="offer-note">Everything a creator needs to land the next brand deal, in one free account.</p>
+    </div>
+    <div class="lined-cell offer-cards">
+      <a class="offer-card" href="/discover-collaborations" data-reveal><h3><em>Discover</em> Collaborations</h3><p>A fresh feed of brand openings every morning, filtered by niche, paid or barter, and your follower count.</p><span class="more">Learn more →</span></a>
+      <a class="offer-card" href="/creator-portfolio" data-reveal><h3><em>Build</em> Your Portfolio</h3><p>Drag-and-drop modules, photo carousels, PDF media kits and social previews, published to your own link.</p><span class="more">Learn more →</span></a>
+      <a class="offer-card" href="/features" data-reveal><h3><em>Track</em> Every Application</h3><p>Star openings for later and keep an Applied list that follows you to every device.</p><span class="more">Learn more →</span></a>
+    </div>
   </div>
 </section>
 
@@ -262,7 +262,7 @@
   <div class="mock-portfolio theme-coral" >
   <span class="tag-example">Example portfolio</span>
   <div class="mp-head">
-    <div class="mp-avatar" aria-hidden="true">S</div>
+    <div class="mp-avatar has-photo"><img class="" src="/assets/photos/dupatta-600.jpg" srcset="/assets/photos/dupatta-600.jpg 600w, /assets/photos/dupatta-1200.jpg 1200w" sizes="120px" width="1200" height="1800" alt="" loading="lazy" decoding="async"></div>
     <div>
       <p class="mp-name">Skincare creator · Mumbai</p>
       <p class="mp-bio">Honest reviews for oily, Indian skin</p>
@@ -276,7 +276,7 @@
   <div class="mock-portfolio theme-teal" >
   <span class="tag-example">Example portfolio</span>
   <div class="mp-head">
-    <div class="mp-avatar" aria-hidden="true">H</div>
+    <div class="mp-avatar has-photo"><img class="" src="/assets/photos/kurta-600.jpg" srcset="/assets/photos/kurta-600.jpg 600w, /assets/photos/kurta-1200.jpg 1200w" sizes="120px" width="1200" height="960" alt="" loading="lazy" decoding="async"></div>
     <div>
       <p class="mp-name">Home chef · Hyderabad</p>
       <p class="mp-bio">Quick Telugu recipes, 30 minutes or less</p>
@@ -290,7 +290,7 @@
   <div class="mock-portfolio theme-ink" >
   <span class="tag-example">Example portfolio</span>
   <div class="mp-head">
-    <div class="mp-avatar" aria-hidden="true">T</div>
+    <div class="mp-avatar has-photo"><img class="" src="/assets/photos/portrait-bw-600.jpg" srcset="/assets/photos/portrait-bw-600.jpg 600w, /assets/photos/portrait-bw-1200.jpg 1200w" sizes="120px" width="1200" height="1800" alt="" loading="lazy" decoding="async"></div>
     <div>
       <p class="mp-name">Tech reviewer · Bengaluru</p>
       <p class="mp-bio">Budget phones and gadgets, explained simply</p>
@@ -302,7 +302,7 @@
   <ul class="mp-rates"><li><span>Instagram Reel</span><strong>₹12,000</strong></li><li><span>Story</span><strong>₹3,000</strong></li></ul>
 </div>
 </div>
-<p class="fine center">These are illustrative example portfolios, not real creators. Yours will show your own details.</p>
+<p class="fine center">Illustrative example portfolios using stock photos of models, not real creators. Yours will show your own details.</p>
   </div>
 </section>
 
@@ -319,8 +319,8 @@
     <h2>Your next collab could be one tap away.</h2>
     <p>Create a free account, find openings that fit you, and publish a portfolio brands can open from anywhere.</p>
     <div class="cta-row">
-      <a class="btn btn-primary btn-lg" href="/signup" data-track="sign_up_click" data-track-where="cta-band">Sign up free</a>
-      <a class="btn btn-ghost btn-lg" href="/signin">I already have an account</a>
+      <a class="pill pill-lg" href="/signup" data-track="sign_up_click" data-track-where="cta-band">Sign up free <span aria-hidden="true">→</span></a>
+      <a class="pill pill-lg cream" href="/signin">I already have an account</a>
     </div>
   </div>
 </section>
@@ -329,22 +329,22 @@
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="brand" href="/" aria-label="Collab Pro home">
-  <img src="/assets/logo-mark.svg" alt="" width="34" height="34">
-  <span class="wordmark">collab<span>pro</span></span>
+  <img src="/assets/logo-mark.svg" alt="" width="38" height="38">
+  <span class="wordmark">Collab <em>Pro</em></span>
 </a>
       <p>Find brand collabs. Build your portfolio. All in one place.</p>
-      <a class="btn btn-primary" href="/signup" data-track="sign_up_click" data-track-where="footer">Create your free account</a>
+      <a class="pill" href="/signup" data-track="sign_up_click" data-track-where="footer">Create your free account <span aria-hidden="true">→</span></a>
     </div>
     <nav aria-label="Product"><h2>Product</h2><ul><li><a href="/discover-collaborations">Discover collaborations</a></li><li><a href="/creator-portfolio">Creator portfolio</a></li><li><a href="/features">Features</a></li><li><a href="/how-it-works">How it works</a></li></ul></nav><nav aria-label="Company"><h2>Company</h2><ul><li><a href="/about">About us</a></li><li><a href="/contact">Contact us</a></li><li><a href="/faq">FAQ</a></li></ul></nav><nav aria-label="Legal"><h2>Legal</h2><ul><li><a href="/privacy-policy">Privacy policy</a></li><li><a href="/terms-of-service">Terms of service</a></li></ul></nav>
   </div>
   <div class="wrap foot-bottom">
-    <span>© 2026 Collab Pro. Made for creators in India.</span>
+    <span>© 2026 Collab Pro. Made for creators in India. Photos from <a href="https://unsplash.com" rel="noopener">Unsplash</a>, showing models, not Collab Pro users.</span>
     <button type="button" class="link" data-open-consent hidden>Cookie settings</button>
   </div>
 </footer>
 <div class="consent" id="consent" role="dialog" aria-live="polite" aria-label="Cookie notice" hidden>
   <p>We'd like to use analytics cookies to understand how creators use Collab Pro. Nothing is collected unless you agree.</p>
-  <div><button type="button" class="btn btn-ghost" data-consent="no">No thanks</button><button type="button" class="btn btn-primary" data-consent="yes">Allow analytics</button></div>
+  <div><button type="button" class="pill cream" data-consent="no">No thanks</button><button type="button" class="pill" data-consent="yes">Allow analytics</button></div>
 </div>
 <div class="cursor" aria-hidden="true"></div>
 
