@@ -159,6 +159,7 @@ ${p.bare ? "" : footer()}
 <div class="cursor" aria-hidden="true"></div>
 ${(p.scripts || []).map((s) => `<script src="${s}"></script>`).join("\n")}
 <script src="/site.js" defer></script>
+<script src="/splash-cursor.js" defer></script>
 </body>
 </html>
 `;

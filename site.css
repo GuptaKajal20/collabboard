@@ -535,3 +535,6 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: #b4231
   :root:not([data-theme="light"]) .theme-btn .moon { display: block; }
 }
 body, .site-header, .card, .section, .lined { transition: background-color 0.35s ease, color 0.35s ease; }
+
+/* The splash cursor replaces the small cursor ring where it runs. */
+.has-splash .cursor { display: none; }
