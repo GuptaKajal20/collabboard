@@ -1,66 +1,38 @@
 :root {
-  --bg: #f7f7f5;
-  --card: #ffffff;
-  --text: #1c1c1a;
-  --muted: #6b6a65;
-  --border: #e4e3de;
-  --accent: #5b4bd6;
-  --accent-soft: #eeecfd;
-  --accent-text: #ffffff;
-  --cta-bg: #1e1b4b;
-  --cta-text: #c4b5fd;
-  --cta-glow: rgba(30, 27, 75, 0.45);
-  --paid-bg: #e3f4ec;
-  --paid-text: #0f6e56;
-  --barter-bg: #faeeda;
-  --barter-text: #854f0b;
-  --tag-bg: #f1efe8;
-  --tag-text: #444441;
-  --warn-bg: #fdf6e7;
-  --warn-text: #7a5a12;
+  /* Collab Pro editorial palette (matches the website). */
+  color-scheme: light;
+  --bg: #ebe8de;
+  --card: #faf8f2;
+  --text: #141413;
+  --muted: #5d5b55;
+  --border: rgba(20, 20, 19, 0.24);
+  --line: #141413;
+  --yellow: #f2e27d;
+  --accent: #141413;
+  --accent-soft: #f2e27d;
+  --accent-text: #141413;
+  --cta-bg: #f2e27d;
+  --cta-text: #141413;
+  --cta-glow: rgba(20, 20, 19, 0.35);
+  --paid-bg: #dcefe6;
+  --paid-text: #1d6b51;
+  --barter-bg: #f6e9cf;
+  --barter-text: #8a5a10;
+  --tag-bg: #efece3;
+  --tag-text: #3a3935;
+  --warn-bg: #f4f2ea;
+  --warn-text: #3a3935;
   --error: #b42318;
-  --glass: rgba(255, 255, 255, 0.62);
-  --glass-strong: rgba(255, 255, 255, 0.78);
-  --glass-border: rgba(255, 255, 255, 0.7);
-  --glass-edge: rgba(28, 28, 26, 0.08);
-  --shadow: 0 1px 2px rgba(28, 28, 26, 0.04), 0 8px 24px rgba(60, 50, 140, 0.08);
-  --shadow-hover: 0 2px 4px rgba(28, 28, 26, 0.05), 0 16px 40px rgba(60, 50, 140, 0.16);
-  --blob-1: rgba(124, 108, 240, 0.22);
-  --blob-2: rgba(240, 140, 110, 0.18);
-  --blob-3: rgba(60, 190, 160, 0.16);
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #161615;
-    --card: #1f1f1d;
-    --text: #ececea;
-    --muted: #a3a29c;
-    --border: #33322f;
-    --accent: #8f84ee;
-    --accent-soft: #2a2648;
-    --accent-text: #161615;
-    --cta-bg: #1e1b4b;
-    --cta-text: #c4b5fd;
-    --cta-glow: rgba(124, 108, 240, 0.3);
-    --paid-bg: #123a2f;
-    --paid-text: #7fd8b8;
-    --barter-bg: #3d2c10;
-    --barter-text: #f2c27a;
-    --tag-bg: #2a2a27;
-    --tag-text: #d3d1c7;
-    --warn-bg: #2e2612;
-    --warn-text: #e8cf8f;
-    --error: #f2948b;
-    --glass: rgba(38, 38, 44, 0.55);
-    --glass-strong: rgba(40, 40, 48, 0.72);
-    --glass-border: rgba(255, 255, 255, 0.09);
-    --glass-edge: rgba(255, 255, 255, 0.06);
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
-    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35), 0 18px 44px rgba(0, 0, 0, 0.4);
-    --blob-1: rgba(124, 108, 240, 0.2);
-    --blob-2: rgba(240, 120, 90, 0.1);
-    --blob-3: rgba(40, 180, 150, 0.1);
-  }
+  --glass: #faf8f2;
+  --glass-strong: #f4f2ea;
+  --glass-border: #141413;
+  --glass-edge: transparent;
+  --shadow: none;
+  --shadow-hover: 6px 6px 0 #141413;
+  --blob-1: rgba(242, 226, 125, 0.28);
+  --blob-2: rgba(255, 255, 255, 0.45);
+  --blob-3: rgba(242, 226, 125, 0.18);
+  --serif: "DM Serif Display", Georgia, "Times New Roman", serif;
 }
 
 * { box-sizing: border-box; }
@@ -661,3 +633,82 @@ input.invalid { border-color: var(--error); box-shadow: 0 0 0 3px rgba(180, 35, 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ---------- Collab Pro editorial theme: serif headings, pill buttons, outlined cards ---------- */
+h1, .pf-top h1, .onb-intro h1, .onb-form h2, .ask-box h2, .section-head h2, .stat-num, .callout h3 {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+h1 { font-size: 44px; line-height: 1.02; margin-bottom: 8px; }
+.pf-top h1 { font-size: 34px; }
+.section-head h2 { font-size: 30px; }
+.stat-num { font-size: 40px; }
+.logo span { font-family: var(--serif); font-weight: 400; font-size: 23px; letter-spacing: -0.01em; }
+.logo em { font-style: italic; }
+.logo img { border-radius: 0; }
+
+/* Buttons are pills; the main one is yellow with an ink outline and turns ink on hover. */
+.btn, .apply, .save, .pager button, .tabs button, .panel-tabs button, .seg, .seg button, .x, .mini, .themes button, .undo, .menu a, .onb-switch, .onb-switch button, .pick, .link-btn.pill { border-radius: 999px; }
+.btn { border: 1.5px solid var(--line); background: var(--card); }
+.btn.primary, .apply:not(.done), .pager button.current, .tabs button.active, .seg button.active, .panel-tabs button.active, .onb-switch button.active {
+  background: var(--yellow);
+  color: var(--text);
+  border: 1.5px solid var(--line);
+  box-shadow: none;
+}
+.apply:not(.done):hover, .btn.primary:hover, .btn:hover {
+  background: var(--text);
+  color: var(--yellow);
+  border-color: var(--line);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.5);
+}
+.apply.done { border: 1.5px solid var(--paid-text); }
+.tabs button { border: 1.5px solid var(--line); background: var(--card); }
+.tab-count { background: var(--text); color: var(--yellow); }
+.tabs button.active .tab-count { background: var(--text); color: var(--yellow); }
+.pager button { border: 1.5px solid var(--line); }
+.seg { border: 1.5px solid var(--line); background: var(--card); }
+
+/* Cards and panels: paper with a thin ink outline, offset shadow on hover. */
+.card, .stat, .pf-share, .panel, .canvas-wrap, .onb-form, fieldset, .callout, .ask-box {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.card:hover, a.stat:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+.card h3 { font-family: var(--serif); font-weight: 400; font-size: 21px; line-height: 1.2; }
+.callout { background: var(--yellow); }
+.ask-box { box-shadow: 10px 10px 0 var(--line); }
+.ask { background: rgba(20, 20, 19, 0.35); }
+
+/* Side menu: stone with an ink rule; active item is a yellow pill. */
+.side { background: var(--bg); border-right: 1px solid var(--line); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.menu a { border: 1.5px solid transparent; }
+.menu a:hover { background: var(--card); }
+.menu a.active { background: var(--yellow); color: var(--text); border-color: var(--line); }
+.menu-toggle { border-radius: 999px; border: 1.5px solid var(--line); color: var(--text); }
+.pf-top { background: rgba(235, 232, 222, 0.94); border-bottom: 1px solid var(--line); }
+.panel-tabs { background: var(--bg); border-bottom: 1px solid var(--line); }
+
+/* Tags, notices, inputs. */
+.tag { border: 1px solid var(--border); background: transparent; }
+.tag.paid, .tag.barter, .tag.fit { border-color: transparent; }
+.notice { background: var(--warn-bg); border: 1px dashed var(--line); border-radius: 16px; }
+input, select, textarea { border: 1.5px solid var(--line); border-radius: 14px; background: var(--card); }
+input:focus, select:focus, textarea:focus { outline: none; box-shadow: 4px 4px 0 var(--line); }
+.filters input, .filters select { border-radius: 999px; }
+.rte, .rte-bar, .emoji-grid, .crop-box, .picked, .file-row, .choice button, .platforms button, .themes button, .x, .mini { border-color: var(--line); }
+.rte:focus { box-shadow: 4px 4px 0 var(--line); border-color: var(--line); }
+.pick { border-color: var(--line); color: var(--text); }
+.pick:hover { background: var(--yellow); border-color: var(--line); }
+.thumb.add { border-color: var(--line); color: var(--text); }
+.thumb.add:hover { background: var(--yellow); }
+.empty { border-color: var(--line); border-radius: 22px; }
+.slider-row input { accent-color: #141413; }
+.form-ok { border: 1px solid var(--paid-text); }
+.star:hover { background: var(--yellow); }
