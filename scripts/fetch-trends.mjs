@@ -30,7 +30,25 @@ export const NICHES = {
   Parenting: { yt: "parenting tips|baby care|mom life", ig: "parenting OR mom life OR baby", tags: ["parenting", "momlife", "parentingtips"] },
   Gaming: { yt: "gaming|gameplay|bgmi", ig: "gaming OR gameplay", tags: ["gaming", "bgmi", "gamer"] },
 };
-const COUNTRIES = ["IN", "US", "GB"];
+// Searches run for India. Two language passes (English, Hindi) plus a "posted in the last 2 days" pass,
+// so the Today filter always has fresh videos. 6 searches per niche = about 6,000 of 10,000 free daily units.
+const SEARCH_LANGS = ["en", "hi"];
+const LANG_NAMES = { en: "English", hi: "Hindi", ta: "Tamil", te: "Telugu", bn: "Bengali", mr: "Marathi", gu: "Gujarati", kn: "Kannada", ml: "Malayalam", pa: "Punjabi" };
+// Language from the video's own setting, else from the script its title is written in.
+function languageOf(snippet, fallback) {
+  const code = String(snippet.defaultAudioLanguage || snippet.defaultLanguage || "").toLowerCase().split("-")[0];
+  if (LANG_NAMES[code]) return LANG_NAMES[code];
+  const t = snippet.title || "";
+  if (/[\u0900-\u097F]/.test(t)) return "Hindi";
+  if (/[\u0B80-\u0BFF]/.test(t)) return "Tamil";
+  if (/[\u0C00-\u0C7F]/.test(t)) return "Telugu";
+  if (/[\u0980-\u09FF]/.test(t)) return "Bengali";
+  if (/[\u0A80-\u0AFF]/.test(t)) return "Gujarati";
+  if (/[\u0C80-\u0CFF]/.test(t)) return "Kannada";
+  if (/[\u0D00-\u0D7F]/.test(t)) return "Malayalam";
+  if (/[\u0A00-\u0A7F]/.test(t)) return "Punjabi";
+  return code && code !== "zxx" ? "Other" : LANG_NAMES[fallback] || "English";
+}
 
 // A video must mention at least one of these words (title, tags or description) to count for a niche.
 const MUST = {
@@ -68,46 +86,51 @@ async function yt(path, params, key) {
 }
 
 async function fetchYouTube(key) {
-  const since = new Date(Date.now() - 30 * 864e5).toISOString();
+  const month = new Date(Date.now() - 30 * 864e5).toISOString();
+  const fresh = new Date(Date.now() - 2 * 864e5).toISOString();
   const items = new Map();
-  for (const [niche, n] of Object.entries(NICHES)) {
-    for (const country of COUNTRIES) {
-      // "short" = under 4 minutes (Shorts are up to 3); "medium" = 4–20 minutes.
-      for (const [format, duration] of [["short", "short"], ["long", "medium"]]) {
-        try {
-          const search = await yt("search", { part: "id", type: "video", q: n.yt, regionCode: country, order: "viewCount", publishedAfter: since, videoDuration: duration, maxResults: "25", safeSearch: "moderate" }, key);
-          const ids = (search.items || []).map((i) => i.id.videoId).filter(Boolean);
-          if (!ids.length) continue;
-          const details = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
-          for (const v of details.items || []) {
-            const sn = v.snippet;
-            if (!relevant(niche, `${sn.title} ${(sn.tags || []).join(" ")} ${(sn.description || "").slice(0, 300)}`) || FOREIGN.test(sn.title)) continue;
-            const len = seconds(v.contentDetails.duration);
-            const s = v.statistics || {};
-            const key2 = `${v.id}|${niche}|${country}`;
-            items.set(key2, {
-              id: v.id,
-              niche,
-              country,
-              format: format === "short" && len <= 180 ? "short" : "long",
-              title: v.snippet.title,
-              channel: v.snippet.channelTitle,
-              channelId: v.snippet.channelId,
-              published: v.snippet.publishedAt,
-              thumb: (v.snippet.thumbnails.high || v.snippet.thumbnails.medium || v.snippet.thumbnails.default || {}).url,
-              seconds: len,
-              views: +s.viewCount || 0,
-              likes: s.likeCount !== undefined ? +s.likeCount : null, // some channels hide likes
-              comments: s.commentCount !== undefined ? +s.commentCount : null,
-            });
-          }
-          console.log(`YouTube ${niche} ${country} ${format}: ${ids.length}`);
-        } catch (err) {
-          console.error(err.message);
-          if (/quota/i.test(err.message)) return [...items.values()];
+  // Fresh videos for every niche first, so Today is covered even if the daily limit is reached later.
+  const passes = [
+    ...["short", "long"].map((format) => ({ format, since: fresh, lang: null })),
+    ...SEARCH_LANGS.flatMap((lang) => ["short", "long"].map((format) => ({ format, since: month, lang }))),
+  ];
+  for (const pass of passes) {
+    for (const [niche, n] of Object.entries(NICHES)) {
+      try {
+        const params = { part: "id", type: "video", q: n.yt, regionCode: "IN", order: "viewCount", publishedAfter: pass.since, videoDuration: pass.format === "short" ? "short" : "medium", maxResults: "25", safeSearch: "moderate" };
+        if (pass.lang) params.relevanceLanguage = pass.lang;
+        const search = await yt("search", params, key);
+        const ids = (search.items || []).map((i) => i.id.videoId).filter(Boolean);
+        if (!ids.length) continue;
+        const details = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
+        for (const v of details.items || []) {
+          const sn = v.snippet;
+          if (!relevant(niche, `${sn.title} ${(sn.tags || []).join(" ")} ${(sn.description || "").slice(0, 300)}`) || FOREIGN.test(sn.title)) continue;
+          const len = seconds(v.contentDetails.duration);
+          const s = v.statistics || {};
+          items.set(`${v.id}|${niche}`, {
+            id: v.id,
+            niche,
+            lang: languageOf(sn, pass.lang),
+            format: pass.format === "short" && len <= 180 ? "short" : "long",
+            title: sn.title,
+            channel: sn.channelTitle,
+            channelId: sn.channelId,
+            published: sn.publishedAt,
+            thumb: (sn.thumbnails.high || sn.thumbnails.medium || sn.thumbnails.default || {}).url,
+            seconds: len,
+            views: +s.viewCount || 0,
+            likes: s.likeCount !== undefined ? +s.likeCount : null, // some channels hide likes
+            comments: s.commentCount !== undefined ? +s.commentCount : null,
+            tags: (sn.tags || []).slice(0, 12).map((t) => t.toLowerCase()),
+          });
         }
-        await sleep(150);
+        console.log(`YouTube ${niche} ${pass.format} ${pass.lang || "last 2 days"}: ${ids.length}`);
+      } catch (err) {
+        console.error(err.message);
+        if (/quota/i.test(err.message)) return [...items.values()];
       }
+      await sleep(150);
     }
   }
   return [...items.values()];
@@ -174,7 +197,15 @@ async function main() {
     const d = await readJson(OUT_YT, null);
     if (!d) return console.log("No YouTube file to refilter.");
     const before = d.items.length;
-    d.items = d.items.filter((v) => relevant(v.niche, `${v.title} ${v.channel}`));
+    const seen = new Map();
+    for (const v of d.items.filter((x) => relevant(x.niche, `${x.title} ${x.channel}`))) {
+      const k = `${v.id}|${v.niche}`;
+      const { country, ...rest } = v;
+      if (!rest.lang) rest.lang = languageOf({ title: v.title }, "en");
+      if (!seen.has(k) || seen.get(k).views < rest.views) seen.set(k, rest);
+    }
+    d.items = [...seen.values()];
+    delete d.countries;
     d.count = d.items.length;
     await writeFile(OUT_YT, JSON.stringify(d) + "\n");
     return console.log(`Refiltered YouTube: ${before} -> ${d.items.length}`);
@@ -187,12 +218,19 @@ async function main() {
     else {
       const fresh = await fetchYouTube(key);
       const previous = await readJson(OUT_YT, { items: [] });
-      const done = new Set(fresh.map((v) => `${v.niche}|${v.country}|${v.format}`));
+      // New numbers replace old ones; older videos stay until they are 30 days old.
       const cutoff = Date.now() - 30 * 864e5;
-      const kept = (previous.items || []).filter((v) => !done.has(`${v.niche}|${v.country}|${v.format}`) && Date.parse(v.published) >= cutoff && relevant(v.niche, `${v.title} ${v.channel}`));
-      const items = [...fresh, ...kept];
+      const merged = new Map();
+      for (const v of previous.items || []) {
+        if (Date.parse(v.published) < cutoff || !relevant(v.niche, `${v.title} ${v.channel}`)) continue;
+        const { country, ...rest } = v;
+        if (!rest.lang) rest.lang = languageOf({ title: v.title }, "en");
+        merged.set(`${v.id}|${v.niche}`, rest);
+      }
+      for (const v of fresh) merged.set(`${v.id}|${v.niche}`, v);
+      const items = [...merged.values()];
       if (items.length) {
-        await writeFile(OUT_YT, JSON.stringify({ updated: today, countries: COUNTRIES, count: items.length, items }) + "\n");
+        await writeFile(OUT_YT, JSON.stringify({ updated: today, count: items.length, items }) + "\n");
         console.log(`Saved ${items.length} YouTube videos`);
       }
     }

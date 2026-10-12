@@ -21,8 +21,24 @@
   // Remember the creator's filters on this device.
   const KEY = "cb_trend_filters";
   const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
-  const f = { platform: "youtube", niche: "", country: "IN", format: "short", days: 7, sort: "views", q: "", ...saved };
+  const f = { platform: "youtube", niche: "", lang: "", format: "short", days: 7, sort: "views", q: "", ...saved };
+  delete f.country;
   const remember = () => { try { localStorage.setItem(KEY, JSON.stringify({ ...f, q: "" })); } catch { /* ignore */ } };
+
+  // Official-style Instagram logo: brand gradient tile with the white glyph.
+  const IG_LOGO = '<span class="ig-logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path fill="#fff" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg></span>';
+
+  // Language of a video: from the daily update, else guessed from the script of its title.
+  const SCRIPTS = [[/[\u0900-\u097F]/, "Hindi"], [/[\u0B80-\u0BFF]/, "Tamil"], [/[\u0C00-\u0C7F]/, "Telugu"], [/[\u0980-\u09FF]/, "Bengali"],
+    [/[\u0A80-\u0AFF]/, "Gujarati"], [/[\u0C80-\u0CFF]/, "Kannada"], [/[\u0D00-\u0D7F]/, "Malayalam"], [/[\u0A00-\u0A7F]/, "Punjabi"]];
+  const langOf = (v) => v.lang || (SCRIPTS.find(([re]) => re.test(v.title || "")) || [, "English"])[1];
+
+  // Every search word must appear somewhere in the text.
+  const words = (q) => q.toLowerCase().split(/\s+/).filter(Boolean);
+  const matches = (text, q) => { const t = text.toLowerCase(); return words(q).every((w) => t.includes(w)); };
+
+  // "Today" and "this week" count back from the last update, so they never go empty later in the day.
+  const latest = () => Math.min(Date.now(), Date.parse(yt && yt.updated) || Date.now());
 
   let yt = null;
   let ig = null;
@@ -56,12 +72,15 @@
 
   // ---------- YouTube ----------
   function ytFiltered() {
-    const since = Date.now() - f.days * 864e5;
-    const q = f.q.trim().toLowerCase();
-    // The same video can appear for several countries; keep the chosen country's copy.
-    const list = (yt ? yt.items : []).filter((v) =>
-      v.niche === f.niche && v.country === f.country && (f.format === "all" || v.format === f.format) &&
-      Date.parse(v.published) >= since && (!q || `${v.title} ${v.channel}`.toLowerCase().includes(q)));
+    const since = latest() - f.days * 864e5;
+    const seen = new Set();
+    const list = (yt ? yt.items : []).filter((v) => {
+      if (seen.has(v.id)) return false; // older files listed a video once per country
+      const ok = v.niche === f.niche && (!f.lang || langOf(v) === f.lang) && (f.format === "all" || v.format === f.format) &&
+        Date.parse(v.published) >= since && (!f.q || matches(`${v.title} ${v.channel} ${(v.tags || []).join(" ")}`, f.q));
+      if (ok) seen.add(v.id);
+      return ok;
+    });
     const by = { views: (v) => v.views, likes: (v) => v.likes ?? -1, comments: (v) => v.comments ?? -1, rising: perHour };
     return list.sort((a, b) => by[f.sort](b) - by[f.sort](a));
   }
@@ -73,6 +92,7 @@
     return `<article class="tr-card${short ? " is-short" : ""}" data-yt="${esc(v.id)}">
       <div class="tr-media">
         <img src="${esc(v.thumb)}" alt="" loading="lazy">
+        <span class="tr-lang">${esc(langOf(v))}</span>
         <span class="tr-rank">#${i + 1}</span>
         ${v.seconds ? `<span class="tr-len">${clock(v.seconds)}</span>` : ""}
         <button type="button" class="tr-play" data-play aria-label="Play ${esc(v.title)} here"><span aria-hidden="true">▶</span></button>
@@ -102,17 +122,28 @@
     const rates = list.map(perHour).sort((a, b) => b - a);
     const risingCut = rates.length >= 5 ? rates[Math.floor(rates.length * 0.15)] : Infinity;
     const label = { views: "most viewed", likes: "most liked", comments: "most commented", rising: "rising fastest" }[f.sort];
-    const country = $("tr-country").selectedOptions[0].textContent;
     const time = { 1: "today", 7: "this week", 30: "this month" }[f.days];
+    const lang = f.lang || "all languages";
     $("tr-summary").textContent = list.length
-      ? `${list.length} ${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} · ${f.niche} · ${country} · posted ${time} · ${label} first`
+      ? `${list.length} ${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} · ${f.niche} · ${lang} · posted ${time}${f.q ? ` · matching “${f.q}”` : ""} · ${label} first`
       : "";
     grid.innerHTML = list.length
       ? list.slice(0, ytShown).map((v, i) => ytCard(v, i, risingCut)).join("")
-      : `<div class="empty">Nothing for these filters yet. Try <button type="button" class="link-btn" data-widen>this month</button> or another country.</div>`;
+      : emptyMessage(`${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} in ${f.niche} · ${lang} · posted ${time}`, [
+          f.q && ["q", "Clear the search"], f.days < 30 && ["days", "Show this month"], f.lang && ["lang", "All languages"], f.format !== "all" && ["format", "All formats"],
+        ]);
     $("tr-more").hidden = list.length <= ytShown;
     const fmt = { short: "Shorts", long: "Long videos", all: "All videos" }[f.format];
-    $("tr-filter-sum").textContent = `${f.niche} · ${f.country === "GB" ? "UK" : f.country === "US" ? "USA" : "India"} · ${fmt} · ${{ 1: "Today", 7: "This week", 30: "This month" }[f.days]} · ${{ views: "Most viewed", likes: "Most liked", comments: "Most commented", rising: "Rising fast" }[f.sort]}`;
+    $("tr-filter-sum").textContent = `${f.niche} · ${f.lang || "All languages"} · ${fmt} · ${{ 1: "Today", 7: "This week", 30: "This month" }[f.days]} · ${{ views: "Most viewed", likes: "Most liked", comments: "Most commented", rising: "Rising fast" }[f.sort]}`;
+  }
+
+  // A clear "no results" message that names what was searched and offers ways to widen it.
+  function emptyMessage(what, options) {
+    const opts = options.filter(Boolean);
+    return `<div class="empty tr-empty"><strong>${f.q ? `No results for “${esc(f.q)}”` : "Nothing here yet"}</strong>
+      <span>We looked for ${esc(what)}.</span>
+      ${opts.length ? `<span class="tr-widen">Try: ${opts.map(([k, t]) => `<button type="button" class="link-btn" data-widen="${k}">${t}</button>`).join("")}</span>` : ""}
+    </div>`;
   }
 
   // ---------- Instagram ----------
@@ -120,19 +151,22 @@
     const tags = (ig && ig.tags && ig.tags[f.niche]) || DEFAULT_TAGS[f.niche] || [];
     $("ig-tags").innerHTML = tags.map((t) => `<a class="tr-tag" href="https://www.instagram.com/explore/tags/${encodeURIComponent(t)}/" target="_blank" rel="noopener noreferrer">#${esc(t)} <span aria-hidden="true">↗</span></a>`).join("");
 
-    const reels = ((ig && ig.reels) || []).filter((r) => r.niche === f.niche);
+    const reels = ((ig && ig.reels) || []).filter((r) => r.niche === f.niche && (!f.q || matches(r.caption || "", f.q)));
+    // The preview loads by itself as the card scrolls into view; the cover shows until it does.
     $("ig-grid").innerHTML = reels.length
       ? reels.slice(0, igShown).map((r) => `<article class="tr-card ig-card" data-ig="${esc(r.code)}" data-kind="${esc(r.kind)}">
           <div class="tr-media ig-media">
-            <div class="ig-cover"><span class="tr-logo ig" aria-hidden="true"></span><p>${esc(r.caption || "Instagram Reel")}</p></div>
-            <button type="button" class="tr-play" data-play-ig aria-label="Play this Reel here"><span aria-hidden="true">▶</span></button>
+            <div class="ig-cover">${IG_LOGO}<p>${esc(r.caption || "Instagram Reel")}</p></div>
+            <iframe src="https://www.instagram.com/${r.kind === "post" ? "p" : "reel"}/${encodeURIComponent(r.code)}/embed/" title="Instagram Reel preview" loading="lazy" scrolling="no" allowfullscreen onload="this.classList.add('ready')"></iframe>
           </div>
           <div class="tr-body">
             <p class="tr-channel">Found ${ago(r.found + "T08:00:00")}</p>
             <a class="tr-open" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Open on Instagram ↗</a>
           </div>
         </article>`).join("")
-      : `<div class="empty">No Reels found for ${esc(f.niche)} yet. They refresh every few days. Meanwhile, tap a hashtag above.</div>`;
+      : f.q
+        ? emptyMessage(`Reels in ${f.niche}`, [["q", "Clear the search"]])
+        : `<div class="empty">No Reels found for ${esc(f.niche)} yet. They refresh every few days. Meanwhile, tap a hashtag above.</div>`;
     $("ig-more").hidden = reels.length <= igShown;
 
     const sounds = (ig && ig.sounds) || [];
@@ -143,7 +177,7 @@
 
   // ---------- shared ----------
   function stopAll(except) {
-    document.querySelectorAll("#page-trends .tr-card.playing").forEach((c) => {
+    document.querySelectorAll("#page-trends .tr-card.playing[data-yt]").forEach((c) => {
       if (c === except) return;
       c.classList.remove("playing");
       const frame = c.querySelector("iframe");
@@ -154,9 +188,12 @@
   function syncControls() {
     $("tr-niche").value = f.niche;
     $("ig-niche").value = f.niche;
-    $("tr-country").value = f.country;
     $("tr-sort").value = f.sort;
+    fillLanguages();
+    $("tr-lang").value = f.lang;
     $("tr-q").value = f.q;
+    $("ig-q").value = f.q;
+    document.querySelectorAll(".tr-searchbox").forEach((b) => b.classList.toggle("has-q", !!f.q));
     document.querySelectorAll("#tr-format button").forEach((b) => b.classList.toggle("active", b.dataset.val === f.format));
     document.querySelectorAll("#tr-time button").forEach((b) => b.classList.toggle("active", Number(b.dataset.val) === f.days));
     document.querySelectorAll("[data-platform-tab]").forEach((b) => {
@@ -168,6 +205,27 @@
     $("tr-instagram").hidden = f.platform !== "instagram";
     const stamp = f.platform === "youtube" ? yt && yt.updated : ig && ig.updated;
     $("tr-updated").textContent = stamp ? `Updated ${ago(stamp)}.` : "";
+  }
+
+  // Languages offered are the ones present in this niche, most videos first.
+  function fillLanguages() {
+    const counts = {};
+    for (const v of (yt && yt.items) || []) if (v.niche === f.niche) counts[langOf(v)] = (counts[langOf(v)] || 0) + 1;
+    const langs = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+    if (f.lang && !langs.includes(f.lang)) langs.push(f.lang);
+    $("tr-lang").innerHTML = `<option value="">All languages</option>` + langs.map((l) => `<option value="${esc(l)}">${esc(l)}</option>`).join("");
+  }
+
+  // Search shows a short loading state so it's clear something happened.
+  function search(q) {
+    const grid = f.platform === "youtube" ? $("tr-grid") : $("ig-grid");
+    document.querySelectorAll(".tr-searchbox button[type=submit]").forEach((b) => { b.disabled = true; b.textContent = "Searching…"; });
+    grid.innerHTML = `<div class="empty tr-loading"><span class="tr-spinner" aria-hidden="true"></span>Searching…</div>`;
+    setTimeout(() => {
+      document.querySelectorAll(".tr-searchbox button[type=submit]").forEach((b) => { b.disabled = false; b.textContent = "Search"; });
+      set({ q: q.trim() });
+      if (window.cpTrack && q.trim()) window.cpTrack("trend_search", { platform: f.platform });
+    }, 350);
   }
 
   function render() {
@@ -191,10 +249,14 @@
     $("ig-niche").innerHTML = opts;
     $("tr-niche").addEventListener("change", (e) => set({ niche: e.target.value }));
     $("ig-niche").addEventListener("change", (e) => set({ niche: e.target.value }));
-    $("tr-country").addEventListener("change", (e) => set({ country: e.target.value }));
+    $("tr-lang").addEventListener("change", (e) => set({ lang: e.target.value }));
     $("tr-sort").addEventListener("change", (e) => set({ sort: e.target.value }));
-    let typing;
-    $("tr-q").addEventListener("input", (e) => { clearTimeout(typing); typing = setTimeout(() => set({ q: e.target.value }), 200); });
+    document.querySelectorAll(".tr-searchbox").forEach((form) => {
+      const input = form.querySelector("input");
+      form.addEventListener("submit", (e) => { e.preventDefault(); search(input.value); });
+      form.querySelector("[data-clear]").addEventListener("click", () => { input.value = ""; set({ q: "" }); input.focus(); });
+      input.addEventListener("input", () => { form.classList.toggle("has-q", !!input.value); if (!input.value && f.q) set({ q: "" }); });
+    });
     $("tr-format").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) set({ format: b.dataset.val }); });
     $("tr-time").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) set({ days: Number(b.dataset.val) }); });
     document.querySelectorAll("[data-platform-tab]").forEach((b) => b.addEventListener("click", () => set({ platform: b.dataset.platformTab })));
@@ -207,8 +269,9 @@
 
     // Play in place: swap the cover for the player. Only one plays at a time.
     $("page-trends").addEventListener("click", (e) => {
-      if (e.target.closest("[data-widen]")) return set({ days: 30 });
-      const play = e.target.closest("[data-play], [data-play-ig]");
+      const widen = e.target.closest("[data-widen]");
+      if (widen) return set({ q: { q: "" }, days: { days: 30 }, lang: { lang: "" }, format: { format: "all" } }[widen.dataset.widen]);
+      const play = e.target.closest("[data-play]");
       if (!play) return;
       const card = play.closest(".tr-card");
       stopAll(card);
