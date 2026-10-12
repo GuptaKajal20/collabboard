@@ -51,6 +51,14 @@ const ribbons = `<div class="ribbons" aria-hidden="true">
   <div class="ribbon r2"><div class="ribbon-track">${ribbonText(RIBBON_B)}</div></div>
 </div>`;
 
+// Light / dark switch (the choice is shared with the app).
+const themeBtn = `<button type="button" class="theme-btn" data-theme-toggle aria-label="Switch to dark mode" title="Switch light or dark mode">
+  <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
+  <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+</button>`;
+// Runs before the page draws, so there's no flash of the wrong theme.
+const themeBoot = `<script>try{var t=localStorage.getItem("cp_theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}</script>`;
+
 // ---------- page frame ----------
 function head(p) {
   const title = p.path === "/" ? `${SITE.name}: Find brand collaborations and build your free creator portfolio` : `${p.title} | ${SITE.name}`;
@@ -71,11 +79,13 @@ function head(p) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  ${themeBoot}
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(p.description)}">
   <meta name="robots" content="${p.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}">
   ${p.noindex ? "" : `<link rel="canonical" href="${canonical}">`}
-  <meta name="theme-color" content="#ebe8de">
+  <meta name="theme-color" content="#ebe8de" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${SITE.name}">
@@ -108,6 +118,7 @@ function header(active, onPhoto) {
     <nav class="nav" id="site-nav" aria-label="Main">
       <ul>${NAV.map((n) => `<li><a href="${n.href}"${n.href === active ? ' aria-current="page"' : ""}>${esc(n.label)}</a></li>`).join("")}</ul>
       <div class="nav-cta">
+        ${themeBtn}
         <a class="nav-login" href="/signin">Sign in</a>
         <a class="pill" href="/signup" data-track="sign_up_click" data-track-where="header">Sign up free</a>
       </div>
@@ -646,7 +657,7 @@ const authShell = (inner, aside) => `<section class="auth">
     ${aside}
   </div>
   <div class="auth-main">
-    <a class="back" href="/">← Back to home</a>
+    <div class="auth-top"><a class="back" href="/">← Back to home</a>${themeBtn}</div>
     ${inner}
   </div>
 </section>`;

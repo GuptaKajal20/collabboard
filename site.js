@@ -56,6 +56,30 @@
     onScroll();
   }
 
+  // ---------- light / dark mode (shared by the website and the app) ----------
+  const prefersDark = matchMedia("(prefers-color-scheme: dark)");
+  const currentTheme = () => document.documentElement.dataset.theme || (prefersDark.matches ? "dark" : "light");
+  const labelThemeButtons = () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    $$("[data-theme-toggle]").forEach((b) => {
+      b.setAttribute("aria-label", `Switch to ${next} mode`);
+      const text = b.querySelector(".theme-label");
+      if (text) text.textContent = next === "dark" ? "Dark mode" : "Light mode";
+    });
+    const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+    if (meta) meta.content = currentTheme() === "dark" ? "#121210" : "#ebe8de";
+  };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-theme-toggle]");
+    if (!b) return;
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("cp_theme", next); } catch { /* ignore */ }
+    labelThemeButtons();
+  });
+  prefersDark.addEventListener("change", labelThemeButtons);
+  labelThemeButtons();
+
   // ---------- mobile menu ----------
   const menuBtn = $(".menu-btn");
   const nav = $("#site-nav");
