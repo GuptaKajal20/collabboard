@@ -32,6 +32,23 @@ export const NICHES = {
 };
 const COUNTRIES = ["IN", "US", "GB"];
 
+// A video must mention at least one of these words (title, tags or description) to count for a niche.
+const MUST = {
+  Beauty: /skin|makeup|make-up|beauty|lipstick|\blips?\b|serum|sunscreen|\bspf\b|hair|grwm|\bglow|acne|foundation|\bnails?\b|moistur|cleanser|face ?(wash|pack|mask)|kajal|mehendi|mehndi/,
+  Fashion: /outfit|fashion|styl|ootd|haul|\bdress|saree|sari\b|kurta|lehenga|\bwear\b|\blooks?\b|sneaker|jewel|wardrobe|thrift/,
+  Food: /recipe|\bfood|cook|kitchen|\beat|chef|\bdish|curry|biryani|snack|cake|dessert|restaurant|khana|street food|paneer|chai|maggi/,
+  Fitness: /workout|fitness|\bgym|yoga|exercise|\babs\b|fat loss|weight loss|muscle|cardio|stretch|protein|pilates|run(ning)?\b/,
+  Tech: /phone|iphone|android|\btech|gadget|laptop|unbox|review|samsung|pixel|oneplus|earbuds|smartwatch|\bai\b|camera|\bpc\b|setup|\bapp\b/,
+  Travel: /travel|\btrip|\btour|visit|places|vlog|beach|hotel|flight|trek|road ?trip|destination|explore/,
+  Finance: /money|financ|invest|stock|mutual fund|\bsip\b|\btax|salary|budget|saving|crypto|\bloan|credit card|\brich\b|income|trading|share market/,
+  Lifestyle: /day in (my|the) life|vlog|routine|lifestyle|productiv|morning|night|\bhome\b|self ?care|\blife\b|aesthetic/,
+  Parenting: /\bbaby|\bkids?\b|child|\bmom|\bmum|\bparent|toddler|pregnan|newborn|family|mother|father|dad\b/,
+  Gaming: /\bgame|gaming|gameplay|bgmi|pubg|minecraft|\bgta|free ?fire|valorant|fortnite|roblox|gamer|cod\b|esports/,
+};
+// Titles in scripts our audiences don't read (Vietnamese, Chinese, Japanese, Korean, Arabic, Thai).
+const FOREIGN = /[\u1EA0-\u1EF9đĐơƠưƯ\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af\u0600-\u06ff\u0e00-\u0e7f]/;
+const relevant = (niche, text) => MUST[niche].test(text.toLowerCase()) && !FOREIGN.test(text);
+
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const readJson = async (f, fallback) => { try { return JSON.parse(await readFile(f, "utf8")); } catch { return fallback; } };
 
@@ -63,6 +80,8 @@ async function fetchYouTube(key) {
           if (!ids.length) continue;
           const details = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
           for (const v of details.items || []) {
+            const sn = v.snippet;
+            if (!relevant(niche, `${sn.title} ${(sn.tags || []).join(" ")} ${(sn.description || "").slice(0, 300)}`) || FOREIGN.test(sn.title)) continue;
             const len = seconds(v.contentDetails.duration);
             const s = v.statistics || {};
             const key2 = `${v.id}|${niche}|${country}`;
@@ -151,13 +170,27 @@ async function fetchInstagram(key, previous) {
 
 async function main() {
   await mkdir(join(ROOT, "data"), { recursive: true });
+  if (process.argv.includes("--refilter")) {
+    const d = await readJson(OUT_YT, null);
+    if (!d) return console.log("No YouTube file to refilter.");
+    const before = d.items.length;
+    d.items = d.items.filter((v) => relevant(v.niche, `${v.title} ${v.channel}`));
+    d.count = d.items.length;
+    await writeFile(OUT_YT, JSON.stringify(d) + "\n");
+    return console.log(`Refiltered YouTube: ${before} -> ${d.items.length}`);
+  }
   const tags = Object.fromEntries(Object.entries(NICHES).map(([k, v]) => [k, v.tags]));
 
   if (only !== "instagram") {
     const key = process.env.YOUTUBE_API_KEY;
     if (!key) console.log("Skipping YouTube: no YOUTUBE_API_KEY.");
     else {
-      const items = await fetchYouTube(key);
+      const fresh = await fetchYouTube(key);
+      const previous = await readJson(OUT_YT, { items: [] });
+      const done = new Set(fresh.map((v) => `${v.niche}|${v.country}|${v.format}`));
+      const cutoff = Date.now() - 30 * 864e5;
+      const kept = (previous.items || []).filter((v) => !done.has(`${v.niche}|${v.country}|${v.format}`) && Date.parse(v.published) >= cutoff && relevant(v.niche, `${v.title} ${v.channel}`));
+      const items = [...fresh, ...kept];
       if (items.length) {
         await writeFile(OUT_YT, JSON.stringify({ updated: today, countries: COUNTRIES, count: items.length, items }) + "\n");
         console.log(`Saved ${items.length} YouTube videos`);
