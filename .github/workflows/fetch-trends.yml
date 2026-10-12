@@ -1,0 +1,30 @@
+name: Fetch trends
+
+on:
+  schedule:
+    - cron: "0 1 * * *" # every day at 6:30 IST
+  workflow_dispatch: {}  # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  trends:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: node scripts/fetch-trends.mjs
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      - name: Save new trends
+        run: |
+          git config user.name "collabboard-bot"
+          git config user.email "collabboard-bot@users.noreply.github.com"
+          git add data/trends-*.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "Update trends"
+          git pull --rebase -q || true
+          git push

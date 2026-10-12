@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 .env
 .claude
+# local-only sample data for testing Trend Radar
+data/test-trends-*.json

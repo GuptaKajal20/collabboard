@@ -1,0 +1,185 @@
+// Trend Radar data: collects what's trending for each niche and saves it for the app.
+//   YouTube:   official YouTube Data API (needs YOUTUBE_API_KEY). Views, likes, comments.
+//   Instagram: public Reels found through the web search we already use (needs TAVILY_API_KEY),
+//              plus links to public "trending sounds" round-ups. Instagram shares no view counts.
+//
+// Usage:
+//   YOUTUBE_API_KEY=xxx TAVILY_API_KEY=yyy node scripts/fetch-trends.mjs
+//   node scripts/fetch-trends.mjs --only youtube      (or --only instagram)
+
+import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+const OUT_YT = join(ROOT, "data", "trends-youtube.json");
+const OUT_IG = join(ROOT, "data", "trends-instagram.json");
+const only = process.argv.includes("--only") ? process.argv[process.argv.indexOf("--only") + 1] : null;
+const today = new Date().toISOString();
+
+// Niches match the app's profile niches. Search words are what creators in that niche post about.
+export const NICHES = {
+  Beauty: { yt: "skincare|makeup routine|beauty tips", ig: "skincare OR makeup", tags: ["skincare", "skincareindia", "makeup"] },
+  Fashion: { yt: "outfit ideas|fashion haul|styling tips", ig: "outfit OR fashion OR styling", tags: ["fashion", "outfitideas", "ootdindia"] },
+  Food: { yt: "recipe|street food|cooking", ig: "recipe OR food OR cooking", tags: ["foodie", "indianfood", "recipes"] },
+  Fitness: { yt: "workout|fitness|yoga", ig: "workout OR fitness OR yoga", tags: ["fitness", "workout", "yoga"] },
+  Tech: { yt: "smartphone review|tech unboxing|gadgets", ig: "tech OR gadget OR unboxing", tags: ["tech", "gadgets", "unboxing"] },
+  Travel: { yt: "travel vlog|places to visit|travel guide", ig: "travel OR trip OR vlog", tags: ["travel", "incredibleindia", "travelreels"] },
+  Finance: { yt: "personal finance|investing|money tips", ig: "finance OR investing OR money tips", tags: ["personalfinance", "investing", "moneytips"] },
+  Lifestyle: { yt: "day in my life|lifestyle vlog|productivity", ig: "day in my life OR lifestyle", tags: ["lifestyle", "dayinmylife", "vlog"] },
+  Parenting: { yt: "parenting tips|baby care|mom life", ig: "parenting OR mom life OR baby", tags: ["parenting", "momlife", "parentingtips"] },
+  Gaming: { yt: "gaming|gameplay|bgmi", ig: "gaming OR gameplay", tags: ["gaming", "bgmi", "gamer"] },
+};
+const COUNTRIES = ["IN", "US", "GB"];
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const readJson = async (f, fallback) => { try { return JSON.parse(await readFile(f, "utf8")); } catch { return fallback; } };
+
+// "PT1M5S" -> 65
+function seconds(iso = "") {
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  return m ? (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0) : 0;
+}
+
+// ---------- YouTube ----------
+
+async function yt(path, params, key) {
+  const qs = new URLSearchParams({ ...params, key });
+  const res = await fetch(`https://www.googleapis.com/youtube/v3/${path}?${qs}`);
+  if (!res.ok) throw new Error(`YouTube ${path} ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return res.json();
+}
+
+async function fetchYouTube(key) {
+  const since = new Date(Date.now() - 30 * 864e5).toISOString();
+  const items = new Map();
+  for (const [niche, n] of Object.entries(NICHES)) {
+    for (const country of COUNTRIES) {
+      // "short" = under 4 minutes (Shorts are up to 3); "medium" = 4–20 minutes.
+      for (const [format, duration] of [["short", "short"], ["long", "medium"]]) {
+        try {
+          const search = await yt("search", { part: "id", type: "video", q: n.yt, regionCode: country, order: "viewCount", publishedAfter: since, videoDuration: duration, maxResults: "25", safeSearch: "moderate" }, key);
+          const ids = (search.items || []).map((i) => i.id.videoId).filter(Boolean);
+          if (!ids.length) continue;
+          const details = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
+          for (const v of details.items || []) {
+            const len = seconds(v.contentDetails.duration);
+            const s = v.statistics || {};
+            const key2 = `${v.id}|${niche}|${country}`;
+            items.set(key2, {
+              id: v.id,
+              niche,
+              country,
+              format: format === "short" && len <= 180 ? "short" : "long",
+              title: v.snippet.title,
+              channel: v.snippet.channelTitle,
+              channelId: v.snippet.channelId,
+              published: v.snippet.publishedAt,
+              thumb: (v.snippet.thumbnails.high || v.snippet.thumbnails.medium || v.snippet.thumbnails.default || {}).url,
+              seconds: len,
+              views: +s.viewCount || 0,
+              likes: s.likeCount !== undefined ? +s.likeCount : null, // some channels hide likes
+              comments: s.commentCount !== undefined ? +s.commentCount : null,
+            });
+          }
+          console.log(`YouTube ${niche} ${country} ${format}: ${ids.length}`);
+        } catch (err) {
+          console.error(err.message);
+          if (/quota/i.test(err.message)) return [...items.values()];
+        }
+        await sleep(150);
+      }
+    }
+  }
+  return [...items.values()];
+}
+
+// ---------- Instagram (via web search) ----------
+
+async function tavily(body, key) {
+  const res = await fetch("https://api.tavily.com/search", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({ search_depth: "basic", topic: "general", max_results: 20, ...body }),
+  });
+  if (!res.ok) throw new Error(`Tavily ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  return (await res.json()).results || [];
+}
+
+const COLLAB_WORDS = /\bcollab|collaboration|\bapply\b|fill (the|this) form|influencers? wanted|creators? wanted|looking for (creators|influencers)|barter|paid partnership opportunit|registration/i;
+const clean = (s = "") => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+
+async function fetchInstagram(key, previous) {
+  const reels = new Map((previous.reels || []).map((r) => [r.code, r]));
+  for (const [niche, n] of Object.entries(NICHES)) {
+    try {
+      const results = await tavily({ query: `instagram reels ${n.ig} India`, include_domains: ["instagram.com"], time_range: "week" }, key);
+      for (const r of results) {
+        const m = String(r.url).match(/instagram\.com\/(?:[\w.]+\/)?(reel|p)\/([\w-]+)/i);
+        if (!m) continue;
+        const code = m[2];
+        // Brand calls ("collab", "apply", "DM for paid…") belong in Find Collabs, not trends.
+        if (COLLAB_WORDS.test(`${r.title} ${r.content}`)) continue;
+        const old = reels.get(code);
+        reels.set(code, { code, kind: m[1].toLowerCase() === "reel" ? "reel" : "post", url: `https://www.instagram.com/${m[1].toLowerCase()}/${code}/`, niche, caption: clean(r.content).slice(0, 220), found: old ? old.found : today.slice(0, 10) });
+      }
+      console.log(`Instagram ${niche}: ${results.length} results`);
+    } catch (err) {
+      console.error(err.message);
+    }
+    await sleep(400);
+  }
+  // Keep the last 30 days, newest first.
+  const cutoff = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+  const kept = [...reels.values()].filter((r) => r.found >= cutoff).sort((a, b) => b.found.localeCompare(a.found));
+
+  // Public round-ups of trending sounds (we link to them; we don't copy their lists).
+  let sounds = previous.sounds || [];
+  try {
+    const results = await tavily({ query: "Instagram trending audio this week reels sounds", time_range: "week", max_results: 8 }, key);
+    const fresh = results
+      .filter((r) => !/instagram\.com/.test(r.url))
+      .map((r) => ({ title: clean(r.title).slice(0, 120), url: r.url, source: new URL(r.url).hostname.replace(/^www\./, ""), found: today.slice(0, 10) }));
+    if (fresh.length) sounds = fresh.slice(0, 6);
+  } catch (err) {
+    console.error(err.message);
+  }
+  return { reels: kept, sounds };
+}
+
+// ---------- main ----------
+
+async function main() {
+  await mkdir(join(ROOT, "data"), { recursive: true });
+  const tags = Object.fromEntries(Object.entries(NICHES).map(([k, v]) => [k, v.tags]));
+
+  if (only !== "instagram") {
+    const key = process.env.YOUTUBE_API_KEY;
+    if (!key) console.log("Skipping YouTube: no YOUTUBE_API_KEY.");
+    else {
+      const items = await fetchYouTube(key);
+      if (items.length) {
+        await writeFile(OUT_YT, JSON.stringify({ updated: today, countries: COUNTRIES, count: items.length, items }) + "\n");
+        console.log(`Saved ${items.length} YouTube videos`);
+      }
+    }
+  }
+
+  if (only !== "youtube") {
+    const key = process.env.TAVILY_API_KEY;
+    if (!key) console.log("Skipping Instagram: no TAVILY_API_KEY.");
+    else {
+      const previous = await readJson(OUT_IG, {});
+      // Web searches are limited each month, so Instagram refreshes every 3 days.
+      const age = previous.updated ? (Date.now() - Date.parse(previous.updated)) / 864e5 : Infinity;
+      if (age < 2.5 && !process.argv.includes("--force")) console.log("Instagram refreshed recently; skipping.");
+      else {
+        const ig = await fetchInstagram(key, previous);
+        await writeFile(OUT_IG, JSON.stringify({ updated: today, tags, ...ig }, null, 1) + "\n");
+        console.log(`Saved ${ig.reels.length} Instagram posts and ${ig.sounds.length} sound round-ups`);
+      }
+    }
+  }
+}
+
+main();

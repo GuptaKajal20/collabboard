@@ -1245,7 +1245,7 @@ el("logout").addEventListener("click", async () => {
 
 // ---------- menu and pages ----------
 
-const PAGES = ["dashboard", "collabs", "portfolio"];
+const PAGES = ["dashboard", "collabs", "trends", "portfolio"];
 
 function showPage() {
   const [, page, sub] = location.hash.match(/^#\/(\w+)(?:\/(\w+))?/) || [];
@@ -1254,6 +1254,7 @@ function showPage() {
   document.querySelectorAll(".menu a").forEach((a) => a.classList.toggle("active", a.dataset.page === current));
   if (current === "dashboard") renderDashboard();
   if (current === "collabs") setView(["saved", "applied"].includes(sub) ? sub : "all");
+  if (current === "trends" && window.TrendRadar) window.TrendRadar.open(profile);
   window.scrollTo(0, 0);
 }
 

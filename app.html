@@ -87,6 +87,7 @@
       <nav class="menu" aria-label="Main menu">
         <a href="#/dashboard" data-page="dashboard">Dashboard</a>
         <a href="#/collabs" data-page="collabs">Find Collabs</a>
+        <a href="#/trends" data-page="trends">Trend Radar</a>
         <a href="#/portfolio" data-page="portfolio">My Portfolio</a>
       </nav>
       <div class="side-foot">
@@ -154,6 +155,68 @@
       </section>
 
       <!-- My Portfolio -->
+      <section class="page" id="page-trends">
+        <div class="tr-head">
+          <div>
+            <h1>Trend Radar</h1>
+            <p class="sub">What's working right now in your niche. Watch it here, then go make your own. <span id="tr-updated"></span></p>
+          </div>
+          <div class="tr-platforms" role="tablist" aria-label="Platform">
+            <button type="button" role="tab" data-platform-tab="youtube" class="active" aria-selected="true"><span class="tr-logo yt" aria-hidden="true"></span>YouTube</button>
+            <button type="button" role="tab" data-platform-tab="instagram" aria-selected="false"><span class="tr-logo ig" aria-hidden="true"></span>Instagram</button>
+          </div>
+        </div>
+
+        <!-- YouTube -->
+        <div id="tr-youtube">
+          <button type="button" class="tr-filter-toggle" id="tr-filter-toggle" aria-expanded="false" aria-controls="tr-filters">
+            <span id="tr-filter-sum">Filters</span><span class="tr-filter-edit">Filters ▾</span>
+          </button>
+          <div class="tr-filters" id="tr-filters" aria-label="Filters">
+            <label class="tr-field">Niche<select id="tr-niche"></select></label>
+            <label class="tr-field">Country<select id="tr-country">
+              <option value="IN">India</option><option value="US">United States</option><option value="GB">United Kingdom</option>
+            </select></label>
+            <div class="tr-field"><span>Format</span><div class="seg" role="group" aria-label="Format" id="tr-format">
+              <button type="button" data-val="short" class="active">Shorts</button><button type="button" data-val="long">Long videos</button><button type="button" data-val="all">All</button>
+            </div></div>
+            <div class="tr-field"><span>Posted</span><div class="seg" role="group" aria-label="Posted" id="tr-time">
+              <button type="button" data-val="1">Today</button><button type="button" data-val="7" class="active">This week</button><button type="button" data-val="30">This month</button>
+            </div></div>
+            <label class="tr-field">Sort by<select id="tr-sort">
+              <option value="views">Most viewed</option><option value="likes">Most liked</option><option value="comments">Most commented</option><option value="rising">Rising fast</option>
+            </select></label>
+            <label class="tr-field tr-search">Search<input id="tr-q" type="search" placeholder="e.g. sunscreen, GRWM"></label>
+          </div>
+          <p class="count" id="tr-summary"></p>
+          <div class="tr-grid" id="tr-grid" aria-live="polite"></div>
+          <div class="tr-more"><button type="button" class="btn" id="tr-more" hidden>Show more</button></div>
+        </div>
+
+        <!-- Instagram -->
+        <div id="tr-instagram" hidden>
+          <div class="tr-filters" aria-label="Filters">
+            <label class="tr-field">Niche<select id="ig-niche"></select></label>
+          </div>
+          <section class="tr-block">
+            <h2>See Instagram's top posts</h2>
+            <p class="fine">Instagram ranks these itself. Tap a hashtag to open it in Instagram.</p>
+            <div class="tr-tags" id="ig-tags"></div>
+          </section>
+          <section class="tr-block">
+            <h2>Reels found this week</h2>
+            <p class="fine">Found on the public web for your niche. Instagram doesn't share view counts with other apps, so these are shown newest first, not ranked.</p>
+            <div class="tr-grid ig-grid" id="ig-grid"></div>
+            <div class="tr-more"><button type="button" class="btn" id="ig-more" hidden>Show more</button></div>
+          </section>
+          <section class="tr-block">
+            <h2>Trending sounds this week</h2>
+            <p class="fine">Round-ups published by others. Open one, then search the sound in Instagram's audio picker.</p>
+            <ul class="tr-sounds" id="ig-sounds"></ul>
+          </section>
+        </div>
+      </section>
+
       <section class="page" id="page-portfolio">
         <div class="pf-top">
           <div>
@@ -222,6 +285,7 @@
   <script src="cloud.js"></script>
   <script src="portfolio.js"></script>
   <script src="app.js"></script>
+  <script src="trends.js"></script>
   <script src="/site.js" defer></script>
 </body>
 </html>
