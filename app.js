@@ -1067,6 +1067,18 @@ function setupPanel() {
     }
     setPath(b, f, v);
     undoKey = `${b.id}:${f}`;
+    // Up / down: if the photo only just fills the header box, there's nothing above or below to move to.
+    // Zoom in a little (like left / right does) so the slider visibly moves the photo.
+    if (f === "coverY" && (b.coverZoom ?? 100) < 130) {
+      const img = document.querySelector(`#canvas [data-block="${b.id}"] .pb-cover-img img`);
+      const box = img && img.parentElement.getBoundingClientRect();
+      const tall = img && img.naturalWidth ? (box.width / img.naturalWidth) * img.naturalHeight : 0;
+      if (!tall || tall < box.height * 1.3) {
+        b.coverZoom = 130;
+        const z = panel.querySelector('[data-f="coverZoom"]');
+        if (z) { z.value = 130; z.nextElementSibling.textContent = "130%"; z.style.cssText = fill(130, 100, 300); }
+      }
+    }
     if (f === "coverX" && (b.coverZoom ?? 100) < 130) {
       b.coverZoom = 130;
       const z = panel.querySelector('[data-f="coverZoom"]');
