@@ -653,6 +653,7 @@ function renderEditPanel() {
           <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="7" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="5" cy="17" r="1.6"/><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="2.5" y="9" font-size="7" font-weight="700">1</text><text x="2.5" y="19" font-size="7" font-weight="700">2</text><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-color-toggle title="Text colour" aria-label="Text colour" aria-expanded="false"><span class="rte-a">A</span></button>
+          <select data-style aria-label="Text style" title="Text style"><option value="normal">Normal</option><option value="heading">Heading</option><option value="upper">UPPERCASE</option></select>
           <select data-size aria-label="Text size" title="Text size">${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
           <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
         </div>
@@ -885,6 +886,8 @@ function setupTextEditor(b) {
     const px = Math.round(parseFloat(getComputedStyle(node).fontSize));
     const near = SIZES.reduce((best, [v]) => (Math.abs(v - px) < Math.abs(best - px) ? Number(v) : best), 16);
     sizeMenu.value = String(near);
+    const blk = blockOf(sel.anchorNode);
+    styleMenu.value = blk && blk.tagName === "H2" ? "heading" : upperOf(sel.anchorNode) ? "upper" : "normal";
     for (const [cmd, q] of [["bold", "bold"], ["italic", "italic"], ["ul", "insertUnorderedList"], ["ol", "insertOrderedList"]]) {
       const b = panel.querySelector(`[data-cmd="${cmd}"]`);
       const on = document.queryCommandState(q);
@@ -896,6 +899,38 @@ function setupTextEditor(b) {
   editor.addEventListener("mouseup", showFormat);
   editor.addEventListener("focus", () => setTimeout(showFormat));
   sizeMenu.addEventListener("change", () => setTimeout(showFormat));
+
+  // Style: Normal text, Heading (uses the heading font and colour from Designs → Text) or UPPERCASE.
+  const styleMenu = panel.querySelector("[data-style]");
+  const blockOf = (node) => { let n = node && (node.nodeType === 3 ? node.parentElement : node); while (n && n !== editor && !/^(H2|DIV|P|LI)$/.test(n.tagName)) n = n.parentElement; return n === editor ? null : n; };
+  const upperOf = (node) => { let n = node && (node.nodeType === 3 ? node.parentElement : node); while (n && n !== editor) { if (n.classList.contains("pb-upper")) return n; n = n.parentElement; } return null; };
+  styleMenu.addEventListener("change", () => {
+    const v = styleMenu.value;
+    restore();
+    const sel = getSelection();
+    if (v === "heading") {
+      document.execCommand("formatBlock", false, "h2");
+    } else if (v === "upper") {
+      if (sel.isCollapsed) { // nothing selected: make the whole line uppercase
+        const line = blockOf(sel.anchorNode);
+        if (line) { const r = document.createRange(); r.selectNodeContents(line); sel.removeAllRanges(); sel.addRange(r); }
+      }
+      const span = document.createElement("span");
+      span.className = "pb-upper";
+      const range = sel.getRangeAt(0);
+      span.appendChild(range.extractContents());
+      range.insertNode(span);
+    } else {
+      // Normal: headings become plain lines and uppercase is removed.
+      const up = upperOf(sel.anchorNode);
+      if (up) up.replaceWith(...up.childNodes);
+      editor.querySelectorAll(".pb-upper").forEach((u) => { if (sel.containsNode(u, true)) u.replaceWith(...u.childNodes); });
+      if (blockOf(sel.anchorNode) && blockOf(sel.anchorNode).tagName === "H2") document.execCommand("formatBlock", false, "div");
+    }
+    remember();
+    commit();
+    setTimeout(showFormat);
+  });
 
   panel.querySelector(".emoji-grid").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-emoji]");

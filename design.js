@@ -84,6 +84,7 @@
         video: { url: String((bg.video || {}).url || "") },
         anim: { preset, colors: [0, 1, 2].map((i) => hex((anim.colors || [])[i], ANIMS[preset].colors[i])), base: hex(anim.base, ANIMS[preset].base) },
         tone: bg.tone === "light" ? "light" : bg.tone === "dark" ? "dark" : "auto",
+        mediaFrom: ["link", "upload", "free"].includes(bg.mediaFrom) ? bg.mediaFrom : "",
         scrim: clamp(bg.scrim, 0, 80, 0),
       },
       text: {
@@ -100,8 +101,10 @@
         // Four card styles; older names map onto them.
         cards: ({ solid: "card", brutal: "card", soft: "card", glass: "transparent", "glass-dark": "transparent" })[look.cards] || (["auto", "card", "none", "transparent", "outline"].includes(look.cards) ? look.cards : "auto"),
         layout: LAYOUTS.includes(look.layout) ? look.layout : "classic",
-        hover: hex(look.hover, "#f2e27d"),
+        hover: hex(look.hover, ""), // empty = a soft version of the page colour
         cardColor: hex(look.cardColor, "#ffffff"),
+        glassColor: hex(look.glassColor, "#ffffff"),
+        outlineColor: hex(look.outlineColor, ""),
         btnColor: hex(look.btnColor, ""),
         lineColor: hex(look.lineColor, ""),
         radius: clamp(look.radius, 0, 32, 16),
@@ -164,12 +167,17 @@
       "--radius": `${d.look.radius}px`,
       "--page-max": `${d.look.width}px`,
       "--gap": `${d.look.gap}px`,
-      "--hover": d.look.hover,
+      // Hover glow: always a lighter, softer version of the chosen colour (never dark).
+      "--hover": mix(d.look.hover || accent, "#ffffff", 0.35),
+      "--hover-soft": mix(d.look.hover || accent, "#ffffff", 0.6),
+      "--glass": rgba(d.look.glassColor, lum(d.look.glassColor) > 0.36 ? 0.22 : 0.3),
+      "--glass-edge": rgba("#ffffff", 0.35),
+      "--outline-c": d.look.outlineColor || "",
       "--card-bg": d.look.cardColor,
       "--btn-bg": d.look.btnColor || accent,
       "--btn-ink": lum(d.look.btnColor || accent) > 0.45 ? "#141413" : "#ffffff",
       "--rule": d.look.lineColor || accent,
-      "--glass": light ? "rgba(255,255,255,0.58)" : "rgba(10,10,14,0.38)",
+
     };
     const cls = [
       `pb-cards-${cards}`, `pb-surface-${surface}`, `pb-layout-${d.look.layout}`, `pb-links-${d.look.links}`, `pb-stats-${d.look.stats}`,
@@ -270,7 +278,7 @@
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = kind === "particles" ? Math.round(Math.min(90, (w * h) / 14000)) : 0;
+      const count = kind === "particles" ? Math.round(Math.min(320, (w * h) / 4200)) : 0;
       parts = Array.from({ length: count }, (_, i) => ({ x: Math.random() * w, y: Math.random() * h, r: 1 + Math.random() * 2.8, vx: (Math.random() - 0.5) * 0.6, vy: -0.25 - Math.random() * 0.6, c: colors[i % colors.length], p: Math.random() * 6.28 }));
     };
     const draw = (t) => {

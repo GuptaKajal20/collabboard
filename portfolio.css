@@ -218,8 +218,10 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 /* Module cards: with card, without card, transparent, outline. */
 .pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-block { padding: 18px 20px; border-radius: var(--radius, 16px); }
 .pb-cards-card .pb-block { background: var(--card-bg, #fff); border: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 14px 32px -20px rgba(0, 0, 0, 0.45); }
-.pb-cards-transparent .pb-block { background: var(--glass); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
-.pb-cards-outline .pb-block { border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); }
+/* Transparent: frosted glass. */
+.pb-cards-transparent .pb-block { background: var(--glass); border: 1px solid var(--glass-edge); -webkit-backdrop-filter: blur(18px) saturate(170%); backdrop-filter: blur(18px) saturate(170%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 8px 32px -8px rgba(0, 0, 0, 0.22); }
+/* Outline: just the border, in the chosen colour. */
+.pb-cards-outline .pb-block { background: transparent; border: 1.5px solid var(--outline-c, color-mix(in srgb, var(--ink) 30%, transparent)); }
 .pb-surface-dark .pb-avatar { border-color: rgba(255, 255, 255, 0.85); }
 
 /* Hover: links and cards glow in the page's hover colour (public page). */
@@ -310,7 +312,7 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-layout-compact .pb-profile.pb-on-cover { margin-top: -38px; }
 /* Offset: heavy borders with hard shadows. */
 .pb-layout-offset { gap: 18px; }
-.pb-layout-offset > .pb-block { border: 2px solid #141413 !important; box-shadow: 6px 6px 0 #141413 !important; }
+.pb-layout-offset.pb-cards-card > .pb-block { border: 2px solid #141413 !important; box-shadow: 6px 6px 0 #141413 !important; }
 .pb-layout-offset > .pb-block:nth-child(even) { transform: rotate(-0.6deg); }
 .pb-layout-offset > .pb-block:nth-child(odd):not(:first-child) { transform: rotate(0.5deg); }
 /* Narrow pages (phones, the phone preview): every layout becomes one column. */
@@ -330,13 +332,13 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
    Every module keeps its border. On hover: a yellow border with a soft glow, drawn above the
    neighbouring modules so nothing covers it (also when the module is selected). */
 .pb-editable { border-radius: 12px; outline: calc(1px / var(--cz, 1)) solid color-mix(in srgb, var(--ink, #1c1c1a) 22%, transparent); outline-offset: 6px; transition: outline-color 0.15s ease, box-shadow 0.2s ease; }
-.pb-editable:hover { z-index: 4; outline: calc(2.5px / var(--cz, 1)) solid var(--hover, #f2e27d);
-  box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent) !important; }
+.pb-editable:hover { z-index: 4; outline: calc(2.5px / var(--cz, 1)) solid var(--hover);
+  box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover) 55%, transparent) !important; }
 .pb-glow { position: absolute; inset: calc(-8px / var(--cz, 1)); z-index: 1; border-radius: calc(16px / var(--cz, 1)); padding: calc(2.5px / var(--cz, 1)); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
-  background: linear-gradient(120deg, var(--hover, #f2e27d), #fff6c2 35%, var(--hover, #f2e27d) 55%, #ffd166 80%, var(--hover, #f2e27d));
+  background: linear-gradient(120deg, var(--hover), var(--hover-soft) 50%, var(--hover));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .pb-editable:hover > .pb-glow { opacity: 1; }
-.pb-editable:hover .pb-empty { border-color: var(--hover, #f2e27d); }
+.pb-editable:hover .pb-empty { border-color: var(--hover); }
 .pb-selected { outline: calc(2px / var(--cz, 1)) solid var(--k); }
 .pb-dragging { opacity: 0.4; }
 .pb-tools {
@@ -426,23 +428,52 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 /* ---------- four more card-stack style layouts ---------- */
 /* Ledger: index cards with a thick accent edge and a hard accent shadow. */
 .pb-layout-ledger { --page-max: 760px; gap: 18px; }
-.pb-layout-ledger > .pb-block { border: 2px solid var(--k) !important; border-left-width: 10px !important; border-radius: 6px !important; box-shadow: 7px 7px 0 var(--k) !important; }
+.pb-layout-ledger.pb-cards-card > .pb-block { border: 2px solid var(--k) !important; border-left-width: 10px !important; border-radius: 6px !important; box-shadow: 7px 7px 0 var(--k) !important; }
 .pb-layout-ledger .pb-profile:not(.pb-side) { justify-items: start; text-align: left; }
 .pb-layout-ledger .pb-profile-text { justify-items: start; }
 /* Layered: every card sits on two paper sheets, like a stack. */
 .pb-layout-layered { gap: 26px; }
-.pb-layout-layered > .pb-block { border: 2px solid #141413 !important; box-shadow: 6px 6px 0 -2px var(--card-bg, #fff), 6px 6px 0 0 #141413, 12px 12px 0 -2px var(--card-bg, #fff), 12px 12px 0 0 #141413 !important; }
+.pb-layout-layered.pb-cards-card > .pb-block { border: 2px solid #141413 !important; box-shadow: 6px 6px 0 -2px var(--card-bg, #fff), 6px 6px 0 0 #141413, 12px 12px 0 -2px var(--card-bg, #fff), 12px 12px 0 0 #141413 !important; }
 /* Report: boxed two-column grid; every box has a heavy coloured top bar. */
 .pb-layout-report { --page-max: 900px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .pb-layout-report > :is(.pb-profile-block, .pb-text-block, .pb-file-block, .pb-instagram-block, .pb-start) { grid-column: 1 / -1; }
-.pb-layout-report > .pb-block { border: 2px solid #141413 !important; border-top: 12px solid var(--k) !important; border-radius: 4px !important; box-shadow: 5px 5px 0 #141413 !important; }
+.pb-layout-report.pb-cards-card > .pb-block { border: 2px solid #141413 !important; border-top: 12px solid var(--k) !important; border-radius: 4px !important; box-shadow: 5px 5px 0 #141413 !important; }
 .pb-layout-report .pb-profile:not(.pb-side) { justify-items: start; text-align: left; }
 .pb-layout-report .pb-profile-text { justify-items: start; }
 /* Pocket: narrow and rounded, chunky cards with a solid bottom shadow, header on a colour panel. */
 .pb-layout-pocket { --page-max: 440px; gap: 14px; }
-.pb-layout-pocket > .pb-block { border: 2px solid #141413 !important; border-radius: 22px !important; box-shadow: 0 6px 0 #141413 !important; }
-.pb-layout-pocket > .pb-profile-block { background: var(--k) !important; }
-.pb-layout-pocket > .pb-profile-block h1, .pb-layout-pocket > .pb-profile-block .pb-bio { color: #fff; }
+.pb-layout-pocket.pb-cards-card > .pb-block { border: 2px solid #141413 !important; border-radius: 22px !important; box-shadow: 0 6px 0 #141413 !important; }
+.pb-layout-pocket.pb-cards-card > .pb-profile-block { background: var(--k) !important; }
+.pb-layout-pocket.pb-cards-card > .pb-profile-block h1, .pb-layout-pocket.pb-cards-card > .pb-profile-block .pb-bio { color: #fff; }
 @container pb (max-width: 640px) { .pb-layout-report { grid-template-columns: minmax(0, 1fr); } }
 /* Hovered modules keep their glow even in these layouts. */
-.pb-editable:is(.pb-block):hover { box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent) !important; }
+.pb-editable:is(.pb-block):hover { box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover) 55%, transparent) !important; }
+
+/* Text module: headings use the heading style from Designs → Text; body text uses the body style. */
+.pb-rich h2 { margin: 6px 0 4px; font-family: var(--head-font, inherit); font-weight: var(--head-weight, 700); color: var(--head, inherit); font-size: 1.45em; line-height: 1.2; letter-spacing: var(--head-spacing, 0); }
+.pb-head-upper .pb-rich h2 { text-transform: uppercase; }
+.pb-rich .pb-upper { text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Without card: no background, border or shadow, whatever the layout. */
+.pb-page.pb-cards-none > .pb-block { background: transparent !important; border: 0 !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* Hover glow on the public page: only the chosen colour, softened. */
+.pb-page a.pb-link[href]:hover, .pb-page a.pb-social-card[href]:hover, .pb-page a.pb-sp-post:hover, .pb-page .pb-pdf:hover { border-color: var(--hover); box-shadow: 0 0 0 3px var(--hover-soft), 0 12px 28px -12px var(--hover); }
+
+/* Calmer sizing: smaller padding and media, the same for every module. */
+.pb-page { padding: 32px 20px 44px; }
+.pb-block { padding: 10px 12px; }
+.pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-block { padding: 14px 16px; }
+.pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-cover-img { margin: -14px -16px 0; }
+.pb-page:not(.pb-cards-card):not(.pb-cards-transparent):not(.pb-cards-outline) .pb-cover-img { margin: -10px -12px 0; }
+.pb-cover-img { height: 140px; }
+.pb-profile h1 { font-size: calc(28px * var(--head-scale, 1)); }
+.pb-link-cover { aspect-ratio: 2.2 / 1; }
+.pb-link-cover.is-image, .pb-link-cover.is-image img { max-height: 280px; }
+.pb-carousel { max-width: 100%; }
+.pb-slide { max-height: 420px; }
+.pb-igp iframe { height: 500px; }
+.pb-sp { padding: 12px; gap: 10px; }
+.pb-stats div { padding: 12px; }
+.pb-stats strong { font-size: 22px; }
+.pb-link { padding: 12px 16px; }

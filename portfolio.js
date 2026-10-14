@@ -80,7 +80,7 @@
       ? `<span class="pb-ic" style="--c:${p.color};--ink:${p.ink || "#fff"};--m:url('${ICONS}${p.icon}.svg')"></span>`
       : `<span class="pb-ic pb-ic-text" style="--c:${p.color};--ink:${p.ink || "#fff"}">${esc(p.text)}</span>`;
 
-  // ---------- rich text: only bold, italic, lists, line breaks, font size and colour survive ----------
+  // ---------- rich text: only bold, italic, lists, headings, uppercase, line breaks, font size and colour survive ----------
 
   function cleanHtml(html = "") {
     const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
@@ -95,6 +95,8 @@
         const wrap = (t) => { const e = document.createElement(t); target.appendChild(e); target = e; };
         if (tag === "DIV" || tag === "P") wrap("div");
         if (tag === "UL" || tag === "OL" || tag === "LI") wrap(tag.toLowerCase());
+        if (/^H[1-6]$/.test(tag)) wrap("h2");
+        if ((n.classList && n.classList.contains("pb-upper")) || (n.style && n.style.textTransform === "uppercase")) { wrap("span"); target.className = "pb-upper"; }
         if (tag === "B" || tag === "STRONG" || /^(bold|[6-9]00)$/.test(n.style ? n.style.fontWeight : "")) wrap("b");
         if (tag === "I" || tag === "EM" || (n.style && n.style.fontStyle === "italic")) wrap("i");
         const px = parseInt(n.style ? n.style.fontSize : "", 10);

@@ -134,7 +134,11 @@
     const img = b.image;
     let body = `<div class="seg wide dz-seg" role="tablist">${[["upload", "Upload"], ["url", "Paste link"], ["pexels", "Free photos"]].map(([v, l]) => `<button type="button" data-imgsrc="${v}" class="${imgSource === v ? "active" : ""}">${l}</button>`).join("")}</div>`;
     if (imgSource === "upload") body += `<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" data-bgmedia><span>＋ Upload an image or video</span></label><p class="upload-note" id="dz-media-note" hidden></p>`;
-    if (imgSource === "url") body += `<form class="dz-search" data-form="medialink"><input type="url" name="url" placeholder="Paste an image, video or YouTube link" aria-label="Image or video link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-media-link-note" hidden></p>`;
+    const current = b.type === "image" ? img.url : b.type === "video" ? b.video.url : "";
+    const pasted = b.mediaFrom === "link" ? current : "";
+    if (imgSource === "url") body += `<form class="dz-search" data-form="medialink"><input type="url" name="url" value="${h(pasted)}" placeholder="Paste an image, video or YouTube link" aria-label="Image or video link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-media-link-note" hidden></p>`;
+    // A small preview of the image or video in use (pasted, uploaded or picked).
+    if (current && ["image", "video"].includes(b.type) && (imgSource !== "pexels" || b.type === "video")) body += mediaPreview(b);
     if (imgSource === "pexels") {
       body += `<form class="dz-search" data-form="pexels"><input type="search" name="q" value="${h(pexels.q)}" placeholder="Search e.g. beach, pastel, city" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form>
         <div class="dz-results" id="dz-pexels">${pexelsResults()}</div>
@@ -149,6 +153,15 @@
     }
     if (b.type === "video" && imgSource !== "url") body += `<button type="button" class="btn small" data-act="video-remove">Remove video</button>`;
     return body;
+  }
+
+  function mediaPreview(b) {
+    if (b.type === "image") return `<div class="dz-media-pv"><img src="${h(b.image.url)}" alt="Background image in use"></div>`;
+    const v = D.videoSource(b.video.url);
+    if (!v) return "";
+    if (v.kind === "youtube") return `<div class="dz-media-pv is-video"><img src="https://i.ytimg.com/vi/${h(v.id)}/hqdefault.jpg" alt="Background video in use"></div>`;
+    if (v.kind === "file") return `<div class="dz-media-pv"><video src="${h(v.src)}" muted playsinline autoplay loop preload="metadata"></video></div>`;
+    return `<div class="dz-media-pv is-video"><span>Vimeo video</span></div>`;
   }
 
   function pexelsResults() {
@@ -231,14 +244,14 @@
     return `<div class="dz-box"><p class="dz-box-title">Headings</p>
         <label><span class="lbl">Font</span>${fontSelect("text.headFont", t.headFont, true)}</label>
         <p class="dz-font-sample dz-head-sample" style="font-family:${D.fontStack(t.headFont || t.font)};font-weight:${t.headWeight};${t.headCase === "upper" ? "text-transform:uppercase;" : ""}">Your Name</p>
-        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.headColor", ["#1c1c1a", "#5b4bd6", "#d85a30", "#0f6e56", "#9d174d", "#1d4ed8", "#ffffff", "#f2e27d"], t.headColor, autoChip("text.headColor", !t.headColor))}</div>
+        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.headColor", ["#1c1c1a", "#5b4bd6", "#d85a30", "#0f6e56", "#9d174d", "#1d4ed8", "#ffffff", "#f2e27d"], t.headColor)}</div>
         <div class="pick-field"><span class="lbl">Weight</span>${segRow("text.headWeight", t.headWeight, [[400, "Regular"], [600, "Semi-bold"], [700, "Bold"], [800, "Heavy"]])}</div>
         <div class="pick-field"><span class="lbl">Letters</span>${segRow("text.headCase", t.headCase, [["none", "Normal"], ["upper", "UPPERCASE"]])}</div>
       </div>
       <div class="dz-box"><p class="dz-box-title">Body text</p>
         <label><span class="lbl">Font</span>${fontSelect("text.font", t.font, false)}</label>
         <p class="dz-font-sample" style="font-family:${D.fontStack(t.font)}">The quick brown fox jumps over the lazy dog.</p>
-        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.color", ["#1c1c1a", "#3f3f46", "#14213d", "#4a1b0c", "#04342c", "#ffffff", "#f6f5f0", "#fde68a"], t.color, autoChip("text.color", !t.color))}</div>
+        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.color", ["#1c1c1a", "#3f3f46", "#14213d", "#4a1b0c", "#04342c", "#ffffff", "#f6f5f0", "#fde68a"], t.color)}</div>
       </div>`;
   }
 
@@ -247,13 +260,17 @@
   function pageTab() {
     const d = design();
     const l = d.look;
+    const style = D.cardStyle(d);
     const CARD_COLORS = ["#ffffff", "#f7f6f2", "#fff8e1", "#fde2e4", "#e3f0ff", "#e1f5ee", "#1c1c1a", "#14213d"];
-    const INK = ["#5b4bd6", "#141413", "#e11d74", "#2563eb", "#0f6e56", "#ea580c", "#f2e27d", "#ffffff"];
-    return group("Module cards", cardPicker(d) + (D.cardStyle(d) === "card" ? `<div class="pick-field"><span class="lbl">Card colour</span>${swatches("look.cardColor", CARD_COLORS, l.cardColor)}</div>` : "")) +
-      group("Links look like", segRow("look.links", l.links, [["card", "Cards"], ["pill", "Buttons"], ["underline", "Lines"]]) +
-        (l.links === "pill" ? `<div class="pick-field"><span class="lbl">Button colour</span>${swatches("look.btnColor", INK, l.btnColor || l.accent || D.THEMES[site.theme] || "")}</div>` : "") +
-        (l.links === "underline" ? `<div class="pick-field"><span class="lbl">Line colour</span>${swatches("look.lineColor", INK, l.lineColor || l.accent || D.THEMES[site.theme] || "")}</div>` : "")) +
-      group("Hover colour", swatches("look.hover", ["#f2e27d", "#ffb4a2", "#a5b4fc", "#86efac", "#7dd3fc", "#f9a8d4", "#1c1c1a", "#ffffff"], l.hover), "The glow when visitors point at a link or card.");
+    const GLASS = ["#ffffff", "#fde2e4", "#e3f0ff", "#e1f5ee", "#fff8e1", "#141413"];
+    const LINES = ["#141413", "#ffffff", "#5b4bd6", "#2563eb", "#0f6e56", "#e11d74", "#ea580c", "#f2e27d"];
+    // Soft, light hover colours (any colour picked is lightened automatically).
+    const HOVER = ["#f9a8d4", "#a5b4fc", "#93c5fd", "#86efac", "#fcd34d", "#fdba74", "#c4b5fd", "#99f6e4"];
+    const extra = style === "card" ? `<div class="pick-field"><span class="lbl">Card colour</span>${swatches("look.cardColor", CARD_COLORS, l.cardColor)}</div>`
+      : style === "transparent" ? `<div class="pick-field"><span class="lbl">Glass tint</span>${swatches("look.glassColor", GLASS, l.glassColor)}</div>`
+        : style === "outline" ? `<div class="pick-field"><span class="lbl">Outline colour</span>${swatches("look.outlineColor", LINES, l.outlineColor)}</div>` : "";
+    return group("Module cards", cardPicker(d) + extra) +
+      group("Hover colour", swatches("look.hover", HOVER, l.hover));
   }
 
   // ---------- Templates ----------
@@ -488,7 +505,14 @@
     panel.addEventListener("click", async (e) => {
       const t = e.target.closest("button");
       if (!t || t.disabled) return;
-      if (t.dataset.dz) { section = section === t.dataset.dz ? null : t.dataset.dz; render(); return; }
+      if (t.dataset.dz) {
+        // Opening a section closes the one that was open, and brings the new one to the top.
+        section = section === t.dataset.dz ? null : t.dataset.dz;
+        render();
+        const open = document.querySelector(".dz-acc.open");
+        if (open) open.scrollIntoView({ block: "start", behavior: "smooth" });
+        return;
+      }
       if (t.dataset.bgview) {
         bgView = t.dataset.bgview;
         const d = design();
@@ -576,12 +600,13 @@
           if (/^image\//.test(file.type)) {
             note.textContent = "Uploading…";
             setImage(await uploadImage(file, 2000));
+            change((d) => { d.bg.mediaFrom = "upload"; }, { panel: true });
           } else if (/^video\/(mp4|webm|quicktime)$/.test(file.type)) {
             if (file.size > 50 * 1024 * 1024) throw new Error("That video is over 50 MB. Try a shorter clip.");
             if (!window.Cloud || !Cloud.ready) throw new Error("Video uploads turn on once you're signed in. Meanwhile, paste a YouTube link.");
             note.textContent = "Uploading your video…";
             const url = await Cloud.upload(file);
-            change((d) => { d.bg.type = "video"; d.bg.video.url = url; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
+            change((d) => { d.bg.type = "video"; d.bg.video.url = url; d.bg.mediaFrom = "upload"; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
           } else throw new Error("Please choose a JPG, PNG, WebP image or an MP4, WebM, MOV video.");
         } catch (err) { note.textContent = err.message || "Upload failed. Please try again."; note.classList.add("error"); }
         return;
@@ -618,12 +643,12 @@
         const show = (t, err) => { note.hidden = false; note.textContent = t; note.classList.toggle("error", !!err); };
         if (!/^https?:\/\/\S+$/i.test(val)) return show("Please paste a full link starting with https://", true);
         if (D.videoSource(val)) {
-          change((d) => { d.bg.type = "video"; d.bg.video.url = val; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
+          change((d) => { d.bg.type = "video"; d.bg.video.url = val; d.bg.mediaFrom = "link"; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
           return;
         }
         show("Checking the link…");
         const test = new Image();
-        test.onload = () => setImage(val);
+        test.onload = () => { setImage(val); change((d) => { d.bg.mediaFrom = "link"; }, { panel: true }); };
         test.onerror = () => show("That link didn't open as an image or video. Use a direct image link, a YouTube link, or an .mp4 link.", true);
         test.src = val;
         return;

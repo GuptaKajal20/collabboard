@@ -967,7 +967,7 @@ input[type="search"]::-webkit-search-cancel-button, input[type="search"]::-webki
 
 /* ---------- My Portfolio → Designs (designs.js) ---------- */
 .canvas > .pb-root { min-height: inherit; }
-.canvas > .pb-root > .pb-frame > .pb-page { padding: 28px 22px 40px; }
+.canvas > .pb-root > .pb-frame > .pb-page { padding: 22px 14px 32px; }
 .dz-nav { display: flex; gap: 2px; padding: 4px; margin-bottom: 14px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--card); }
 .dz-nav button { flex: 1 1 auto; height: 32px; padding: 0 8px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .dz-nav button.active { background: var(--yellow); color: #141413; }
@@ -1173,3 +1173,12 @@ label.switch { font-weight: 600; }
 .tpl-mini .pb-block { overflow: hidden; min-width: 0; }
 .tpl-head b { max-width: 100%; }
 .tpl-mini.pb-layout-split > .pb-profile-block { position: static; }
+
+/* Background media in use: a small preview under the upload / link controls */
+.dz-media-pv { position: relative; height: 120px; border-radius: 12px; overflow: hidden; border: 1.5px solid var(--line); background: #111; }
+.dz-media-pv img, .dz-media-pv video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dz-media-pv.is-video::after { content: "▶"; position: absolute; left: 50%; top: 50%; translate: -50% -50%; display: grid; place-items: center; width: 44px; height: 32px; padding-left: 3px; border-radius: 10px; background: #ff0000; color: #fff; font-size: 14px; }
+.dz-media-pv span { display: grid; place-items: center; height: 100%; color: #fff; }
+/* Text module editor: how headings and uppercase look while typing */
+.rte h2 { margin: 6px 0 4px; font-size: 1.4em; line-height: 1.2; }
+.rte .pb-upper { text-transform: uppercase; letter-spacing: 0.04em; }
