@@ -138,20 +138,21 @@
     const pasted = b.mediaFrom === "link" ? current : "";
     if (imgSource === "url") body += `<form class="dz-search" data-form="medialink"><input type="url" name="url" value="${h(pasted)}" placeholder="Paste an image, video or YouTube link" aria-label="Image or video link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-media-link-note" hidden></p>`;
     // A small preview of the image or video in use (pasted, uploaded or picked).
-    if (current && ["image", "video"].includes(b.type) && (imgSource !== "pexels" || b.type === "video")) body += mediaPreview(b);
+    // Free photos shows only photo results; the upload and link tabs show what's in use.
+    if (current && ["image", "video"].includes(b.type) && imgSource !== "pexels") body += mediaPreview(b);
     if (imgSource === "pexels") {
       body += `<form class="dz-search" data-form="pexels"><input type="search" name="q" value="${h(pexels.q)}" placeholder="Search e.g. beach, pastel, city" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form>
         <div class="dz-results" id="dz-pexels">${pexelsResults()}</div>
         <p class="fine" id="dz-source">${sourceNote()}</p>`;
     }
     // Adjusting a chosen photo (not while pasting a link).
-    if (b.type === "image" && img.url && imgSource !== "url") {
+    if (b.type === "image" && img.url && imgSource === "upload") {
       body += group("Adjust", `${range("Zoom", "bg.image.zoom", img.zoom, 100, 300, "%")}${range("Up / down", "bg.image.y", img.y, 0, 100, "%")}
         <div class="pick-field"><span class="lbl">Fit</span>${segRow("bg.image.fit", img.fit, [["cover", "Fill the page"], ["contain", "Show whole photo"]])}</div>
         <button type="button" class="btn small" data-act="img-reset">Reset</button>
         ${img.credit && img.credit.name ? `<p class="fine">${D.creditHtml(img.credit)}</p>` : ""}`);
     }
-    if (b.type === "video" && imgSource !== "url") body += `<button type="button" class="btn small" data-act="video-remove">Remove video</button>`;
+    if (b.type === "video" && imgSource === "upload") body += `<button type="button" class="btn small" data-act="video-remove">Remove video</button>`;
     return body;
   }
 
@@ -243,14 +244,12 @@
     const t = design().text;
     return `<div class="dz-box"><p class="dz-box-title">Headings</p>
         <label><span class="lbl">Font</span>${fontSelect("text.headFont", t.headFont, true)}</label>
-        <p class="dz-font-sample dz-head-sample" style="font-family:${D.fontStack(t.headFont || t.font)};font-weight:${t.headWeight};${t.headCase === "upper" ? "text-transform:uppercase;" : ""}">Your Name</p>
         <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.headColor", ["#1c1c1a", "#5b4bd6", "#d85a30", "#0f6e56", "#9d174d", "#1d4ed8", "#ffffff", "#f2e27d"], t.headColor)}</div>
         <div class="pick-field"><span class="lbl">Weight</span>${segRow("text.headWeight", t.headWeight, [[400, "Regular"], [600, "Semi-bold"], [700, "Bold"], [800, "Heavy"]])}</div>
         <div class="pick-field"><span class="lbl">Letters</span>${segRow("text.headCase", t.headCase, [["none", "Normal"], ["upper", "UPPERCASE"]])}</div>
       </div>
       <div class="dz-box"><p class="dz-box-title">Body text</p>
         <label><span class="lbl">Font</span>${fontSelect("text.font", t.font, false)}</label>
-        <p class="dz-font-sample" style="font-family:${D.fontStack(t.font)}">The quick brown fox jumps over the lazy dog.</p>
         <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.color", ["#1c1c1a", "#3f3f46", "#14213d", "#4a1b0c", "#04342c", "#ffffff", "#f6f5f0", "#fde68a"], t.color)}</div>
       </div>`;
   }

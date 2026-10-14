@@ -519,7 +519,7 @@ body.splitting iframe { pointer-events: none; } /* keep dragging smooth over emb
   min-height: 420px;
 }
 /* The preview shows the page at its real width, scaled down to fit (app.js sets --cz). */
-.canvas { width: 860px; zoom: var(--cz, 1); }
+.canvas { width: 960px; zoom: var(--cz, 1); }
 .canvas[data-device="mobile"] { width: 390px; max-width: none; }
 .canvas[data-device="mobile"] .pb-page { padding: 28px 18px 40px; }
 .canvas[data-device="mobile"] .pb-profile h1 { font-size: 26px; }
@@ -1182,3 +1182,19 @@ label.switch { font-weight: 600; }
 /* Text module editor: how headings and uppercase look while typing */
 .rte h2 { margin: 6px 0 4px; font-size: 1.4em; line-height: 1.2; }
 .rte .pb-upper { text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Background type chips: labels stay on one line and the row wraps if needed. */
+.dz-types { display: flex !important; flex-wrap: wrap; gap: 6px; }
+.dz-types button { flex: 1 1 auto; height: 36px; padding: 0 14px; white-space: nowrap; }
+.dz-types button:hover:not(.active) { border-color: var(--yellow); }
+/* Option cards and swatches: yellow border on hover, like the rest of the editor. */
+.dz-card-opt:hover, .dz-anim:hover, .tpl-open:hover .tpl-thumb { border-color: var(--yellow); }
+.dz-sw:hover { outline: 2px solid var(--yellow); outline-offset: 2px; }
+/* Keyboard focus is yellow, never the browser's blue. */
+:focus-visible { outline-color: var(--yellow); }
+.panel-tabs button:focus-visible, .dz-acc-head:focus-visible, .seg button:focus-visible, .btn:focus-visible, .icon-btn:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+/* Slim, dark scrollbars: no light bar flashing while scrolling. */
+.panel, .canvas-wrap, .dz-results, .platforms, .rte { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--text) 25%, transparent) transparent; }
+.panel::-webkit-scrollbar, .canvas-wrap::-webkit-scrollbar { width: 8px; }
+.panel::-webkit-scrollbar-track, .canvas-wrap::-webkit-scrollbar-track { background: transparent; }
+.panel::-webkit-scrollbar-thumb, .canvas-wrap::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--text) 25%, transparent); border-radius: 8px; }

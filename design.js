@@ -374,12 +374,14 @@
         ? `https://www.youtube-nocookie.com/embed/${src.id}?autoplay=1&mute=1&loop=1&playlist=${src.id}&controls=0&playsinline=1&rel=0&modestbranding=1&disablekb=1&iv_load_policy=3`
         : `https://player.vimeo.com/video/${src.id}?background=1&muted=1&loop=1&autoplay=1`;
       holder.appendChild(f);
-      // Cover the area like a photo would (16:9 video).
+      // Cover the area like a photo would (16:9 video), a little larger than needed so the
+      // player's own title bar and edges are cropped away (no grey strip at the top).
       const fit = () => {
-        const r = holder.getBoundingClientRect();
+        const r = holder.offsetWidth ? { width: holder.offsetWidth, height: holder.offsetHeight } : holder.getBoundingClientRect();
         const wide = r.width / Math.max(1, r.height) > 16 / 9;
-        f.style.width = wide ? `${r.width}px` : `${(r.height * 16) / 9}px`;
-        f.style.height = wide ? `${(r.width * 9) / 16}px` : `${r.height}px`;
+        const w = (wide ? r.width : (r.height * 16) / 9) * 1.25;
+        f.style.width = `${w}px`;
+        f.style.height = `${(w * 9) / 16}px`;
       };
       fit();
       new ResizeObserver(fit).observe(holder);

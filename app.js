@@ -642,7 +642,7 @@ function renderEditPanel() {
         `<div class="sub-box"><p class="panel-label">Name style</p>${slider("Font size", "nameScale", b.nameScale ?? 100, 60, 180, "%")}${slider("Letter spacing", "nameSpacing", b.nameSpacing ?? 0, -4, 12, "")}</div>` +
         `<div class="sub-box"><label class="toggle-row"><span class="lbl">Header image</span><input type="checkbox" role="switch" class="toggle" data-f="coverOn" ${b.coverOn ? "checked" : ""} aria-checked="${b.coverOn ? "true" : "false"}"></label>
           ${b.coverOn ? imagePicker("Image", b.coverImg, b.coverImgName, "coverImg", null) +
-            (b.coverImg ? slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
+            (b.coverImg ? slider("Left / right", "coverX", b.coverX ?? 50, 0, 100, "%") + slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
               <form class="dz-search" data-cover-search><input type="search" name="q" placeholder="Search free photos" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form><div class="dz-results" id="cover-results"></div>`) : ""}
         </div>`;
       break;
@@ -1387,7 +1387,7 @@ async function setupPortfolio() {
   const fitCanvas = () => {
     const c = el("canvas");
     const avail = c.parentElement.clientWidth - 16;
-    const cz = Math.min(1, avail / (c.dataset.device === "mobile" ? 390 : 860));
+    const cz = Math.min(1, avail / (c.dataset.device === "mobile" ? 390 : 960));
     c.style.setProperty("--cz", cz.toFixed(3));
     // The background stays in view: as tall as the visible preview area.
     const visible = Math.min(c.parentElement.clientHeight || innerHeight, innerHeight);

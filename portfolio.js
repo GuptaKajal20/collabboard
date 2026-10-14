@@ -224,7 +224,7 @@
         const sampleTag = b.photoSample && edit && photo ? `<span class="pb-sample-tag">Sample photo · add yours in the panel</span>` : "";
         // Header image (like a cover photo): only when switched on and chosen.
         const coverUrl = b.coverOn ? safeMedia(b.coverImg) : "";
-        const cover = coverUrl ? `<div class="pb-cover-img"><img src="${esc(coverUrl)}" alt="" style="object-position:50% ${Math.max(0, Math.min(100, Number(b.coverY ?? 50)))}%"></div>` : "";
+        const cover = coverUrl ? `<div class="pb-cover-img"><img src="${esc(coverUrl)}" alt="" style="object-position:${Math.max(0, Math.min(100, Number(b.coverX ?? 50)))}% ${Math.max(0, Math.min(100, Number(b.coverY ?? 50)))}%"></div>` : "";
         const nameStyle = b.nameScale || b.nameSpacing ? ` style="${b.nameScale ? `font-size:calc(32px * var(--head-scale, 1) * ${Math.max(0.6, Math.min(1.8, b.nameScale / 100))});` : ""}${b.nameSpacing ? `letter-spacing:${Math.max(-4, Math.min(12, b.nameSpacing)) / 100}em;` : ""}"` : "";
         if (cover) layoutCls = `${layout} pb-on-cover`;
         return `${cover}<header class="pb-profile${layoutCls}">${avatar}${sampleTag}
