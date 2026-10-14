@@ -165,7 +165,8 @@
       "--item-bg": light ? "#ffffff" : "rgba(255,255,255,0.08)",
       "--item-ink": light ? "#1c1c1a" : "#f6f5f0",
       "--radius": `${d.look.radius}px`,
-      "--page-max": `${d.look.width}px`,
+      // Single-column pages stay compact (600px at most). Two-column layouts set their own width in portfolio.css.
+      ...(["split", "bento", "poster", "report"].includes(d.look.layout) ? {} : { "--page-max": `${Math.min(d.look.width, 600)}px` }),
       "--gap": `${d.look.gap}px`,
       // Hover glow: always a lighter, softer version of the chosen colour (never dark).
       "--hover": mix(d.look.hover || accent, "#ffffff", 0.35),
