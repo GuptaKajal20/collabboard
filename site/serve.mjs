@@ -14,7 +14,7 @@ const exists = async (p) => { try { return (await stat(p)).isFile(); } catch { r
 createServer(async (req, res) => {
   let path = decodeURIComponent(new URL(req.url, "http://x").pathname);
   // Server functions in /api, like Vercel runs them.
-  if (/^\/api\/[\w-]+$/.test(path) && (await exists(join(ROOT, `${path}.js`)))) {
+  if (/^\/api\/[a-z][\w-]*$/.test(path) && (await exists(join(ROOT, `${path}.js`)))) {
     const { default: fn } = await import(join(ROOT, `${path}.js`));
     return fn(req, res);
   }

@@ -12,9 +12,14 @@
 
   const COLORS = ["#ffffff", "#f7f6f2", "#f2e27d", "#fde2e4", "#e3f0ff", "#e1f5ee", "#efe9ff", "#fff1e0", "#1c1c1a", "#14213d", "#2b2d42", "#0f3d3e", "#5b4bd6", "#d85a30", "#0f6e56", "#c2185b"];
   const GRADIENTS = [
-    ["#fbe7c6", "#f6b6c4", 135], ["#e0c3fc", "#8ec5fc", 135], ["#f2e27d", "#f7f6f2", 180], ["#a1ffce", "#faffd1", 135],
-    ["#ff9a8b", "#ffc3a0", 120], ["#141e30", "#243b55", 160], ["#0f2027", "#2c5364", 135], ["#3a1c71", "#d76d77", 135],
+    ["#fbe7c6", "#f6b6c4"], ["#e0c3fc", "#8ec5fc"], ["#f2e27d", "#f7f6f2"], ["#a1ffce", "#faffd1"],
+    ["#ff9a8b", "#ffc3a0", "#fff1e0"], ["#141e30", "#243b55"], ["#0f2027", "#203a43", "#2c5364"], ["#3a1c71", "#d76d77", "#ffaf7b"],
   ];
+  // Gradient directions, like the arrows in design tools.
+  const DIRS = ["to top left", "to top", "to top right", "to left", "", "to right", "to bottom left", "to bottom", "to bottom right"];
+  const angleToDir = (a) => ["to top", "to top right", "to right", "to bottom right", "to bottom", "to bottom left", "to left", "to top left"][Math.round((((Number(a) || 0) % 360) + 360) % 360 / 45) % 8];
+  // Module layouts: how the modules are arranged on the page.
+  const LAYOUTS = ["classic", "split", "bento", "magazine", "timeline", "poster", "compact", "offset"];
   // name, Google Fonts family, weights (empty = the font has one weight), CSS fallback
   const FONTS = {
     inter: ["Inter", "Inter", "400;500;600;700;800", "system-ui, sans-serif"],
@@ -69,7 +74,12 @@
       bg: {
         type: ["none", "color", "gradient", "image", "video", "anim"].includes(bg.type) ? bg.type : "none",
         color: hex(bg.color, "#f7f6f2"),
-        gradient: { a: hex((bg.gradient || {}).a, "#fbe7c6"), b: hex((bg.gradient || {}).b, "#f6b6c4"), angle: clamp((bg.gradient || {}).angle, 0, 360, 135) },
+        gradient: (() => {
+          const g = bg.gradient || {};
+          // Older drafts saved { a, b, angle }.
+          const colors = (Array.isArray(g.colors) ? g.colors : [g.a, g.b]).map((c) => hex(c, "")).filter(Boolean).slice(0, 3);
+          return { colors: colors.length >= 2 ? colors : ["#fbe7c6", "#f6b6c4"], dir: DIRS.includes(g.dir) && g.dir ? g.dir : g.angle !== undefined ? angleToDir(g.angle) : "to bottom right" };
+        })(),
         image: { url: String(img.url || ""), zoom: clamp(img.zoom, 100, 300, 100), x: clamp(img.x, 0, 100, 50), y: clamp(img.y, 0, 100, 50), fit: img.fit === "contain" ? "contain" : "cover", credit: img.credit && typeof img.credit === "object" ? Object.fromEntries(["name", "url", "title", "page", "source", "license", "licenseUrl"].map((k) => [k, String(img.credit[k] || "").slice(0, 200)])) : null },
         video: { url: String((bg.video || {}).url || "") },
         anim: { preset, colors: [0, 1, 2].map((i) => hex((anim.colors || [])[i], ANIMS[preset].colors[i])), base: hex(anim.base, ANIMS[preset].base) },
@@ -87,14 +97,15 @@
         headSpacing: clamp(t.headSpacing, -4, 12, 0),
       },
       look: {
-        cards: ["auto", "none", "solid", "glass", "glass-dark", "outline", "brutal", "soft"].includes(look.cards) ? look.cards : "auto",
+        // Four card styles; older names map onto them.
+        cards: ({ solid: "card", brutal: "card", soft: "card", glass: "transparent", "glass-dark": "transparent" })[look.cards] || (["auto", "card", "none", "transparent", "outline"].includes(look.cards) ? look.cards : "auto"),
+        layout: LAYOUTS.includes(look.layout) ? look.layout : "classic",
+        hover: hex(look.hover, "#f2e27d"),
         radius: clamp(look.radius, 0, 32, 16),
-        align: look.align === "left" ? "left" : "center",
         width: clamp(look.width, 520, 900, 720),
         accent: hex(look.accent, ""),
         links: ["card", "pill", "underline"].includes(look.links) ? look.links : "card",
         stats: look.stats === "plain" ? "plain" : "tiles",
-        cover: !!look.cover,
         gap: clamp(look.gap, 0, 28, 8),
       },
     };
@@ -115,19 +126,20 @@
     if (b.tone !== "auto" && ["image", "video"].includes(b.type)) return b.tone;
     if (b.type === "none") return "light";
     if (b.type === "color") return lum(b.color) > 0.36 ? "light" : "dark";
-    if (b.type === "gradient") return (lum(b.gradient.a) + lum(b.gradient.b)) / 2 > 0.36 ? "light" : "dark";
+    if (b.type === "gradient") return b.gradient.colors.reduce((t, c) => t + lum(c), 0) / b.gradient.colors.length > 0.36 ? "light" : "dark";
     if (b.type === "anim") return lum(b.anim.base) > 0.36 ? "light" : "dark";
     return "dark";
   }
   // "auto" module cards: plain on simple light/dark colours, frosted glass on photos, video and animation.
-  const cardStyle = (d) => (d.look.cards !== "auto" ? d.look.cards : ["image", "video", "anim"].includes(d.bg.type) ? "glass" : "none");
+  const cardStyle = (d) => (d.look.cards !== "auto" ? d.look.cards : ["image", "video", "anim"].includes(d.bg.type) ? "transparent" : "none");
 
   // CSS variables and classes for the page. Module text sits on a card (if any) or straight on the background.
   function pageAttrs(design, theme) {
     const d = normalize(design);
     const cards = cardStyle(d);
     const tone = bgTone(d);
-    const surface = ["solid", "glass", "brutal", "soft"].includes(cards) ? "light" : cards === "glass-dark" ? "dark" : tone;
+    // White cards always get dark text; otherwise the text follows the background.
+    const surface = cards === "card" ? "light" : tone;
     const light = surface === "light";
     const accent = d.look.accent || THEMES[theme] || THEMES.violet;
     const ink = d.text.color || (light ? "#1c1c1a" : "#f6f5f0");
@@ -149,10 +161,12 @@
       "--radius": `${d.look.radius}px`,
       "--page-max": `${d.look.width}px`,
       "--gap": `${d.look.gap}px`,
+      "--hover": d.look.hover,
+      "--glass": light ? "rgba(255,255,255,0.58)" : "rgba(10,10,14,0.38)",
     };
     const cls = [
-      `pb-cards-${cards}`, `pb-surface-${surface}`, `pb-links-${d.look.links}`, `pb-stats-${d.look.stats}`,
-      d.look.align === "left" ? "pb-align-left" : "", d.look.cover ? "pb-cover" : "", d.text.headCase === "upper" ? "pb-head-upper" : "",
+      `pb-cards-${cards}`, `pb-surface-${surface}`, `pb-layout-${d.look.layout}`, `pb-links-${d.look.links}`, `pb-stats-${d.look.stats}`,
+      d.text.headCase === "upper" ? "pb-head-upper" : "",
       d.bg.type !== "none" ? "pb-has-bg" : "",
     ].filter(Boolean).join(" ");
     return { cls, style: Object.entries(v).map(([k, val]) => `${k}:${val}`).join(";") };
@@ -179,7 +193,7 @@
     const tone = bgTone(d);
     let base = b.color;
     let inner = "";
-    if (b.type === "gradient") base = `linear-gradient(${b.gradient.angle}deg, ${b.gradient.a}, ${b.gradient.b})`;
+    if (b.type === "gradient") base = `linear-gradient(${b.gradient.dir}, ${b.gradient.colors.join(", ")})`;
     if (b.type === "image") {
       base = "#1c1c1a";
       if (b.image.url && /^(https?:|data:image\/)/i.test(b.image.url)) {
@@ -364,5 +378,5 @@
     root.querySelectorAll(".pb-bg-video[data-video]").forEach(startVideo);
   }
 
-  window.PortfolioDesign = { COLORS, GRADIENTS, FONTS, ANIMS, ANIM_PALETTES, THEMES, normalize, pageAttrs, bgHtml, bgTone, cardStyle, videoSource, loadFonts, creditHtml, mount, fontStack, lum };
+  window.PortfolioDesign = { COLORS, GRADIENTS, DIRS, LAYOUTS, FONTS, ANIMS, ANIM_PALETTES, THEMES, normalize, pageAttrs, bgHtml, bgTone, cardStyle, videoSource, loadFonts, creditHtml, mount, fontStack, lum };
 })();

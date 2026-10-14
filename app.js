@@ -418,7 +418,48 @@ function setPath(obj, path, value) {
   o[keys.at(-1)] = value;
 }
 
-function saveSite({ changed = true } = {}) {
+// ----- undo: recent portfolio changes -----
+// undoNow is the page as last saved. A change pushes it onto the stack first, unless it continues
+// the same edit (same field, within a moment), so a burst of typing or dragging is one step.
+const undoStack = [];
+let undoNow = null;
+let undoKey = null;
+let undoLastKey = null;
+let undoAt = 0;
+const undoSnap = () => JSON.stringify({ blocks: site.blocks, design: site.design || null, theme: site.theme || "violet" });
+function recordUndo() {
+  const snap = undoSnap();
+  if (snap === undoNow) { undoKey = null; return; } // nothing actually changed (e.g. opening the crop tools)
+  const same = undoKey && undoKey === undoLastKey && Date.now() - undoAt < 1200;
+  if (!same) {
+    undoStack.push(undoNow);
+    if (undoStack.length > 30) undoStack.shift();
+  }
+  undoLastKey = undoKey;
+  undoKey = null;
+  undoAt = Date.now();
+  undoNow = snap;
+  const btn = el("pf-undo");
+  if (btn) btn.disabled = !undoStack.length;
+}
+function undo() {
+  const prev = undoStack.pop();
+  if (!prev) return;
+  const s = JSON.parse(prev);
+  Object.assign(site, { blocks: s.blocks, design: s.design || undefined, theme: s.theme });
+  undoNow = prev;
+  undoLastKey = null;
+  if (selectedId && !findBlock(selectedId)) selectedId = null;
+  cropOpen = null;
+  saveSite({ record: false });
+  renderCanvas();
+  renderEditPanel();
+  if (window.Designs) window.Designs.render();
+  el("pf-undo").disabled = !undoStack.length;
+}
+
+function saveSite({ changed = true, record = true } = {}) {
+  if (changed && record && undoNow !== null) recordUndo();
   if (changed) site.dirty = true;
   const ok = store.set("cb_site", site);
   if (ok === false) note("Your browser is out of space for this draft. Publish to keep big photos safe.", true);
@@ -432,6 +473,15 @@ function renderCanvas() {
 }
 
 // Redraws only one module, so the others (like an Instagram preview) don't reload.
+// Scroll a photo carousel in the builder to photo i (no animation).
+function showSlide(id, i) {
+  const track = document.querySelector(`#canvas [data-block="${id}"] .pb-track`);
+  if (!track) return;
+  track.style.scrollBehavior = "auto";
+  track.scrollLeft = i * track.clientWidth;
+  track.style.scrollBehavior = "";
+}
+
 function renderOne(id) {
   const b = findBlock(id);
   const node = document.querySelector(`#canvas [data-block="${id}"]`);
@@ -440,6 +490,8 @@ function renderOne(id) {
   tmp.innerHTML = P.wrapBlock(b, true, selectedId);
   node.replaceWith(tmp.firstElementChild);
   P.enhance(el("canvas"), { edit: true });
+  const m = (cropOpen || "").match(/^items\.(\d+)$/);
+  if (m && b.type === "file" && id === selectedId) showSlide(id, Number(m[1]));
 }
 
 function selectBlock(id) {
@@ -529,18 +581,19 @@ function imagePicker(label, url, name, uploadKey, cropKey, required = false) {
   return `<div class="pick-field">${head}<div class="picked">
     <img src="${escapeHtml(P.safeMedia(url))}" alt="">
     <span class="fname">${escapeHtml(name || "Image")}</span>
-    <button type="button" class="mini${cropOpen === cropKey ? " on" : ""}" data-crop="${cropKey}">Crop</button>
+    ${cropKey ? `<button type="button" class="mini${cropOpen === cropKey ? " on" : ""}" data-crop="${cropKey}">Crop</button>` : ""}
     <button type="button" class="x" data-clear="${uploadKey}" aria-label="Remove image">✕</button>
   </div></div>`;
 }
 
+// Social preview asks only for the handle. [platform, what's shown before it, placeholder]
 const SOCIAL_PREVIEW = [
-  ["instagram", "Username", "@yourname"],
-  ["facebook", "Page link", "https://www.facebook.com/yourpage"],
-  ["youtube", "Video or channel link", "https://youtu.be/…"],
-  ["linkedin", "Post or profile link", "https://www.linkedin.com/…"],
-  ["threads", "Username", "@yourname"],
-  ["x", "Username", "@yourname"],
+  ["instagram", "@", "yourname"],
+  ["facebook", "facebook.com/", "yourpage"],
+  ["youtube", "@", "yourchannel"],
+  ["linkedin", "linkedin.com/in/", "your-name"],
+  ["threads", "@", "yourname"],
+  ["x", "@", "yourname"],
 ];
 
 function renderEditPanel() {
@@ -563,7 +616,13 @@ function renderEditPanel() {
         `<div class="pick-field"><span class="lbl">Layout</span>${seg("layout", b.layout || "stack", [["stack", "Image on top"], ["side", "Side by side"]])}</div>` +
         (b.layout === "side" ? seg("flip", !!b.flip, [[false, "Text on right"], [true, "Text on left"]]) : "") +
         field(`${REQ}Name`, "name", b.name, 'aria-required="true"') +
-        `<label>Bio<textarea data-f="bio" rows="4">${escapeHtml(b.bio || "")}</textarea></label>`;
+        `<label>Bio<textarea data-f="bio" rows="4">${escapeHtml(b.bio || "")}</textarea></label>` +
+        `<div class="sub-box"><p class="panel-label">Name style</p>${slider("Font size", "nameScale", b.nameScale ?? 100, 60, 180, "%")}${slider("Letter spacing", "nameSpacing", b.nameSpacing ?? 0, -4, 12, "")}</div>` +
+        `<div class="sub-box"><label class="check switch"><input type="checkbox" data-f="coverOn" ${b.coverOn ? "checked" : ""}> <span>Header image</span></label>
+          ${b.coverOn ? imagePicker("Image", b.coverImg, b.coverImgName, "coverImg", null) +
+            (b.coverImg ? slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
+              <form class="dz-search" data-cover-search><input type="search" name="q" placeholder="Search free photos" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form><div class="dz-results" id="cover-results"></div>`) : ""}
+        </div>`;
       break;
     case "text":
       body = `<div class="rte-bar" role="toolbar" aria-label="Text formatting">
@@ -581,11 +640,13 @@ function renderEditPanel() {
         <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here">${P.cleanHtml(b.html || "")}</div>`;
       break;
     case "link":
-      body = field(`${REQ}Text`, "text", b.text, 'placeholder="Watch my latest campaign" aria-required="true"') +
-        field(`${REQ}Link`, "url", b.url, `placeholder="YouTube, PDF, Google Drive or any link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
+      body = field(`${REQ}Link`, "url", b.url, `placeholder="Paste any YouTube, website or image link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
+        `<p class="fine" id="link-status">${linkStatus(b)}</p>` +
+        field("Text", "text", b.text, `placeholder="${escapeHtml((b.preview && b.preview.title) || "e.g. Watch my latest campaign")}"`) +
         imagePicker("Image", b.image, b.imageName, "image", "image") +
         (b.image && cropOpen === "image" ? cropEditor(b, "image", b.image, "4 / 3") : "") +
-        (b.image ? seg("side", b.side === "right" ? "right" : "left", [["left", "Image left"], ["right", "Image right"]]) : "");
+        (b.image ? seg("side", b.side === "right" ? "right" : "left", [["left", "Image left"], ["right", "Image right"]]) : "") +
+        `<p class="fine">${b.image ? "Your image shows instead of the link's own preview." : "No image? The link's own preview shows automatically."}</p>`;
       break;
     case "stats":
       body = rows(b.items || [], "label", "value", "e.g. Instagram followers", "e.g. 12400");
@@ -624,18 +685,17 @@ function renderEditPanel() {
     case "instagram": {
       const plat = b.platform || "instagram";
       const accounts = P.previewAccounts(b);
-      const [, label, ph] = SOCIAL_PREVIEW.find(([id]) => id === plat) || SOCIAL_PREVIEW[0];
+      const [, pre, ph] = SOCIAL_PREVIEW.find(([id]) => id === plat) || SOCIAL_PREVIEW[0];
       const p = P.platformById(plat);
-      const value = accounts[plat] || "";
-      const check = previewCheck(plat, value);
+      const value = P.handleFor(plat, accounts[plat]) || accounts[plat] || "";
+      const check = previewCheck(plat, value, b);
       body = `<div class="pick-field"><span class="lbl">Platform</span>
         <div class="plat-pick" role="group" aria-label="Platform">${SOCIAL_PREVIEW.map(([id]) => {
           const q = P.platformById(id);
-          const set = !!accounts[id];
+          const set = !!P.handleFor(id, accounts[id]);
           return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}${set ? " set" : ""}" title="${escapeHtml(q.name)}${set ? " (added)" : " (not added yet)"}" aria-label="${escapeHtml(q.name)}${set ? ", added" : ", not added yet"}" aria-pressed="${plat === id}">${P.icon(q)}<span>${escapeHtml(q.name)}</span></button>`;
-        }).join("")}</div>
-        <p class="fine">Faded platforms aren't added yet. Your page shows the one that's selected.</p></div>` +
-        `<label><span class="lbl">${REQ}Your ${escapeHtml(p.name)} ${escapeHtml(label.toLowerCase())}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></label>
+        }).join("")}</div></div>` +
+        `<label><span class="lbl">${REQ}Your ${escapeHtml(p.name)} handle</span><span class="handle-field"><span class="handle-pre">${escapeHtml(pre)}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></span></label>
         <p class="fine plat-check${check.ok === false ? " error" : ""}" id="plat-check">${escapeHtml(check.text)}</p>`;
       break;
     }
@@ -645,23 +705,58 @@ function renderEditPanel() {
   if (b.type === "text") setupTextEditor(b);
 }
 
-// What we can tell about a Social preview account as it's typed.
-function previewCheck(plat, raw) {
+// What we can tell about a Social preview handle as it's typed.
+function previewCheck(plat, raw, b) {
   const v = String(raw || "").trim();
   const name = P.platformById(plat).name;
-  if (!v) return { ok: null, text: `Add your ${name} account to show a preview.` };
-  const handle = /^@?[\w.]{1,30}$/.test(v);
-  const url = (re) => re.test(v) && !!P.safeUrl(v);
-  const rules = {
-    instagram: [handle || url(/instagram\.com\/[\w.]+/i), "Shows your Instagram profile and latest posts.", "Use @username or an instagram.com profile link."],
-    facebook: [handle || url(/facebook\.com\/.+/i), "Shows your public Facebook page.", "Use your page name or a facebook.com page link."],
-    youtube: [handle || url(/youtube\.com|youtu\.be/i), /(?:youtu\.be\/|[?&]v=|\/shorts\/)[\w-]{11}/.test(v) ? "Shows this video, playable on your page." : "Shows a link to your channel. Paste a video link to show a playable video.", "Use @channel, a channel link or a video link."],
-    linkedin: [handle || url(/linkedin\.com\/.+/i), /activity[-:]\d{10,}/.test(v) ? "Shows this LinkedIn post." : "Shows a link to your profile. Paste a post link to show the post.", "Use a linkedin.com profile or post link."],
-    threads: [handle || url(/threads\.(net|com)\/@?[\w.]+/i), "Threads doesn't allow previews on other sites, so your page shows a profile card.", "Use @username or a threads.net link."],
-    x: [handle || url(/(x|twitter)\.com\/[\w]+/i), "X doesn't allow previews without its script, so your page shows a profile card.", "Use @username or an x.com link."],
-  };
-  const [ok, good, bad] = rules[plat] || [true, "Shows a link card.", ""];
-  return { ok, text: ok ? `${good}` : `That doesn't look like a ${name} account. ${bad}` };
+  if (!v) return { ok: null, text: `Add your ${name} handle to show your profile.` };
+  const h = P.handleFor(plat, v);
+  if (!h) return { ok: false, text: `Use just your ${name} handle, like ${plat === "linkedin" ? "riya-sharma" : "@riyacreates"}.` };
+  if (plat === "instagram") return { ok: true, text: "Shows your Instagram profile picture, bio and latest posts." };
+  if (plat === "facebook") return { ok: true, text: "Shows your public Facebook page with its latest posts. Personal profiles can't be shown." };
+  const snap = b && b.social && b.social[plat];
+  if (!snap || snap.handle !== h) return { ok: true, text: "Looking up your profile…" };
+  if (!snap.found) return { ok: true, text: `${name} didn't share this profile with us right now, so your page shows a profile card with a link.` };
+  return { ok: true, text: `Found ${snap.name}.${snap.posts && snap.posts.length ? ` Showing ${snap.posts.length} recent videos.` : ` ${snap.postsNote || ""}`}` };
+}
+
+// Fetch profile details for a handle (picture, bio, recent videos) and keep a copy with the page.
+let socialTimer = null;
+function lookupSocial(b) {
+  clearTimeout(socialTimer);
+  const plat = b.platform || "instagram";
+  const h = P.handleFor(plat, P.previewAccounts(b)[plat]);
+  if (!h || ["instagram", "facebook"].includes(plat)) return;
+  if (b.social && b.social[plat] && b.social[plat].handle === h) return;
+  socialTimer = setTimeout(async () => {
+    let snap = null;
+    try { const r = await fetch(`/api/social?platform=${plat}&handle=${encodeURIComponent(h)}`); snap = r.ok ? await r.json() : null; } catch { snap = null; }
+    if (!snap) snap = { platform: plat, handle: h, found: false, name: `@${h}`, bio: "", image: "", posts: [], postsNote: "" };
+    b.social = { ...(b.social || {}), [plat]: snap };
+    saveSite();
+    renderOne(b.id);
+    const n = el("plat-check");
+    if (n && selectedId === b.id) n.textContent = previewCheck(plat, h, b).text;
+  }, 600);
+}
+
+// Link preview: fetched once when the link is added, then saved with the page.
+const linkStatus = (b) => (!b.url ? "Paste a link to see its preview." : !P.safeUrl(b.url) ? "That doesn't look like a web link." : b.image ? "Using your image." : b.preview && b.preview.url === P.safeUrl(b.url) ? (b.preview.title || b.preview.kind === "image" ? "Preview ready." : "This site doesn't share a preview, so a simple card shows.") : "Getting the preview…");
+let previewTimer = null;
+function lookupLink(b) {
+  clearTimeout(previewTimer);
+  const url = P.safeUrl(b.url);
+  if (!url || (b.preview && b.preview.url === url)) return;
+  previewTimer = setTimeout(async () => {
+    let pv = null;
+    try { const r = await fetch(`/api/preview?url=${encodeURIComponent(url)}`); pv = r.ok ? await r.json() : null; } catch { pv = null; }
+    if (P.safeUrl(b.url) !== url) return; // the link changed meanwhile
+    b.preview = pv ? { ...pv, url } : { url, kind: "page", title: "", description: "", image: "", site: new URL(url).hostname.replace(/^www\./, "") };
+    saveSite();
+    renderOne(b.id);
+    const n = el("link-status");
+    if (n && selectedId === b.id) n.textContent = linkStatus(b);
+  }, 700);
 }
 
 function updateCropPreviews(b) {
@@ -824,29 +919,87 @@ function setupPanel() {
     }
     const f = e.target.dataset.f;
     if (!f) return;
-    const v = e.target.type === "checkbox" ? e.target.checked : e.target.dataset.num !== undefined ? Number(e.target.value) : e.target.value;
+    let v = e.target.type === "checkbox" ? e.target.checked : e.target.dataset.num !== undefined ? Number(e.target.value) : e.target.value;
+    if (f.startsWith("accounts.")) {
+      // Pasted a profile link? Keep just the handle.
+      const plat = b.platform || "instagram";
+      const h = P.handleFor(plat, v);
+      if (h && h !== v.trim().replace(/^@/, "")) { v = h; e.target.value = h; }
+    }
     setPath(b, f, v);
+    undoKey = `${b.id}:${f}`;
     if (e.target.type === "range") {
       e.target.nextElementSibling.textContent = `${v}${e.target.dataset.unit || ""}`;
       e.target.style.cssText = fill(v, Number(e.target.min), Number(e.target.max));
       updateCropPreviews(b);
+      // One photo in a carousel: change just that photo, in place, and keep it in view.
+      const m = f.match(/^items\.(\d+)\.(zoom|posY)$/);
+      if (m && b.type === "file") {
+        const i = Number(m[1]);
+        const img = document.querySelector(`#canvas [data-block="${b.id}"] .pb-slide:nth-child(${i + 1}) img`);
+        if (img) img.setAttribute("style", P.cropStyle(b.items[i].zoom, b.items[i].posY));
+        showSlide(b.id, i);
+        saveSite();
+        return;
+      }
     }
     if (f.startsWith("accounts.")) {
-      const c = previewCheck(b.platform || "instagram", v);
+      const c = previewCheck(b.platform || "instagram", v, b);
       e.target.classList.toggle("invalid", c.ok === false);
       const n = el("plat-check");
       n.textContent = c.text;
       n.classList.toggle("error", c.ok === false);
-      panel.querySelectorAll(".plat-pick button").forEach((btn) => btn.classList.toggle("set", !!(b.accounts || {})[btn.dataset.val]));
+      panel.querySelectorAll(".plat-pick button").forEach((btn) => btn.classList.toggle("set", !!P.handleFor(btn.dataset.val, (b.accounts || {})[btn.dataset.val])));
+      lookupSocial(b);
     }
-    if (f === "url") e.target.classList.toggle("invalid", !!e.target.value.trim() && !P.safeUrl(e.target.value));
+    if (f === "url") {
+      e.target.classList.toggle("invalid", !!e.target.value.trim() && !P.safeUrl(e.target.value));
+      const n = el("link-status");
+      if (n) n.textContent = linkStatus(b);
+      lookupLink(b);
+    }
     saveSite();
     renderOne(b.id);
+    if (f === "coverOn") renderEditPanel();
+  });
+  // Header image: paste a link, or pick a free photo.
+  panel.addEventListener("submit", async (e) => {
+    const b = findBlock(selectedId);
+    if (!b) return;
+    if (e.target.matches("[data-cover-link]")) {
+      e.preventDefault();
+      const url = P.safeUrl(e.target.elements.url.value);
+      if (!url) return note("Please paste a full image link starting with https://", true);
+      Object.assign(b, { coverImg: url, coverImgName: "Image from a link", coverY: 50 });
+    } else if (e.target.matches("[data-cover-search]")) {
+      e.preventDefault();
+      const box = el("cover-results");
+      box.innerHTML = `<p class="fine">Searching…</p>`;
+      try {
+        const photos = await window.Designs.findPhotos(e.target.elements.q.value);
+        box.innerHTML = photos.length ? photos.map((p, i) => `<button type="button" class="dz-ph" data-cover-pick="${i}"><img src="${escapeHtml(p.thumb)}" alt="${escapeHtml(p.alt)}" loading="lazy"></button>`).join("") : `<p class="fine">No photos found. Try another word.</p>`;
+        box.photos = photos;
+      } catch (err) {
+        box.innerHTML = `<p class="fine error">${escapeHtml(err.message)}</p>`;
+      }
+      return;
+    } else return;
+    saveSite();
+    renderOne(b.id);
+    renderEditPanel();
   });
   panel.addEventListener("click", (e) => {
     const b = findBlock(selectedId);
     const t = e.target.closest("button");
     if (!b || !t || t.disabled) return;
+    if (t.dataset.coverPick !== undefined) {
+      const p = el("cover-results").photos[Number(t.dataset.coverPick)];
+      Object.assign(b, { coverImg: p.url, coverImgName: p.title || "Free photo", coverY: 50, coverCredit: { name: p.photographer, url: p.photographerUrl, source: p.source, license: p.license } });
+      saveSite();
+      renderOne(b.id);
+      renderEditPanel();
+      return;
+    }
     if (t.dataset.addRow !== undefined) b.items.push({});
     else if (t.dataset.delRow !== undefined) b.items.splice(Number(t.dataset.delRow), 1);
     else if (t.dataset.delItem !== undefined) {
@@ -885,6 +1038,7 @@ function setupPanel() {
         else if (kind === "image") Object.assign(b, { image: await uploadImage(file, 800), imageName: file.name, imgZoom: 100, imgPosY: 50 });
         else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name, zoom: 100, posY: 50 });
         else if (kind === "pdf") b.items.push({ type: "pdf", url: await uploadPdf(file), name: file.name });
+        else if (kind === "coverImg") Object.assign(b, { coverImg: await uploadImage(file, 1600), coverImgName: file.name, coverY: 50, coverOn: true });
       }
       // Open the crop tools straight away for a newly chosen image.
       if (kind === "photo" || kind === "image") cropOpen = kind;
@@ -937,6 +1091,7 @@ function setupCanvas() {
     if (!f || !block) return;
     const b = findBlock(block.dataset.block);
     setPath(b, f, e.target.innerText.replace(/\n$/, ""));
+    undoKey = `${b.id}:${f}`;
     saveSite();
     // Keep the panel in step with what's typed on the page.
     const twin = el("panel-edit").querySelector(`[data-f="${f}"]`);
@@ -1011,11 +1166,7 @@ function renderShareBar() {
   const url = shareUrl();
   bar.innerHTML = `<span class="dot${site.dirty ? " pending" : ""}"></span>
     <span>${site.dirty ? "You have changes that aren't public yet. Click Publish to update your link." : "Your portfolio is live:"}</span>
-    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url.replace(/^https?:\/\//, ""))}</a>
-    <button type="button" class="btn small" id="copy-link">Copy link</button>`;
-  el("copy-link").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText(url); el("copy-link").textContent = "Copied"; } catch { prompt("Copy your link:", url); }
-  });
+    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url.replace(/^https?:\/\//, ""))}</a>`;
 }
 
 const validSlug = (s) => /^[a-z0-9][a-z0-9-]{2,39}$/.test(s);
@@ -1029,8 +1180,7 @@ async function publish() {
     return;
   }
   if (!validSlug(site.slug || "")) {
-    showPanel("look");
-    if (window.Designs) window.Designs.showSection("page");
+    openLinkPop(true);
     el("pf-slug").focus();
     el("slug-note").textContent = "Choose your link name first: at least 3 lowercase letters, numbers or dashes.";
     el("slug-note").classList.add("error");
@@ -1051,11 +1201,43 @@ async function publish() {
   } catch (err) {
     bar.hidden = false;
     bar.innerHTML = `<span class="dot pending"></span><span class="error">${escapeHtml(err.message || "Could not publish. Please try again.")}</span>`;
-    if (/link name/.test(err.message || "")) { showPanel("look"); if (window.Designs) window.Designs.showSection("page"); }
+    if (/link name/.test(err.message || "")) openLinkPop(true);
   } finally {
     btn.disabled = false;
     btn.textContent = "Publish";
   }
+}
+
+// The link button: shows the portfolio link, copies it, and lets the creator change the link name.
+function updateLinkPop() {
+  const url = validSlug(site.slug || "") ? shareUrl() : "";
+  el("pf-linkurl").textContent = url ? url.replace(/^https?:\/\//, "") : "Choose a link name below";
+  el("pf-copy").disabled = !url;
+  el("pf-linknote").textContent = !url ? "" : site.publishedAt ? (site.dirty ? "Publish to update what brands see at this link." : "Live now. Share it with brands.") : "This link works after you click Publish.";
+}
+function openLinkPop(focusSlug) {
+  const pop = el("pf-linkpop");
+  pop.hidden = false;
+  el("pf-link").setAttribute("aria-expanded", "true");
+  updateLinkPop();
+  if (focusSlug) el("pf-slug").focus();
+}
+function setupLinkPop() {
+  const pop = el("pf-linkpop");
+  el("pf-link").addEventListener("click", () => (pop.hidden ? openLinkPop() : ((pop.hidden = true), el("pf-link").setAttribute("aria-expanded", "false"))));
+  document.addEventListener("click", (e) => { if (!pop.hidden && !e.target.closest(".pf-linkwrap")) { pop.hidden = true; el("pf-link").setAttribute("aria-expanded", "false"); } });
+  el("pf-copy").addEventListener("click", async () => {
+    const url = shareUrl();
+    try { await navigator.clipboard.writeText(url); el("pf-copy").textContent = "Copied"; setTimeout(() => { el("pf-copy").textContent = "Copy"; }, 1500); } catch { prompt("Copy your link:", url); }
+  });
+  el("pf-slug").addEventListener("input", updateLinkPop);
+  el("pf-undo").addEventListener("click", undo);
+  document.addEventListener("keydown", (e) => {
+    if (!(e.metaKey || e.ctrlKey) || e.shiftKey || e.key.toLowerCase() !== "z" || el("page-portfolio").hidden) return;
+    if (e.target.closest("input, textarea, select, [contenteditable]")) return; // let text fields undo their own typing
+    e.preventDefault();
+    undo();
+  });
 }
 
 async function setupPortfolio() {
@@ -1075,15 +1257,25 @@ async function setupPortfolio() {
 
   document.querySelectorAll(".panel-tabs [data-panel]").forEach((b) => b.addEventListener("click", () => showPanel(b.dataset.panel)));
 
+  // Scale the preview so the whole page width fits the preview column.
+  const fitCanvas = () => {
+    const c = el("canvas");
+    const avail = c.parentElement.clientWidth - 16;
+    c.style.setProperty("--cz", Math.min(1, avail / (c.dataset.device === "mobile" ? 390 : 860)).toFixed(3));
+  };
+  new ResizeObserver(fitCanvas).observe(el("canvas").parentElement);
   document.querySelectorAll(".seg [data-device]").forEach((b) => b.addEventListener("click", () => {
     el("canvas").dataset.device = b.dataset.device;
+    fitCanvas();
     document.querySelectorAll(".seg [data-device]").forEach((x) => {
       x.classList.toggle("active", x === b);
       x.setAttribute("aria-pressed", String(x === b));
     });
   }));
 
+  setupLinkPop();
   if (window.Designs) window.Designs.init();
+  undoNow = undoSnap();
   const markTheme = () => document.querySelectorAll("#themes [data-theme]").forEach((b) => b.classList.toggle("active", b.dataset.theme === (site.theme || "violet")));
   markTheme();
   el("themes").addEventListener("click", (e) => {

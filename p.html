@@ -79,6 +79,9 @@
       const bgImg = data.design && data.design.bg && data.design.bg.type === "image" && data.design.bg.image;
       const credit = bgImg && window.PortfolioDesign.creditHtml(window.PortfolioDesign.normalize(data.design).bg.image.credit);
       if (credit) document.querySelector(".foot").insertAdjacentHTML("beforeend", `<br><span class="credit">Background: ${credit}</span>`);
+      const head = data.blocks.find((b) => b.type === "profile" && b.coverOn && b.coverImg && b.coverCredit);
+      const headCredit = head && window.PortfolioDesign.creditHtml(head.coverCredit);
+      if (headCredit) document.querySelector(".foot").insertAdjacentHTML("beforeend", `<br><span class="credit">Header image: ${headCredit}</span>`);
       window.Portfolio.enhance(sheet);
       const profile = data.blocks.find((b) => b.type === "profile");
       if (slug && !params.has("draft")) document.getElementById("canonical").href = `${location.origin}/p/${slug}`;

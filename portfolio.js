@@ -218,10 +218,16 @@
           ? `<div class="pb-avatar" style="border-radius:${radius}%;--av:${size}px"><img src="${esc(photo)}" alt="" style="${cropStyle(zoom, posY)}"></div>`
           : `<div class="pb-avatar pb-initial" style="border-radius:${radius}%;--av:${size}px">${initial}</div>`;
         const layout = b.layout === "side" ? ` pb-side${b.flip ? " pb-flip" : ""}` : "";
+        let layoutCls = layout;
         const sampleTag = b.photoSample && edit && photo ? `<span class="pb-sample-tag">Sample photo · add yours in the panel</span>` : "";
-        return `<header class="pb-profile${layout}">${avatar}${sampleTag}
+        // Header image (like a cover photo): only when switched on and chosen.
+        const coverUrl = b.coverOn ? safeMedia(b.coverImg) : "";
+        const cover = coverUrl ? `<div class="pb-cover-img"><img src="${esc(coverUrl)}" alt="" style="object-position:50% ${Math.max(0, Math.min(100, Number(b.coverY ?? 50)))}%"></div>` : "";
+        const nameStyle = b.nameScale || b.nameSpacing ? ` style="${b.nameScale ? `font-size:calc(32px * var(--head-scale, 1) * ${Math.max(0.6, Math.min(1.8, b.nameScale / 100))});` : ""}${b.nameSpacing ? `letter-spacing:${Math.max(-4, Math.min(12, b.nameSpacing)) / 100}em;` : ""}"` : "";
+        if (cover) layoutCls = `${layout} pb-on-cover`;
+        return `${cover}<header class="pb-profile${layoutCls}">${avatar}${sampleTag}
           <div class="pb-profile-text">
-            <h1${ed("name", "Your name")}>${esc(b.name)}</h1>
+            <h1${ed("name", "Your name")}${nameStyle}>${esc(b.name)}</h1>
             ${b.bio || edit ? `<p class="pb-bio"${ed("bio", "A short bio")}>${esc(b.bio)}</p>` : ""}
           </div>
         </header>`;
@@ -233,11 +239,21 @@
       case "link": {
         const url = safeUrl(b.url);
         const img = safeMedia(b.image);
-        if (!b.text || !url) return empty("Add the link text and address in the panel on the right.");
+        if (!url) return empty("Paste a link in the panel on the right.");
         const attrs = edit ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`;
+        // No image uploaded: show the page's own preview (title, picture), fetched when the link was added.
+        const pv = !img && b.preview && b.preview.url ? b.preview : null;
+        const pvImg = pv && safeUrl(pv.image);
+        const title = b.text || (pv && pv.title) || linkKind(url);
+        if (pv) {
+          return `<a class="pb-link pb-link-card${pvImg ? "" : " no-img"}" ${attrs}>
+            ${pvImg ? `<span class="pb-link-cover${pv.kind === "youtube" ? " is-video" : ""}${pv.kind === "image" ? " is-image" : ""}"><img src="${esc(pvImg)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()"></span>` : ""}
+            <span class="pb-link-text"><strong>${esc(title)}</strong>${pv.description && pv.kind === "page" ? `<span class="pb-link-desc">${esc(pv.description)}</span>` : ""}<small>${esc(pv.site || linkKind(url))} ↗</small></span>
+          </a>`;
+        }
         return `<a class="pb-link${img ? ` has-img img-${b.side === "right" ? "right" : "left"}` : ""}" ${attrs}>
           ${img ? `<span class="pb-link-img"><img src="${esc(img)}" alt="" style="${cropStyle(b.imgZoom, b.imgPosY)}"></span>` : ""}
-          <span class="pb-link-text"><strong>${esc(b.text)}</strong><small>${esc(linkKind(url))} ↗</small></span>
+          <span class="pb-link-text"><strong>${esc(title)}</strong><small>${esc(linkKind(url))} ↗</small></span>
         </a>`;
       }
       case "stats": {
@@ -282,41 +298,65 @@
         return `<ul class="pb-rates">${items.map((r, i) => `<li><span${ed(`items.${i}.label`, "What")}>${esc(r.label)}</span><strong${ed(`items.${i}.price`, "₹ price")}>${edit ? esc(r.price) : formatRupees(r.price)}</strong></li>`).join("")}</ul>${b.barter ? `<p class="pb-note">Open to barter collaborations</p>` : ""}`;
       }
       case "instagram": {
-        // "Social preview": what each platform lets other sites show.
-        const plat = b.platform || "instagram";
-        const raw = String(previewAccounts(b)[plat] || "").trim();
-        if (!raw) return empty("Add your profile in the panel on the right.");
-        const p = platformById(plat);
-        const fromUrl = (re) => (raw.match(re) || [])[1];
-        const card = (url, label) => `<a class="pb-social-card" ${edit || !url ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`}>${icon(p)}<span><strong>${esc(label)}</strong><small>View on ${esc(p.name)} ↗</small></span></a>`;
+        // "Social preview": profile picture, name, bio and recent posts where the platform allows it.
+        const plat = SOCIAL_URL[b.platform] ? b.platform : "instagram";
+        const h = handleFor(plat, previewAccounts(b)[plat]);
+        if (!h) return empty("Add your handle in the panel on the right.");
+        const profile = SOCIAL_URL[plat](h);
         if (plat === "instagram") {
-          const h = (fromUrl(/instagram\.com\/([\w.]+)/i) || handleOf(raw)).replace(/[^\w.]/g, "");
-          if (!h) return empty("Add your Instagram username.");
-          return `<div class="pb-igp"><iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>${card(`https://www.instagram.com/${h}/`, `@${h}`)}</div>`;
+          return `<div class="pb-igp"><iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>${socialFoot(plat, profile, h, edit)}</div>`;
         }
         if (plat === "facebook") {
-          const page = safeUrl(/facebook\.com/i.test(raw) ? raw : `https://www.facebook.com/${handleOf(raw)}`);
-          if (!page) return empty("Add your Facebook page link.");
-          const src = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(page)}&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
-          return `<div class="pb-igp"><iframe src="${esc(src)}" loading="lazy" title="Facebook page" scrolling="no" allow="encrypted-media"></iframe>${card(page, "Facebook page")}</div>`;
+          const src = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(profile)}&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
+          return `<div class="pb-igp"><iframe src="${esc(src)}" loading="lazy" title="Facebook page" scrolling="no" allow="encrypted-media"></iframe>${socialFoot(plat, profile, h, edit)}</div>`;
         }
-        if (plat === "youtube") {
-          const vid = fromUrl(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/)([\w-]{11})/);
-          const channel = safeUrl(/youtube\.com|youtu\.be/i.test(raw) ? raw : `https://www.youtube.com/@${handleOf(raw)}`);
-          if (!vid) return card(channel, raw.startsWith("@") ? raw : "YouTube channel");
-          return `<div class="pb-video"><iframe src="https://www.youtube-nocookie.com/embed/${esc(vid)}" loading="lazy" title="YouTube video" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
-        }
-        if (plat === "linkedin") {
-          const act = fromUrl(/(?:urn:li:activity:|activity[-:])(\d{10,})/);
-          if (act) return `<div class="pb-igp"><iframe class="pb-li" src="https://www.linkedin.com/embed/feed/update/urn:li:activity:${esc(act)}" loading="lazy" title="LinkedIn post"></iframe></div>`;
-          const url = safeUrl(/linkedin\.com/i.test(raw) ? raw : `https://www.linkedin.com/in/${handleOf(raw)}`);
-          return card(url, "LinkedIn profile");
-        }
-        return card(socialUrl({ platform: plat, value: raw }), raw.replace(/^https?:\/\/(www\.)?/, ""));
+        const snap = b.social && b.social[plat] && b.social[plat].handle === h ? b.social[plat] : null;
+        return `<div class="pb-sp" data-social="${plat}" data-handle="${esc(h)}">${socialCard(plat, h, snap, edit)}</div>`;
       }
       default:
         return "";
     }
+  }
+
+  // ---------- social preview ----------
+
+  const SOCIAL_URL = {
+    instagram: (h) => `https://www.instagram.com/${h}/`,
+    facebook: (h) => `https://www.facebook.com/${h}`,
+    youtube: (h) => `https://www.youtube.com/@${h}`,
+    linkedin: (h) => `https://www.linkedin.com/in/${h}`,
+    threads: (h) => `https://www.threads.net/@${h}`,
+    x: (h) => `https://x.com/${h}`,
+  };
+  // The handle, from "@name", "name" or (older drafts) a profile link.
+  function handleFor(plat, raw) {
+    let v = String(raw || "").trim();
+    const fromUrl = v.match(/^(?:https?:\/\/)?(?:[\w-]+\.)?(?:instagram\.com|facebook\.com|fb\.com|youtube\.com|linkedin\.com\/in|threads\.(?:net|com)|x\.com|twitter\.com)\/@?([\w.-]+)/i);
+    if (fromUrl) v = fromUrl[1];
+    v = v.replace(/^@/, "").replace(/\/+$/, "");
+    const ok = plat === "linkedin" ? /^[\w-]{3,100}$/ : plat === "youtube" || plat === "facebook" ? /^[\w.-]{2,80}$/ : /^[\w.]{1,30}$/;
+    return ok.test(v) ? v : "";
+  }
+  const socialFoot = (plat, url, h, edit) => {
+    const p = platformById(plat);
+    return `<a class="pb-social-card" ${edit ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`}>${icon(p)}<span><strong>@${esc(h)}</strong><small>View on ${esc(p.name)} ↗</small></span></a>`;
+  };
+  // Profile card for YouTube, LinkedIn, Threads and X. snap = what /api/social returned (or null while loading).
+  function socialCard(plat, h, snap, edit) {
+    const p = platformById(plat);
+    const url = SOCIAL_URL[plat](h);
+    const link = (u, inner, cls = "") => (edit ? `<span class="${cls}">${inner}</span>` : `<a class="${cls}" href="${esc(u)}" target="_blank" rel="noopener noreferrer">${inner}</a>`);
+    const pic = snap && safeUrl(snap.image);
+    const posts = (snap && snap.posts) || [];
+    const note = snap && snap.postsNote ? snap.postsNote : "";
+    return `<div class="pb-sp-head">
+        <span class="pb-sp-pic">${pic ? `<img src="${esc(pic)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}${icon(p)}</span>
+        <span class="pb-sp-who"><strong>${esc((snap && snap.name) || `@${h}`)}</strong><small>@${esc(h)} · ${esc(p.name)}</small></span>
+      </div>
+      ${snap && snap.bio ? `<p class="pb-sp-bio">${esc(snap.bio)}</p>` : snap ? "" : `<p class="pb-sp-bio pb-sp-loading">Loading profile…</p>`}
+      ${posts.length ? `<div class="pb-sp-posts">${posts.slice(0, 5).map((v) => link(v.url, `<span class="pb-sp-thumb"><img src="${esc(safeUrl(v.image))}" alt="" loading="lazy"></span><span class="pb-sp-title">${esc(v.title)}</span>`, "pb-sp-post")).join("")}</div>` : ""}
+      ${note ? `<p class="pb-note">${esc(note)}</p>` : ""}
+      ${link(url, `View profile on ${esc(p.name)} ↗`, "pb-sp-btn")}`;
   }
 
   // Social preview keeps one account per platform. Older pages saved a single value for one platform.
@@ -351,7 +391,8 @@
     if (!D) return `<div class="pb-page pb-theme-${theme}">${body}</div>`;
     D.loadFonts(p.design);
     const a = D.pageAttrs(p.design, p.theme);
-    return `<div class="pb-root">${D.bgHtml(p.design, { fixed: fixedBg })}<div class="pb-page pb-theme-${theme} ${a.cls}" style="${a.style}">${body}</div></div>`;
+    // .pb-frame measures the page width, so layouts fold to one column on narrow screens (and the phone preview).
+    return `<div class="pb-root">${D.bgHtml(p.design, { fixed: fixedBg })}<div class="pb-frame"><div class="pb-page pb-theme-${theme} ${a.cls}" style="${a.style}">${body}</div></div></div>`;
   }
 
   // ---------- live parts: carousel, PDF thumbnails and reader ----------
@@ -454,7 +495,15 @@
     }
     pdfThumbs(root);
     if (window.PortfolioDesign) window.PortfolioDesign.mount(root);
+    if (!edit) root.querySelectorAll(".pb-sp[data-social]:not([data-live])").forEach(async (node) => {
+      node.dataset.live = "1";
+      try {
+        const r = await fetch(`/api/social?platform=${node.dataset.social}&handle=${encodeURIComponent(node.dataset.handle)}`);
+        const snap = r.ok ? await r.json() : null;
+        if (snap && snap.found) node.innerHTML = socialCard(node.dataset.social, node.dataset.handle, snap, false);
+      } catch { /* keep the saved copy */ }
+    });
   }
 
-  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
+  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, handleFor, socialCard, SOCIAL_URL, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
 })();

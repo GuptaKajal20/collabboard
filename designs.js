@@ -10,7 +10,7 @@
   const clone = (o) => JSON.parse(JSON.stringify(o ?? null));
   const abs = (path) => (/^https?:|^data:/.test(path) ? path : `${location.origin}${path}`);
 
-  let section = "templates";
+  let section = null; // which Designs section is open (one at a time; all closed at first)
   let bgView = null;
   let imgSource = "pexels";
   let tplCat = "business";
@@ -89,12 +89,19 @@
     const view = bgView || (b.type === "none" ? "color" : b.type);
     const types = [["color", "Colour"], ["gradient", "Gradient"], ["image", "Image"], ["video", "Video"], ["anim", "Animated"]];
     let body = `<div class="dz-types" role="tablist">${types.map(([v, l]) => `<button type="button" data-bgview="${v}" class="${view === v ? "active" : ""}${b.type === v ? " live" : ""}" role="tab" aria-selected="${view === v}">${l}</button>`).join("")}</div>`;
-    body += b.type !== "none" ? `<p class="fine dz-current">Showing: <strong>${{ color: "Colour", gradient: "Gradient", image: "Image", video: "Video", anim: "Animated" }[b.type]}</strong> · <button type="button" class="link-btn" data-act="bg-none">Back to plain white</button></p>` : `<p class="fine dz-current">Showing: <strong>Plain white</strong></p>`;
+    if (b.type !== "none") body += `<button type="button" class="link-btn dz-reset" data-act="bg-none">Use plain white</button>`;
 
-    if (view === "color") body += group("Colour", swatches("bg.color", D.COLORS, b.type === "color" ? b.color : ""));
+    if (view === "color") body += swatches("bg.color", D.COLORS, b.type === "color" ? b.color : "");
     if (view === "gradient") {
-      body += group("Presets", `<div class="dz-swatches">${D.GRADIENTS.map(([a, c, ang]) => `<button type="button" class="dz-sw dz-grad${b.type === "gradient" && b.gradient.a === a && b.gradient.b === c ? " on" : ""}" data-act="grad" data-a="${a}" data-b="${c}" data-angle="${ang}" style="background:linear-gradient(${ang}deg,${a},${c})" aria-label="Gradient ${a} to ${c}"></button>`).join("")}</div>`);
-      body += group("Your own", `<div class="dz-two"><label><span class="lbl">From</span><input type="color" data-color="bg.gradient.a" value="${b.gradient.a}"></label><label><span class="lbl">To</span><input type="color" data-color="bg.gradient.b" value="${b.gradient.b}"></label></div>${range("Direction", "bg.gradient.angle", b.gradient.angle, 0, 360, "°")}`);
+      const g = b.gradient;
+      const on = b.type === "gradient";
+      body += `<div class="dz-swatches">${D.GRADIENTS.map((cols, i) => `<button type="button" class="dz-sw dz-grad${on && cols.join() === g.colors.join() ? " on" : ""}" data-act="grad" data-i="${i}" style="background:linear-gradient(to right,${cols.join(",")})" aria-label="Gradient ${i + 1}"></button>`).join("")}</div>
+        <div class="dz-grad-edit">
+          <div class="dz-grad-preview" style="background:linear-gradient(${g.dir}, ${g.colors.join(", ")})"></div>
+          <div class="dz-grad-stops">${g.colors.map((c, i) => `<label class="dz-stop"><input type="color" data-color="bg.gradient.colors.${i}" value="${c}" aria-label="Colour ${i + 1}"><span>${c}</span>${g.colors.length > 2 ? `<button type="button" class="dz-stop-x" data-act="grad-del" data-i="${i}" aria-label="Remove colour ${i + 1}">✕</button>` : ""}</label>`).join("")}
+            ${g.colors.length < 3 ? `<button type="button" class="dz-add" data-act="grad-add">+ Colour</button>` : ""}</div>
+          <div class="dz-dirs" role="group" aria-label="Direction">${D.DIRS.map((dir) => dir ? `<button type="button" data-act="grad-dir" data-dir="${dir}" class="${on && g.dir === dir ? "on" : ""}" aria-label="${dir.replace("to ", "Towards ")}" title="${dir.replace("to ", "Towards ")}">${{ "to top left": "↖", "to top": "↑", "to top right": "↗", "to left": "←", "to right": "→", "to bottom left": "↙", "to bottom": "↓", "to bottom right": "↘" }[dir]}</button>` : `<span></span>`).join("")}</div>
+        </div>`;
     }
     if (view === "image") body += imageTab(b);
     if (view === "video") body += videoTab(b);
@@ -107,7 +114,7 @@
       if (b.type === "anim") {
         body += group("Colours", `<div class="dz-swatches">${D.ANIM_PALETTES.map((p, i) => `<button type="button" class="dz-sw dz-pal" data-act="pal" data-i="${i}" style="background:linear-gradient(90deg,${p.join(",")})" aria-label="Palette ${i + 1}"></button>`).join("")}</div>
           <div class="dz-three">${[0, 1, 2].map((i) => `<label><span class="lbl">Colour ${i + 1}</span><input type="color" data-color="bg.anim.colors.${i}" value="${b.anim.colors[i]}"></label>`).join("")}</div>
-          <label class="dz-inline"><span class="lbl">Background</span><input type="color" data-color="bg.anim.base" value="${b.anim.base}"></label>`, "Animations are slow and subtle, and stay still for visitors who turn off motion.");
+          <label class="dz-inline"><span class="lbl">Background</span><input type="color" data-color="bg.anim.base" value="${b.anim.base}"></label>`);
       }
     }
     if (["image", "video", "anim"].includes(b.type) && view === b.type) body += readability(d);
@@ -118,10 +125,11 @@
     const b = d.bg;
     const tone = ["image", "video"].includes(b.type)
       ? `<div class="pick-field"><span class="lbl">This ${b.type === "image" ? "photo" : "video"} is mostly</span>${segRow("bg.tone", b.tone === "auto" ? "dark" : b.tone, [["dark", "Dark"], ["light", "Light"]])}</div>` : "";
-    return group("Readability", `${tone}${range("Dim the background", "bg.scrim", b.scrim, 0, 80, "%")}
-      <label><span class="lbl">Module cards</span>${cardSelect(d.look.cards)}</label>`, "Keep text easy to read over busy backgrounds.");
+    return group("Readability", `${tone}${range("Dim the background", "bg.scrim", b.scrim, 0, 80, "%")}`);
   }
-  const cardSelect = (v) => `<select data-select="look.cards">${[["auto", "Auto (recommended)"], ["none", "No cards"], ["solid", "White cards"], ["glass", "Frosted glass"], ["glass-dark", "Dark glass"], ["soft", "Soft tint"], ["outline", "Outline"], ["brutal", "Bold border"]].map(([k, l]) => `<option value="${k}" ${k === v ? "selected" : ""}>${l}</option>`).join("")}</select>`;
+  // The four module card styles (Page section).
+  const CARDS = [["card", "With card"], ["none", "Without card"], ["transparent", "Transparent"], ["outline", "Outline"]];
+  const cardPicker = (d) => `<div class="dz-cards" role="group" aria-label="Module cards">${CARDS.map(([k, l]) => `<button type="button" data-pick="look.cards" data-val="${k}" class="dz-card-opt dz-card-${k}${D.cardStyle(d) === k ? " on" : ""}"><span class="dz-card-demo"><i></i><i></i></span><span>${l}</span></button>`).join("")}</div>`;
 
   function imageTab(b) {
     const img = b.image;
@@ -210,40 +218,39 @@
   function videoTab(b) {
     const v = b.video.url;
     const src = D.videoSource(v);
-    return group("Video link", `<form class="dz-search" data-form="video"><input type="url" name="url" value="${h(v)}" placeholder="YouTube, Vimeo or .mp4 link" aria-label="Video link"><button type="submit" class="btn small primary">Use</button></form>
-      <p class="fine${v && !src ? " error" : ""}" id="dz-video-note">${v && !src ? "We can't play this link as a background. Use a YouTube or Vimeo link, or a direct .mp4 / .webm file." : b.type === "video" ? "Plays muted and on loop behind your page. Visitors who turn off motion see the colour instead." : "Supported: YouTube, Vimeo, and direct .mp4 or .webm files (for example from Pexels Videos)."}</p>
-      ${b.type === "video" ? `<button type="button" class="btn small" data-act="video-remove">Remove video</button>` : ""}`);
+    const uploaded = src && src.kind === "file";
+    return `<label class="pick"><input type="file" accept="video/mp4,video/webm,video/quicktime" data-bgvideo><span>＋ Upload a video (MP4, up to 50 MB)</span></label>
+      <form class="dz-search" data-form="video"><input type="url" name="url" value="${uploaded ? "" : h(v)}" placeholder="Or paste a YouTube link" aria-label="YouTube link"><button type="submit" class="btn small primary">Use</button></form>
+      <p class="fine${v && !src ? " error" : ""}" id="dz-video-note">${v && !src ? "That link can't play as a background. Use a YouTube link or upload a video." : b.type === "video" ? `Playing${uploaded ? " your uploaded video" : ""}, muted and on loop.` : ""}</p>
+      ${b.type === "video" ? `<button type="button" class="btn small" data-act="video-remove">Remove video</button>` : ""}`;
   }
 
   // ---------- Text ----------
 
   function textTab() {
     const t = design().text;
-    return `<p class="fine">These apply to your whole page. To colour or style a few words, select them in a Text module.</p>` +
-      group("Body text", `<label><span class="lbl">Font</span>${fontSelect("text.font", t.font, false)}</label>
-        <p class="dz-font-sample" style="font-family:${D.fontStack(t.font)}">The quick brown fox jumps over the lazy dog.</p>
-        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.color", ["#1c1c1a", "#3f3f46", "#14213d", "#4a1b0c", "#04342c", "#ffffff", "#f6f5f0", "#fde68a"], t.color, autoChip("text.color", !t.color))}</div>`) +
-      group("Headings", `<label><span class="lbl">Font</span>${fontSelect("text.headFont", t.headFont, true)}</label>
-        <p class="dz-font-sample dz-head-sample" style="font-family:${D.fontStack(t.headFont || t.font)};font-weight:${t.headWeight};${t.headCase === "upper" ? "text-transform:uppercase;" : ""}letter-spacing:${t.headSpacing / 100}em">Your Name</p>
+    return `<div class="dz-box"><p class="dz-box-title">Headings</p>
+        <label><span class="lbl">Font</span>${fontSelect("text.headFont", t.headFont, true)}</label>
+        <p class="dz-font-sample dz-head-sample" style="font-family:${D.fontStack(t.headFont || t.font)};font-weight:${t.headWeight};${t.headCase === "upper" ? "text-transform:uppercase;" : ""}">Your Name</p>
         <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.headColor", ["#1c1c1a", "#5b4bd6", "#d85a30", "#0f6e56", "#9d174d", "#1d4ed8", "#ffffff", "#f2e27d"], t.headColor, autoChip("text.headColor", !t.headColor))}</div>
         <div class="pick-field"><span class="lbl">Weight</span>${segRow("text.headWeight", t.headWeight, [[400, "Regular"], [600, "Semi-bold"], [700, "Bold"], [800, "Heavy"]])}</div>
         <div class="pick-field"><span class="lbl">Letters</span>${segRow("text.headCase", t.headCase, [["none", "Normal"], ["upper", "UPPERCASE"]])}</div>
-        ${range("Size", "text.headScale", t.headScale, 70, 150, "%")}${range("Letter spacing", "text.headSpacing", t.headSpacing, -4, 12, "")}`, "Your name, link titles and big numbers.");
+      </div>
+      <div class="dz-box"><p class="dz-box-title">Body text</p>
+        <label><span class="lbl">Font</span>${fontSelect("text.font", t.font, false)}</label>
+        <p class="dz-font-sample" style="font-family:${D.fontStack(t.font)}">The quick brown fox jumps over the lazy dog.</p>
+        <div class="pick-field"><span class="lbl">Colour</span>${swatches("text.color", ["#1c1c1a", "#3f3f46", "#14213d", "#4a1b0c", "#04342c", "#ffffff", "#f6f5f0", "#fde68a"], t.color, autoChip("text.color", !t.color))}</div>
+      </div>`;
   }
 
   // ---------- Page ----------
 
   function pageTab() {
-    const l = design().look;
-    return group("Accent colour", `${swatches("look.accent", Object.values(D.THEMES).concat(["#e11d74", "#2563eb", "#ea580c", "#16a34a"]), l.accent || D.THEMES[site.theme] || "", "")}`, "Buttons, numbers and highlights.") +
-      group("Modules", `<label><span class="lbl">Cards</span>${cardSelect(l.cards)}</label>
-        ${range("Corner roundness", "look.radius", l.radius, 0, 32, "px")}
-        ${range("Space between modules", "look.gap", l.gap, 0, 28, "px")}
-        <div class="pick-field"><span class="lbl">Links look like</span>${segRow("look.links", l.links, [["card", "Cards"], ["pill", "Buttons"], ["underline", "Lines"]])}</div>
-        <div class="pick-field"><span class="lbl">Numbers look like</span>${segRow("look.stats", l.stats, [["tiles", "Tiles"], ["plain", "Plain"]])}</div>`) +
-      group("Layout", `<div class="pick-field"><span class="lbl">Align</span>${segRow("look.align", l.align, [["center", "Centre"], ["left", "Left"]])}</div>
-        ${range("Page width", "look.width", l.width, 520, 900, "px")}
-        <label class="check"><input type="checkbox" data-check="look.cover" ${l.cover ? "checked" : ""}> Colour banner behind your photo</label>`);
+    const d = design();
+    const l = d.look;
+    return group("Module cards", cardPicker(d)) +
+      group("Links look like", segRow("look.links", l.links, [["card", "Cards"], ["pill", "Buttons"], ["underline", "Lines"]])) +
+      group("Hover colour", swatches("look.hover", ["#f2e27d", "#ffb4a2", "#a5b4fc", "#86efac", "#7dd3fc", "#f9a8d4", "#1c1c1a", "#ffffff"], l.hover), "The glow when visitors point at a link or card.");
   }
 
   // ---------- Templates ----------
@@ -253,16 +260,18 @@
     const d = D.normalize(tpl.design);
     const a = D.pageAttrs(d, "violet");
     const b = d.bg;
-    const bg = b.type === "color" ? b.color : b.type === "gradient" ? `linear-gradient(${b.gradient.angle}deg,${b.gradient.a},${b.gradient.b})`
+    const bg = b.type === "color" ? b.color : b.type === "gradient" ? `linear-gradient(${b.gradient.dir},${b.gradient.colors.join(",")})`
       : b.type === "anim" ? `radial-gradient(circle at 20% 25%, ${b.anim.colors[0]}88, transparent 45%), radial-gradient(circle at 80% 30%, ${b.anim.colors[1]}77, transparent 45%), radial-gradient(circle at 50% 90%, ${b.anim.colors[2]}77, transparent 50%), ${b.anim.base}` : "#ffffff";
     const s = T.SAMPLES[tpl.cat];
     const side = tpl.profile.layout === "side";
+    // Same layout classes as the real page, so split/bento/timeline… show their real arrangement.
     return `<div class="tpl-thumb" style="background:${bg}">
       <div class="pb-page tpl-mini ${a.cls}" style="${a.style}">
-        <div class="tpl-head${side ? " side" : ""}"><img src="${h(tpl.photo)}" alt="" loading="lazy" style="border-radius:${tpl.profile.radius}%"><div><b>${h(s.name)}</b><i></i></div></div>
-        <div class="pb-block tpl-bar"><i></i><i></i><i class="short"></i></div>
-        <div class="pb-block tpl-row"><span></span><span></span></div>
-        <div class="pb-block tpl-link"><span class="pb-link"><span class="pb-link-text"><strong>${h(s.link)}</strong></span></span></div>
+        <section class="pb-block pb-profile-block"><div class="tpl-head${side ? " side" : ""}"><img src="${h(tpl.photo)}" alt="" loading="lazy" style="border-radius:${tpl.profile.radius}%"><div><b>${h(s.name)}</b><i></i></div></div></section>
+        <section class="pb-block pb-text-block tpl-bar"><i></i><i></i><i class="short"></i></section>
+        <section class="pb-block pb-stats-block tpl-row"><span></span><span></span></section>
+        <section class="pb-block pb-link-block tpl-link"><span class="pb-link"><span class="pb-link-text"><strong>${h(s.link)}</strong></span></span></section>
+        <section class="pb-block pb-rates-block tpl-bar"><i></i><i class="short"></i></section>
       </div>
     </div>`;
   }
@@ -272,9 +281,8 @@
     D.loadFonts(null, [...new Set(list.flatMap((x) => [x.design.text.font, x.design.text.headFont]))]);
     const current = design().template;
     const cat = T.CATEGORIES.find(([k]) => k === tplCat);
-    return `${site.templateUndo ? `<div class="dz-undo"><span>Template applied.</span><button type="button" class="btn small" data-act="tpl-undo">Undo</button></div>` : ""}
-      <div class="dz-cats" role="tablist">${T.CATEGORIES.map(([k, l]) => `<button type="button" data-tplcat="${k}" class="${k === tplCat ? "active" : ""}" role="tab">${l}</button>`).join("")}</div>
-      <p class="fine">${h(cat[2])}. Your text, photos and links stay when you switch.</p>
+    return `<div class="dz-cats" role="tablist">${T.CATEGORIES.map(([k, l]) => `<button type="button" data-tplcat="${k}" class="${k === tplCat ? "active" : ""}" role="tab">${l}</button>`).join("")}</div>
+      <p class="fine">${h(cat[2])}.</p>
       <div class="tpl-grid">${list.map((tpl) => `<article class="tpl-card${tpl.id === current ? " on" : ""}">
         <button type="button" class="tpl-open" data-tpl-preview="${tpl.id}" aria-label="Preview ${h(tpl.name)}">${thumb(tpl)}</button>
         <div class="tpl-meta"><strong>${h(tpl.name)}</strong>${tpl.id === current ? `<span class="tpl-inuse">In use</span>` : ""}<span>${h(tpl.about)}</span></div>
@@ -354,7 +362,6 @@
     const m = merged(tpl, false);
     const samples = {};
     for (const b of m.blocks) if (m.added.includes(b.id) || m.filled.some((f) => f.id === b.id)) samples[b.id] = sampleKey(b);
-    site.templateUndo = { design: clone(site.design || null), theme: site.theme, added: m.added, filled: m.filled, profId: m.profId, profBefore: m.profBefore, samples };
     site.templateSamples = { ...(site.templateSamples || {}), ...samples };
     site.blocks = m.blocks;
     site.design = D.normalize({ ...clone(tpl.design), template: tpl.id });
@@ -367,29 +374,6 @@
   // What a sample module looks like, to tell later whether the creator has edited it.
   const sampleKey = (b) => JSON.stringify([b.html, b.text, b.url, b.items]);
   const isUntouchedSample = (b) => !!(site.templateSamples && site.templateSamples[b.id] && site.templateSamples[b.id] === sampleKey(b));
-
-  // Undo: previous design comes back; modules the template added go away unless they've been edited since.
-  function undoTemplate() {
-    const u = site.templateUndo;
-    if (!u) return;
-    site.design = u.design ? D.normalize(u.design) : undefined;
-    site.theme = u.theme;
-    site.blocks = site.blocks.filter((b) => !(u.added.includes(b.id) && (b.type === "profile" ? !b.name && !b.bio : u.samples[b.id] === sampleKey(b) || isEmpty(b))));
-    for (const f of u.filled) {
-      const i = site.blocks.findIndex((b) => b.id === f.id);
-      if (i >= 0 && u.samples[f.id] === sampleKey(site.blocks[i])) site.blocks[i] = f.before;
-    }
-    const prof = site.blocks.find((b) => b.id === u.profId);
-    if (prof) {
-      const keepPhoto = !prof.photoSample; // they uploaded their own since
-      Object.assign(prof, { layout: u.profBefore.layout, size: u.profBefore.size, radius: u.profBefore.radius });
-      if (!keepPhoto) Object.assign(prof, { photo: u.profBefore.photo || "", photoName: u.profBefore.photoName || "", photoSample: u.profBefore.photoSample });
-    }
-    site.templateUndo = null;
-    saveSite();
-    renderCanvas();
-    render();
-  }
 
   // Full-size preview in a dialog, with the creator's own content and samples only where empty.
   function preview(id) {
@@ -442,12 +426,14 @@
 
   // ---------- panel ----------
 
+  const SECTIONS = [["templates", "Templates"], ["background", "Background"], ["text", "Text"], ["page", "Page"]];
   function render() {
     const host = $("dz-body");
     if (!host) return;
-    document.querySelectorAll("[data-dz]").forEach((b) => { b.classList.toggle("active", b.dataset.dz === section); b.setAttribute("aria-selected", String(b.dataset.dz === section)); });
-    $("dz-page-static").hidden = section !== "page";
-    host.innerHTML = section === "templates" ? templatesTab() : section === "background" ? bgTab() : section === "text" ? textTab() : pageTab();
+    host.innerHTML = SECTIONS.map(([k, l]) => `<section class="dz-acc${section === k ? " open" : ""}">
+        <button type="button" class="dz-acc-head" data-dz="${k}" aria-expanded="${section === k}"><span>${l}</span><span class="dz-chev" aria-hidden="true"></span></button>
+        ${section === k ? `<div class="dz-acc-body">${k === "templates" ? templatesTab() : k === "background" ? bgTab() : k === "text" ? textTab() : pageTab()}</div>` : ""}
+      </section>`).join("");
     setupDrag();
   }
 
@@ -499,7 +485,7 @@
     panel.addEventListener("click", async (e) => {
       const t = e.target.closest("button");
       if (!t || t.disabled) return;
-      if (t.dataset.dz) { section = t.dataset.dz; render(); return; }
+      if (t.dataset.dz) { section = section === t.dataset.dz ? null : t.dataset.dz; render(); return; }
       if (t.dataset.bgview) {
         bgView = t.dataset.bgview;
         const d = design();
@@ -536,13 +522,15 @@
       }
       switch (t.dataset.act) {
         case "bg-none": change((d) => { d.bg.type = "none"; }, { panel: true }); break;
-        case "grad": change((d) => { d.bg.type = "gradient"; d.bg.gradient = { a: t.dataset.a, b: t.dataset.b, angle: Number(t.dataset.angle) }; }, { panel: true }); break;
+        case "grad": change((d) => { d.bg.type = "gradient"; d.bg.gradient.colors = [...D.GRADIENTS[Number(t.dataset.i)]]; }, { panel: true }); break;
+        case "grad-dir": change((d) => { d.bg.type = "gradient"; d.bg.gradient.dir = t.dataset.dir; }, { panel: true }); break;
+        case "grad-add": change((d) => { d.bg.type = "gradient"; d.bg.gradient.colors.push("#ffffff"); }, { panel: true }); break;
+        case "grad-del": change((d) => { d.bg.gradient.colors.splice(Number(t.dataset.i), 1); }, { panel: true }); break;
         case "anim": change((d) => { const a = D.ANIMS[t.dataset.val]; const keep = d.bg.type === "anim"; d.bg.type = "anim"; if (!keep || d.bg.anim.preset !== t.dataset.val) d.bg.anim = { preset: t.dataset.val, colors: [...a.colors], base: a.base }; }, { panel: true }); break;
         case "pal": change((d) => { d.bg.anim.colors = [...D.ANIM_PALETTES[Number(t.dataset.i)]]; }, { panel: true }); break;
         case "img-reset": change((d) => { Object.assign(d.bg.image, { zoom: 100, x: 50, y: 50, fit: "cover" }); }, { panel: true }); break;
         case "video-remove": change((d) => { d.bg.type = d.bg.image.url ? "image" : "color"; d.bg.video.url = ""; }, { panel: true }); bgView = null; render(); break;
         case "pexels-more": searchPexels(pexels.q, true); break;
-        case "tpl-undo": undoTemplate(); break;
       }
     });
     panel.addEventListener("input", (e) => {
@@ -551,15 +539,18 @@
         const v = Number(r.value);
         r.style.setProperty("--fill", `${(((v - r.min) / (r.max - r.min)) * 100).toFixed(1)}%`);
         r.nextElementSibling.textContent = `${v}${r.dataset.unit}`;
+        if (typeof undoKey !== "undefined") undoKey = `design:${r.dataset.range}`;
         change((d) => setPathValue(d, r.dataset.range, v));
         if (r.dataset.range.startsWith("bg.image")) syncImageControls();
         if (r.dataset.range.startsWith("text.head")) updateHeadSample();
       }
       if (r.dataset.color) {
         const path = r.dataset.color;
+        if (typeof undoKey !== "undefined") undoKey = `design:${path}`;
         change((d) => {
           const parts = path.split(".");
-          if (parts[2] === "colors") d.bg.anim.colors[Number(parts[3])] = r.value;
+          if (parts[1] === "anim" && parts[2] === "colors") d.bg.anim.colors[Number(parts[3])] = r.value;
+          else if (parts[1] === "gradient" && parts[2] === "colors") { d.bg.gradient.colors[Number(parts[3])] = r.value; const stop = r.parentNode.querySelector("span"); if (stop) stop.textContent = r.value; const pv = document.querySelector(".dz-grad-preview"); if (pv) pv.style.background = `linear-gradient(${d.bg.gradient.dir}, ${d.bg.gradient.colors.join(", ")})`; }
           else setPathValue(d, path, r.value);
           if (path === "bg.color") d.bg.type = "color";
           if (path.startsWith("bg.gradient")) d.bg.type = "gradient";
@@ -571,6 +562,19 @@
       if (s.dataset.select) change((d) => setPathValue(d, s.dataset.select, s.value), { panel: true });
       if (s.dataset.check) change((d) => setPathValue(d, s.dataset.check, s.checked));
       if (s.dataset.color) render(); // mark the picked swatch
+      if (s.dataset.bgvideo !== undefined && s.files.length) {
+        const note = $("dz-video-note");
+        const file = s.files[0];
+        note.classList.remove("error");
+        if (!/^video\/(mp4|webm|quicktime)$/.test(file.type)) { note.textContent = "Please choose an MP4, WebM or MOV video."; note.classList.add("error"); return; }
+        if (file.size > 50 * 1024 * 1024) { note.textContent = "That video is over 50 MB. Try a shorter clip."; note.classList.add("error"); return; }
+        if (!window.Cloud || !Cloud.ready) { note.textContent = "Video uploads turn on once your account is set up. Meanwhile, paste a YouTube link."; note.classList.add("error"); return; }
+        note.textContent = "Uploading your video…";
+        try {
+          const url = await Cloud.upload(file);
+          change((d) => { d.bg.type = "video"; d.bg.video.url = url; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
+        } catch (err) { note.textContent = err.message || "Upload failed. Please try again."; note.classList.add("error"); }
+      }
       if (s.dataset.bgupload !== undefined && s.files.length) {
         const n = $("dz-upload-note");
         n.hidden = false;
@@ -618,14 +622,19 @@
     // The link name (and the original colour themes, now part of Accent colour) move under "Page".
     const old = [...panel.children];
     const isThemes = (n) => n.id === "themes" || (n.classList.contains("panel-label") && n.textContent.trim() === "Colour");
-    panel.innerHTML = `<div class="dz-nav" role="tablist" aria-label="Design sections">
-        <button type="button" data-dz="templates" role="tab">Templates</button><button type="button" data-dz="background" role="tab">Background</button><button type="button" data-dz="text" role="tab">Text</button><button type="button" data-dz="page" role="tab">Page</button>
-      </div><div id="dz-body"></div><div id="dz-page-static" hidden></div>`;
-    old.forEach((n) => { if (isThemes(n)) n.hidden = true; $("dz-page-static").appendChild(n); });
+    panel.innerHTML = `<div id="dz-body"></div><div id="dz-old" hidden></div>`;
+    old.forEach((n) => $("dz-old").appendChild(n));
+    void isThemes;
     bind();
     render();
   }
 
   // Shown in a module's editor while it still has untouched template sample content.
-  window.Designs = { init, render, refresh, isUntouchedSample, showSection: (s) => { section = s; render(); } };
+  // Free photo search for other parts of the editor (the Profile Header's header image).
+  async function findPhotos(q) {
+    const data = (pexelsReady !== false && (await pexelsApi(q, 1))) || (await openverse(q, 1));
+    return data.photos;
+  }
+
+  window.Designs = { init, render, refresh, isUntouchedSample, findPhotos, showSection: (s) => { section = s; render(); } };
 })();
