@@ -396,7 +396,7 @@ function starterSite() {
   const block = (type, extra = {}) => ({ id: newId(), type, ...P.BLOCKS[type].make(), ...extra });
   return {
     v: 2,
-    theme: old.theme || "violet",
+    theme: old.theme || "coral",
     slug: slugify(name),
     blocks: [
       block("profile", { name, bio: old.tagline || "", photo: old.photo || "" }),

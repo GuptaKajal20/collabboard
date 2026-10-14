@@ -486,6 +486,6 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-cover-img { border-radius: calc(var(--radius, 16px) - 1px) calc(var(--radius, 16px) - 1px) 0 0; }
 
 /* Builder: the hover border is the editor's yellow, with a soft glow, on every module. */
-.canvas .pb-editable:hover { outline: calc(2.5px / var(--cz, 1)) solid #f2e27d !important;
+.canvas .pb-editable:hover { outline: calc(2.5px / var(--cz, 1)) solid #f5c542 !important;
   box-shadow: 0 0 0 calc(6px / var(--cz, 1)) rgba(242, 226, 125, 0.3), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) rgba(242, 226, 125, 0.55) !important; }
-.canvas .pb-glow { background: linear-gradient(120deg, #f2e27d, #fff6c2 50%, #f2e27d); }
+.canvas .pb-glow { background: linear-gradient(120deg, #f5c542, #ffe9a8 50%, #f5c542); }

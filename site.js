@@ -67,7 +67,7 @@
       if (text) text.textContent = next === "dark" ? "Dark mode" : "Light mode";
     });
     const meta = document.querySelector('meta[name="theme-color"]:not([media])');
-    if (meta) meta.content = currentTheme() === "dark" ? "#121210" : "#ebe8de";
+    if (meta) meta.content = currentTheme() === "dark" ? "#111611" : "#f6f0dc";
   };
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-theme-toggle]");

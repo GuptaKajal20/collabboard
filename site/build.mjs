@@ -84,8 +84,8 @@ function head(p) {
   <meta name="description" content="${esc(p.description)}">
   <meta name="robots" content="${p.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}">
   ${p.noindex ? "" : `<link rel="canonical" href="${canonical}">`}
-  <meta name="theme-color" content="#ebe8de" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f0dc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#111611" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${SITE.name}">
