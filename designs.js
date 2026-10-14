@@ -302,7 +302,12 @@
     const cat = T.CATEGORIES.find(([k]) => k === tplCat);
     return `<div class="dz-cats" role="tablist">${T.CATEGORIES.map(([k, l]) => `<button type="button" data-tplcat="${k}" class="${k === tplCat ? "active" : ""}" role="tab">${l}</button>`).join("")}</div>
       <p class="fine">${h(cat[2])}.</p>
-      <div class="tpl-grid">${list.map((tpl) => `<article class="tpl-card${tpl.id === current ? " on" : ""}">
+      <div class="tpl-grid">
+      <article class="tpl-card${!current ? " on" : ""}">
+        <button type="button" class="tpl-open tpl-none" data-act="tpl-none" aria-label="No template"><span class="tpl-thumb tpl-none-thumb"><span>No template</span><small>Plain page</small></span></button>
+        <div class="tpl-meta"><strong>No template</strong>${!current ? `<span class="tpl-inuse">In use</span>` : ""}<span>The plain look. Your modules stay as they are.</span></div>
+        <div class="tpl-actions"><button type="button" class="btn small primary" data-act="tpl-none" ${!current ? "disabled" : ""}>${!current ? "In use" : "Use"}</button></div>
+      </article>${list.map((tpl) => `<article class="tpl-card${tpl.id === current ? " on" : ""}">
         <button type="button" class="tpl-open" data-tpl-preview="${tpl.id}" aria-label="Preview ${h(tpl.name)}">${thumb(tpl)}</button>
         <div class="tpl-meta"><strong>${h(tpl.name)}</strong>${tpl.id === current ? `<span class="tpl-inuse">In use</span>` : ""}<span>${h(tpl.about)}</span></div>
         <div class="tpl-actions"><button type="button" class="btn small" data-tpl-preview="${tpl.id}">Preview</button><button type="button" class="btn small primary" data-tpl-use="${tpl.id}">Use</button></div>
@@ -335,12 +340,18 @@
 
   // The creator's page with the template applied. Rules: keep everything they made; fill only what's
   // empty or missing. preview = also fill name, bio, numbers and prices with samples, without saving.
+  // preview = the template preview dialog: shows sample content in empty spots, nothing is saved.
+  // Applying a template (preview false) only changes the look: it never adds, brings back or fills modules.
   function merged(tpl, preview) {
     const blocks = clone(site.blocks);
     const added = [];
     const filled = [];
     const make = (type, extra) => ({ id: Math.random().toString(36).slice(2, 10), type, ...window.Portfolio.BLOCKS[type].make(), ...extra });
     let prof = blocks.find((b) => b.type === "profile");
+    if (!preview) {
+      if (prof) Object.assign(prof, { layout: tpl.profile.layout, size: tpl.profile.size, radius: tpl.profile.radius });
+      return { blocks, added, filled, profId: prof && prof.id, profBefore: null };
+    }
     if (!prof) {
       prof = make("profile", { name: (typeof profile !== "undefined" && profile && profile.name) || "" });
       blocks.unshift(prof);
@@ -373,6 +384,14 @@
       added.push(b.id);
     }
     return { blocks, added, filled, profId: prof.id, profBefore };
+  }
+
+  // "No template": back to the plain look. Content stays exactly as it is.
+  function clearTemplate() {
+    site.design = D.normalize({});
+    saveSite();
+    renderCanvas();
+    render();
   }
 
   function applyTemplate(id) {
@@ -430,7 +449,7 @@
         <div class="seg" role="group" aria-label="Preview size"><button type="button" data-tpl-device="desktop" class="${device === "desktop" ? "active" : ""}">Desktop</button><button type="button" data-tpl-device="mobile" class="${device === "mobile" ? "active" : ""}">Mobile</button></div>
         <button type="button" class="x" data-tpl-close aria-label="Close preview">✕</button>
       </header>
-      <p class="fine tpl-modal-note">Your own text, photos and links are kept. Empty spots show sample content here; numbers and prices are never added to your page.</p>
+      <p class="fine tpl-modal-note">Sample content is only for this preview. Using the template changes just the look: your modules stay exactly as they are, nothing is added or brought back.</p>
       <div class="tpl-stage" data-device="${device}"><div class="tpl-stage-page">${window.Portfolio.renderPortfolio(fake)}</div></div>
       <footer>
         <button type="button" class="btn" data-tpl-go="${list[(i - 1 + list.length) % list.length].id}">‹ Previous</button>
@@ -555,6 +574,7 @@
         case "grad-add": change((d) => { d.bg.type = "gradient"; d.bg.gradient.colors.push("#ffffff"); }, { panel: true }); break;
         case "grad-del": change((d) => { d.bg.gradient.colors.splice(Number(t.dataset.i), 1); }, { panel: true }); break;
         case "anim": change((d) => { const a = D.ANIMS[t.dataset.val]; const keep = d.bg.type === "anim"; d.bg.type = "anim"; if (!keep || d.bg.anim.preset !== t.dataset.val) d.bg.anim = { preset: t.dataset.val, colors: [...a.colors], base: a.base }; }, { panel: true }); break;
+        case "tpl-none": clearTemplate(); break;
         case "pal": change((d) => { d.bg.anim.colors = [...D.ANIM_PALETTES[Number(t.dataset.i)]]; }, { panel: true }); break;
         case "img-reset": change((d) => { Object.assign(d.bg.image, { zoom: 100, x: 50, y: 50, fit: "cover" }); }, { panel: true }); break;
         case "video-remove": change((d) => { d.bg.type = d.bg.image.url ? "image" : "none"; d.bg.video.url = ""; }, { panel: true }); render(); break;
