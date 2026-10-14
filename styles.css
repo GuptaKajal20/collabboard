@@ -498,7 +498,16 @@ a.stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
 .dot.pending { background: #e3a008; box-shadow: 0 0 0 4px var(--warn-bg); }
 
 /* Preview 40%, editor 60%. */
-.builder { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; align-items: start; }
+/* Preview | handle | editor. The split is adjustable (app.js sets --split, the preview's share in %). */
+.builder { --split: 40; display: grid; grid-template-columns: minmax(0, calc(var(--split) * 1%)) 16px minmax(0, 1fr); gap: 6px; align-items: start; }
+.split-handle { position: sticky; top: 96px; align-self: stretch; display: grid; place-items: center; height: calc(100vh - 116px); max-height: 100%; cursor: col-resize; touch-action: none; border-radius: 999px; outline: none; }
+.split-handle::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; translate: -1px 0; border-radius: 2px; background: var(--line); opacity: 0.35; transition: opacity 0.15s ease, background 0.15s ease; }
+.split-grip { position: relative; display: grid; place-items: center; width: 22px; height: 46px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18); transition: background 0.15s ease, transform 0.15s ease; }
+.split-grip svg { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.split-handle:hover::before, .split-handle.dragging::before, .split-handle:focus-visible::before { opacity: 1; background: var(--yellow); }
+.split-handle:hover .split-grip, .split-handle.dragging .split-grip, .split-handle:focus-visible .split-grip { background: var(--yellow); color: #141413; border-color: #141413; transform: scale(1.08); }
+body.splitting { cursor: col-resize; user-select: none; }
+body.splitting iframe { pointer-events: none; } /* keep dragging smooth over embeds */
 .canvas-wrap { position: sticky; top: 96px; max-height: calc(100vh - 116px); overflow: auto; min-width: 0; padding: 8px; border-radius: 20px; background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--shadow); }
 .canvas {
   margin: 0 auto;
@@ -705,6 +714,7 @@ input.invalid { border-color: var(--error); box-shadow: 0 0 0 3px rgba(180, 35, 
   .filters { grid-template-columns: 1fr 1fr; }
   .filters input { grid-column: 1 / -1; }
   .builder { grid-template-columns: minmax(0, 1fr); }
+  .split-handle { display: none; }
   .panel, .canvas-wrap { min-width: 0; }
   .pf-top { margin: -20px -16px 12px; padding: 12px 16px; top: 0; }
   .pf-top > div:not(.pf-actions) { flex: 1 1 100% !important; }

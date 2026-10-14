@@ -1257,6 +1257,48 @@ async function setupPortfolio() {
 
   document.querySelectorAll(".panel-tabs [data-panel]").forEach((b) => b.addEventListener("click", () => showPanel(b.dataset.panel)));
 
+  // Adjustable split: drag the handle (or use arrow keys) to share the width between preview and editor.
+  // Remembered on this device; double-click puts it back to 40 / 60.
+  const builder = document.querySelector("#page-portfolio .builder");
+  const handle = el("split-handle");
+  const setSplit = (pct, save = true) => {
+    const v = Math.round(Math.max(25, Math.min(75, pct)));
+    builder.style.setProperty("--split", v);
+    handle.setAttribute("aria-valuenow", v);
+    handle.setAttribute("aria-valuetext", `Preview ${v}%, editor ${100 - v}%`);
+    if (save) store.set("cb_split", v);
+  };
+  setSplit(Number(store.get("cb_split")) || 40, false);
+  handle.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    handle.classList.add("dragging");
+    document.body.classList.add("splitting");
+    const r = builder.getBoundingClientRect();
+    const move = (ev) => setSplit(((ev.clientX - r.left) / r.width) * 100);
+    const up = () => {
+      handle.classList.remove("dragging");
+      document.body.classList.remove("splitting");
+      handle.removeEventListener("pointermove", move);
+      handle.removeEventListener("pointerup", up);
+      handle.removeEventListener("pointercancel", up);
+    };
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", up);
+    handle.addEventListener("pointercancel", up);
+  });
+  handle.addEventListener("dblclick", () => setSplit(40));
+  handle.addEventListener("keydown", (e) => {
+    const now = Number(builder.style.getPropertyValue("--split")) || 40;
+    const step = e.shiftKey ? 10 : 2;
+    if (e.key === "ArrowLeft") setSplit(now - step);
+    else if (e.key === "ArrowRight") setSplit(now + step);
+    else if (e.key === "Home") setSplit(25);
+    else if (e.key === "End") setSplit(75);
+    else return;
+    e.preventDefault();
+  });
+
   // Scale the preview so the whole page width fits the preview column.
   const fitCanvas = () => {
     const c = el("canvas");
