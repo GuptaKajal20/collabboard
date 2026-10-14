@@ -19,7 +19,7 @@
   const DIRS = ["to top left", "to top", "to top right", "to left", "", "to right", "to bottom left", "to bottom", "to bottom right"];
   const angleToDir = (a) => ["to top", "to top right", "to right", "to bottom right", "to bottom", "to bottom left", "to left", "to top left"][Math.round((((Number(a) || 0) % 360) + 360) % 360 / 45) % 8];
   // Module layouts: how the modules are arranged on the page.
-  const LAYOUTS = ["classic", "split", "bento", "magazine", "timeline", "poster", "compact", "offset"];
+  const LAYOUTS = ["classic", "split", "bento", "magazine", "timeline", "poster", "compact", "offset", "ledger", "layered", "report", "pocket"];
   // name, Google Fonts family, weights (empty = the font has one weight), CSS fallback
   const FONTS = {
     inter: ["Inter", "Inter", "400;500;600;700;800", "system-ui, sans-serif"],
@@ -101,6 +101,9 @@
         cards: ({ solid: "card", brutal: "card", soft: "card", glass: "transparent", "glass-dark": "transparent" })[look.cards] || (["auto", "card", "none", "transparent", "outline"].includes(look.cards) ? look.cards : "auto"),
         layout: LAYOUTS.includes(look.layout) ? look.layout : "classic",
         hover: hex(look.hover, "#f2e27d"),
+        cardColor: hex(look.cardColor, "#ffffff"),
+        btnColor: hex(look.btnColor, ""),
+        lineColor: hex(look.lineColor, ""),
         radius: clamp(look.radius, 0, 32, 16),
         width: clamp(look.width, 520, 900, 720),
         accent: hex(look.accent, ""),
@@ -138,8 +141,8 @@
     const d = normalize(design);
     const cards = cardStyle(d);
     const tone = bgTone(d);
-    // White cards always get dark text; otherwise the text follows the background.
-    const surface = cards === "card" ? "light" : tone;
+    // Cards: text follows the card colour; otherwise the text follows the background.
+    const surface = cards === "card" ? (lum(d.look.cardColor) > 0.36 ? "light" : "dark") : tone;
     const light = surface === "light";
     const accent = d.look.accent || THEMES[theme] || THEMES.violet;
     const ink = d.text.color || (light ? "#1c1c1a" : "#f6f5f0");
@@ -162,6 +165,10 @@
       "--page-max": `${d.look.width}px`,
       "--gap": `${d.look.gap}px`,
       "--hover": d.look.hover,
+      "--card-bg": d.look.cardColor,
+      "--btn-bg": d.look.btnColor || accent,
+      "--btn-ink": lum(d.look.btnColor || accent) > 0.45 ? "#141413" : "#ffffff",
+      "--rule": d.look.lineColor || accent,
       "--glass": light ? "rgba(255,255,255,0.58)" : "rgba(10,10,14,0.38)",
     };
     const cls = [
@@ -264,7 +271,7 @@
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const count = kind === "particles" ? Math.round(Math.min(90, (w * h) / 14000)) : 0;
-      parts = Array.from({ length: count }, (_, i) => ({ x: Math.random() * w, y: Math.random() * h, r: 0.8 + Math.random() * 2.6, vx: (Math.random() - 0.5) * 0.25, vy: -0.08 - Math.random() * 0.3, c: colors[i % colors.length], p: Math.random() * 6.28 }));
+      parts = Array.from({ length: count }, (_, i) => ({ x: Math.random() * w, y: Math.random() * h, r: 1 + Math.random() * 2.8, vx: (Math.random() - 0.5) * 0.6, vy: -0.25 - Math.random() * 0.6, c: colors[i % colors.length], p: Math.random() * 6.28 }));
     };
     const draw = (t) => {
       ctx.clearRect(0, 0, w, h);
@@ -294,7 +301,7 @@
           ctx.beginPath();
           const base = h * (0.55 + i * 0.12);
           ctx.moveTo(0, h);
-          for (let x = 0; x <= w; x += 12) ctx.lineTo(x, base + Math.sin(x / (180 + i * 60) + t / (2600 + i * 900)) * (26 + i * 10) + Math.sin(x / 90 + t / 1700) * 6);
+          for (let x = 0; x <= w; x += 12) ctx.lineTo(x, base + Math.sin(x / (180 + i * 60) + t / (900 + i * 300)) * (30 + i * 12) + Math.sin(x / 90 + t / 700) * 8);
           ctx.lineTo(w, h);
           ctx.fill();
         });
@@ -308,7 +315,7 @@
           ctx.beginPath();
           const y0 = (h / n) * i + h * 0.02;
           for (let x = -20; x <= w + 20; x += 16) {
-            const y = y0 + Math.sin(x / 160 + t / 3000 + i * 0.35) * 34 + Math.cos(x / 340 - t / 4200 + i * 0.2) * 22;
+            const y = y0 + Math.sin(x / 160 + t / 1100 + i * 0.35) * 34 + Math.cos(x / 340 - t / 1600 + i * 0.2) * 22;
             if (x === -20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
           }
           ctx.stroke();

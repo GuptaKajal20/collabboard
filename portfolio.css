@@ -201,23 +201,23 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-anim-mesh, .pb-anim-orbs { position: absolute; inset: -15%; }
 .pb-anim-mesh { filter: blur(70px) saturate(120%); }
 .pb-anim-mesh i, .pb-anim-orbs i { position: absolute; border-radius: 50%; will-change: transform; }
-.pb-anim-mesh i { width: 60%; height: 60%; opacity: 0.9; animation: pb-drift 26s ease-in-out infinite alternate; }
+.pb-anim-mesh i { width: 60%; height: 60%; opacity: 0.9; animation: pb-drift 11s ease-in-out infinite alternate; }
 .pb-anim-mesh i:nth-child(1) { left: 0; top: 0; background: var(--c1); }
-.pb-anim-mesh i:nth-child(2) { right: 0; top: 10%; background: var(--c2); animation-duration: 31s; animation-delay: -8s; }
-.pb-anim-mesh i:nth-child(3) { left: 15%; bottom: 0; background: var(--c3); animation-duration: 36s; animation-delay: -14s; }
-.pb-anim-mesh i:nth-child(4) { right: 10%; bottom: 5%; width: 45%; height: 45%; background: var(--c1); opacity: 0.6; animation-duration: 29s; animation-delay: -20s; }
-.pb-anim-orbs i { width: 34%; aspect-ratio: 1; height: auto; filter: blur(46px); opacity: 0.7; mix-blend-mode: screen; animation: pb-orbit 24s ease-in-out infinite alternate; }
+.pb-anim-mesh i:nth-child(2) { right: 0; top: 10%; background: var(--c2); animation-duration: 13s; animation-delay: -4s; }
+.pb-anim-mesh i:nth-child(3) { left: 15%; bottom: 0; background: var(--c3); animation-duration: 15s; animation-delay: -7s; }
+.pb-anim-mesh i:nth-child(4) { right: 10%; bottom: 5%; width: 45%; height: 45%; background: var(--c1); opacity: 0.6; animation-duration: 12s; animation-delay: -9s; }
+.pb-anim-orbs i { width: 34%; aspect-ratio: 1; height: auto; filter: blur(46px); opacity: 0.7; mix-blend-mode: screen; animation: pb-orbit 10s ease-in-out infinite alternate; }
 .pb-anim-orbs i:nth-child(1) { left: 12%; top: 14%; background: radial-gradient(circle, var(--c1), transparent 70%); }
-.pb-anim-orbs i:nth-child(2) { right: 14%; top: 30%; background: radial-gradient(circle, var(--c2), transparent 70%); animation-duration: 30s; animation-delay: -10s; }
-.pb-anim-orbs i:nth-child(3) { left: 30%; bottom: 10%; background: radial-gradient(circle, var(--c3), transparent 70%); animation-duration: 34s; animation-delay: -5s; }
-.pb-anim-orbs i:nth-child(4) { right: 30%; top: 4%; width: 22%; background: radial-gradient(circle, var(--c2), transparent 70%); animation-duration: 21s; animation-delay: -16s; }
-@keyframes pb-drift { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(14%, 10%) scale(1.12); } 100% { transform: translate(-10%, 16%) scale(0.95); } }
-@keyframes pb-orbit { 0% { transform: translate(0, 0); } 33% { transform: translate(22%, -14%); } 66% { transform: translate(-16%, 18%); } 100% { transform: translate(10%, 8%); } }
+.pb-anim-orbs i:nth-child(2) { right: 14%; top: 30%; background: radial-gradient(circle, var(--c2), transparent 70%); animation-duration: 13s; animation-delay: -5s; }
+.pb-anim-orbs i:nth-child(3) { left: 30%; bottom: 10%; background: radial-gradient(circle, var(--c3), transparent 70%); animation-duration: 15s; animation-delay: -3s; }
+.pb-anim-orbs i:nth-child(4) { right: 30%; top: 4%; width: 22%; background: radial-gradient(circle, var(--c2), transparent 70%); animation-duration: 9s; animation-delay: -6s; }
+@keyframes pb-drift { 0% { transform: translate(0, 0) scale(1); } 50% { transform: translate(28%, 18%) scale(1.2); } 100% { transform: translate(-20%, 26%) scale(0.9); } }
+@keyframes pb-orbit { 0% { transform: translate(0, 0); } 33% { transform: translate(60%, -30%); } 66% { transform: translate(-40%, 45%); } 100% { transform: translate(30%, 20%); } }
 @media (prefers-reduced-motion: reduce) { .pb-anim-mesh i, .pb-anim-orbs i { animation: none; } }
 
 /* Module cards: with card, without card, transparent, outline. */
 .pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-block { padding: 18px 20px; border-radius: var(--radius, 16px); }
-.pb-cards-card .pb-block { background: #fff; border: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 14px 32px -20px rgba(0, 0, 0, 0.45); }
+.pb-cards-card .pb-block { background: var(--card-bg, #fff); border: 1px solid rgba(0, 0, 0, 0.06); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 14px 32px -20px rgba(0, 0, 0, 0.45); }
 .pb-cards-transparent .pb-block { background: var(--glass); border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
 .pb-cards-outline .pb-block { border: 1.5px solid color-mix(in srgb, var(--ink) 30%, transparent); }
 .pb-surface-dark .pb-avatar { border-color: rgba(255, 255, 255, 0.85); }
@@ -408,3 +408,41 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-layout-timeline > .pb-block:last-child::before { bottom: auto; }
 /* Offset: same size and straight, just the heavy border. */
 .pb-layout-offset > .pb-block:nth-child(n) { transform: none; }
+
+/* Links as buttons or lines, in the chosen colours (Page → Links look like). */
+.pb-links-pill .pb-link:not(.pb-link-card) { border-radius: 999px; background: var(--btn-bg, var(--k)); border-color: transparent; padding: 14px 24px; }
+.pb-links-pill .pb-link.has-img { padding: 8px 22px 8px 8px; }
+.pb-links-pill .pb-link.has-img .pb-link-img { border-radius: 999px; width: 64px; height: 64px; }
+.pb-links-pill .pb-link:not(.pb-link-card) .pb-link-text strong { color: var(--btn-ink, #fff); }
+.pb-links-pill .pb-link:not(.pb-link-card) .pb-link-text small { color: color-mix(in srgb, var(--btn-ink, #fff) 80%, transparent); }
+.pb-links-pill .pb-link.pb-link-card { border: 2px solid var(--btn-bg, var(--k)); }
+.pb-links-underline .pb-link { background: transparent; border: 0; border-bottom: 2px solid var(--rule, var(--k)); border-radius: 0; padding: 12px 4px; }
+.pb-links-underline .pb-link-text strong { color: var(--ink); }
+.pb-links-underline .pb-rates li { border-bottom-color: color-mix(in srgb, var(--rule, var(--k)) 60%, transparent); }
+
+/* In the builder, the background (and its animation) stays in view while the preview scrolls. */
+.canvas .pb-root > .pb-bg { position: sticky; top: 0; height: var(--bgh, 100%); margin-bottom: calc(-1 * var(--bgh, 100%)); }
+
+/* ---------- four more card-stack style layouts ---------- */
+/* Ledger: index cards with a thick accent edge and a hard accent shadow. */
+.pb-layout-ledger { --page-max: 760px; gap: 18px; }
+.pb-layout-ledger > .pb-block { border: 2px solid var(--k) !important; border-left-width: 10px !important; border-radius: 6px !important; box-shadow: 7px 7px 0 var(--k) !important; }
+.pb-layout-ledger .pb-profile:not(.pb-side) { justify-items: start; text-align: left; }
+.pb-layout-ledger .pb-profile-text { justify-items: start; }
+/* Layered: every card sits on two paper sheets, like a stack. */
+.pb-layout-layered { gap: 26px; }
+.pb-layout-layered > .pb-block { border: 2px solid #141413 !important; box-shadow: 6px 6px 0 -2px var(--card-bg, #fff), 6px 6px 0 0 #141413, 12px 12px 0 -2px var(--card-bg, #fff), 12px 12px 0 0 #141413 !important; }
+/* Report: boxed two-column grid; every box has a heavy coloured top bar. */
+.pb-layout-report { --page-max: 900px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.pb-layout-report > :is(.pb-profile-block, .pb-text-block, .pb-file-block, .pb-instagram-block, .pb-start) { grid-column: 1 / -1; }
+.pb-layout-report > .pb-block { border: 2px solid #141413 !important; border-top: 12px solid var(--k) !important; border-radius: 4px !important; box-shadow: 5px 5px 0 #141413 !important; }
+.pb-layout-report .pb-profile:not(.pb-side) { justify-items: start; text-align: left; }
+.pb-layout-report .pb-profile-text { justify-items: start; }
+/* Pocket: narrow and rounded, chunky cards with a solid bottom shadow, header on a colour panel. */
+.pb-layout-pocket { --page-max: 440px; gap: 14px; }
+.pb-layout-pocket > .pb-block { border: 2px solid #141413 !important; border-radius: 22px !important; box-shadow: 0 6px 0 #141413 !important; }
+.pb-layout-pocket > .pb-profile-block { background: var(--k) !important; }
+.pb-layout-pocket > .pb-profile-block h1, .pb-layout-pocket > .pb-profile-block .pb-bio { color: #fff; }
+@container pb (max-width: 640px) { .pb-layout-report { grid-template-columns: minmax(0, 1fr); } }
+/* Hovered modules keep their glow even in these layouts. */
+.pb-editable:is(.pb-block):hover { box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent) !important; }

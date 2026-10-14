@@ -12,7 +12,7 @@
 
   let section = null; // which Designs section is open (one at a time; all closed at first)
   let bgView = null;
-  let imgSource = "pexels";
+  let imgSource = "upload";
   let tplCat = "business";
   let pexels = { q: "", items: [], page: 1, busy: false, error: "", more: false };
 
@@ -86,25 +86,24 @@
   function bgTab() {
     const d = design();
     const b = d.bg;
-    const view = bgView || (b.type === "none" ? "color" : b.type);
-    const types = [["color", "Colour"], ["gradient", "Gradient"], ["image", "Image"], ["video", "Video"], ["anim", "Animated"]];
-    let body = `<div class="dz-types" role="tablist">${types.map(([v, l]) => `<button type="button" data-bgview="${v}" class="${view === v ? "active" : ""}${b.type === v ? " live" : ""}" role="tab" aria-selected="${view === v}">${l}</button>`).join("")}</div>`;
-    if (b.type !== "none") body += `<button type="button" class="link-btn dz-reset" data-act="bg-none">Use plain white</button>`;
+    // Images and videos share one "media" section.
+    const kind = (t) => (t === "image" || t === "video" ? "media" : t);
+    const view = bgView || (b.type === "none" ? "color" : kind(b.type));
+    const types = [["color", "Colour"], ["gradient", "Gradient"], ["media", "Image & video"], ["anim", "Animated"]];
+    let body = `<div class="dz-types" role="tablist">${types.map(([v, l]) => `<button type="button" data-bgview="${v}" class="${view === v ? "active" : ""}" role="tab" aria-selected="${view === v}">${l}</button>`).join("")}</div>`;
 
     if (view === "color") body += swatches("bg.color", D.COLORS, b.type === "color" ? b.color : "");
     if (view === "gradient") {
       const g = b.gradient;
       const on = b.type === "gradient";
-      body += `<div class="dz-swatches">${D.GRADIENTS.map((cols, i) => `<button type="button" class="dz-sw dz-grad${on && cols.join() === g.colors.join() ? " on" : ""}" data-act="grad" data-i="${i}" style="background:linear-gradient(to right,${cols.join(",")})" aria-label="Gradient ${i + 1}"></button>`).join("")}</div>
+      body += `<div class="dz-swatches">${D.GRADIENTS.map((cols, i) => `<button type="button" class="dz-sw${on && cols.join() === g.colors.join() ? " on" : ""}" data-act="grad" data-i="${i}" style="background:linear-gradient(to right,${cols.join(",")})" aria-label="Gradient ${i + 1}"></button>`).join("")}</div>
         <div class="dz-grad-edit">
-          <div class="dz-grad-preview" style="background:linear-gradient(${g.dir}, ${g.colors.join(", ")})"></div>
           <div class="dz-grad-stops">${g.colors.map((c, i) => `<label class="dz-stop"><input type="color" data-color="bg.gradient.colors.${i}" value="${c}" aria-label="Colour ${i + 1}"><span>${c}</span>${g.colors.length > 2 ? `<button type="button" class="dz-stop-x" data-act="grad-del" data-i="${i}" aria-label="Remove colour ${i + 1}">✕</button>` : ""}</label>`).join("")}
             ${g.colors.length < 3 ? `<button type="button" class="dz-add" data-act="grad-add">+ Colour</button>` : ""}</div>
           <div class="dz-dirs" role="group" aria-label="Direction">${D.DIRS.map((dir) => dir ? `<button type="button" data-act="grad-dir" data-dir="${dir}" class="${on && g.dir === dir ? "on" : ""}" aria-label="${dir.replace("to ", "Towards ")}" title="${dir.replace("to ", "Towards ")}">${{ "to top left": "↖", "to top": "↑", "to top right": "↗", "to left": "←", "to right": "→", "to bottom left": "↙", "to bottom": "↓", "to bottom right": "↘" }[dir]}</button>` : `<span></span>`).join("")}</div>
         </div>`;
     }
-    if (view === "image") body += imageTab(b);
-    if (view === "video") body += videoTab(b);
+    if (view === "media") body += mediaTab(b);
     if (view === "anim") {
       body += `<div class="dz-anims">${Object.entries(D.ANIMS).map(([k, a]) => {
         const on = b.type === "anim" && b.anim.preset === k;
@@ -113,11 +112,10 @@
       }).join("")}</div>`;
       if (b.type === "anim") {
         body += group("Colours", `<div class="dz-swatches">${D.ANIM_PALETTES.map((p, i) => `<button type="button" class="dz-sw dz-pal" data-act="pal" data-i="${i}" style="background:linear-gradient(90deg,${p.join(",")})" aria-label="Palette ${i + 1}"></button>`).join("")}</div>
-          <div class="dz-three">${[0, 1, 2].map((i) => `<label><span class="lbl">Colour ${i + 1}</span><input type="color" data-color="bg.anim.colors.${i}" value="${b.anim.colors[i]}"></label>`).join("")}</div>
-          <label class="dz-inline"><span class="lbl">Background</span><input type="color" data-color="bg.anim.base" value="${b.anim.base}"></label>`);
+          <div class="dz-pickers">${[0, 1, 2].map((i) => `<input type="color" data-color="bg.anim.colors.${i}" value="${b.anim.colors[i]}" aria-label="Animation colour ${i + 1}" title="Animation colour ${i + 1}">`).join("")}<input type="color" data-color="bg.anim.base" value="${b.anim.base}" aria-label="Background colour" title="Background colour"></div>`);
       }
     }
-    if (["image", "video", "anim"].includes(b.type) && view === b.type) body += readability(d);
+    if (["image", "video", "anim"].includes(b.type) && view === kind(b.type)) body += readability(d);
     return body;
   }
 
@@ -131,24 +129,25 @@
   const CARDS = [["card", "With card"], ["none", "Without card"], ["transparent", "Transparent"], ["outline", "Outline"]];
   const cardPicker = (d) => `<div class="dz-cards" role="group" aria-label="Module cards">${CARDS.map(([k, l]) => `<button type="button" data-pick="look.cards" data-val="${k}" class="dz-card-opt dz-card-${k}${D.cardStyle(d) === k ? " on" : ""}"><span class="dz-card-demo"><i></i><i></i></span><span>${l}</span></button>`).join("")}</div>`;
 
-  function imageTab(b) {
+  // Image & video: upload either from the device, paste an image / video / YouTube link, or pick a free photo.
+  function mediaTab(b) {
     const img = b.image;
-    let body = `<div class="seg wide dz-seg" role="tablist">${[["pexels", "Free photos"], ["upload", "Upload"], ["url", "Paste link"]].map(([v, l]) => `<button type="button" data-imgsrc="${v}" class="${imgSource === v ? "active" : ""}">${l}</button>`).join("")}</div>`;
+    let body = `<div class="seg wide dz-seg" role="tablist">${[["upload", "Upload"], ["url", "Paste link"], ["pexels", "Free photos"]].map(([v, l]) => `<button type="button" data-imgsrc="${v}" class="${imgSource === v ? "active" : ""}">${l}</button>`).join("")}</div>`;
+    if (imgSource === "upload") body += `<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,video/quicktime" data-bgmedia><span>＋ Upload an image or video</span></label><p class="upload-note" id="dz-media-note" hidden></p>`;
+    if (imgSource === "url") body += `<form class="dz-search" data-form="medialink"><input type="url" name="url" placeholder="Paste an image, video or YouTube link" aria-label="Image or video link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-media-link-note" hidden></p>`;
     if (imgSource === "pexels") {
       body += `<form class="dz-search" data-form="pexels"><input type="search" name="q" value="${h(pexels.q)}" placeholder="Search e.g. beach, pastel, city" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form>
         <div class="dz-results" id="dz-pexels">${pexelsResults()}</div>
         <p class="fine" id="dz-source">${sourceNote()}</p>`;
     }
-    if (imgSource === "upload") body += `<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp" data-bgupload><span>＋ Upload from your device</span></label><p class="upload-note" id="dz-upload-note" hidden></p>`;
-    if (imgSource === "url") body += `<form class="dz-search" data-form="imgurl"><input type="url" name="url" placeholder="https://…/photo.jpg" aria-label="Image link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-url-note">Paste a direct link to a JPG, PNG or WebP image.</p>`;
-    if (img.url && b.type === "image") {
-      const z = img.zoom / 100;
-      body += group("Position", `<div class="dz-frame" id="dz-frame" title="Drag to choose what shows"><img src="${h(img.url)}" alt="" draggable="false" style="object-fit:${img.fit};object-position:${img.x}% ${img.y}%;transform:scale(${z});transform-origin:${img.x}% ${img.y}%"><span class="dz-frame-hint">Drag to move</span></div>
-        ${range("Zoom", "bg.image.zoom", img.zoom, 100, 300, "%")}${range("Left / right", "bg.image.x", img.x, 0, 100, "%")}${range("Up / down", "bg.image.y", img.y, 0, 100, "%")}
+    // Adjusting a chosen photo (not while pasting a link).
+    if (b.type === "image" && img.url && imgSource !== "url") {
+      body += group("Adjust", `${range("Zoom", "bg.image.zoom", img.zoom, 100, 300, "%")}${range("Up / down", "bg.image.y", img.y, 0, 100, "%")}
         <div class="pick-field"><span class="lbl">Fit</span>${segRow("bg.image.fit", img.fit, [["cover", "Fill the page"], ["contain", "Show whole photo"]])}</div>
-        <button type="button" class="btn small" data-act="img-reset">Reset position</button>
+        <button type="button" class="btn small" data-act="img-reset">Reset</button>
         ${img.credit && img.credit.name ? `<p class="fine">${D.creditHtml(img.credit)}</p>` : ""}`);
     }
+    if (b.type === "video" && imgSource !== "url") body += `<button type="button" class="btn small" data-act="video-remove">Remove video</button>`;
     return body;
   }
 
@@ -248,8 +247,12 @@
   function pageTab() {
     const d = design();
     const l = d.look;
-    return group("Module cards", cardPicker(d)) +
-      group("Links look like", segRow("look.links", l.links, [["card", "Cards"], ["pill", "Buttons"], ["underline", "Lines"]])) +
+    const CARD_COLORS = ["#ffffff", "#f7f6f2", "#fff8e1", "#fde2e4", "#e3f0ff", "#e1f5ee", "#1c1c1a", "#14213d"];
+    const INK = ["#5b4bd6", "#141413", "#e11d74", "#2563eb", "#0f6e56", "#ea580c", "#f2e27d", "#ffffff"];
+    return group("Module cards", cardPicker(d) + (D.cardStyle(d) === "card" ? `<div class="pick-field"><span class="lbl">Card colour</span>${swatches("look.cardColor", CARD_COLORS, l.cardColor)}</div>` : "")) +
+      group("Links look like", segRow("look.links", l.links, [["card", "Cards"], ["pill", "Buttons"], ["underline", "Lines"]]) +
+        (l.links === "pill" ? `<div class="pick-field"><span class="lbl">Button colour</span>${swatches("look.btnColor", INK, l.btnColor || l.accent || D.THEMES[site.theme] || "")}</div>` : "") +
+        (l.links === "underline" ? `<div class="pick-field"><span class="lbl">Line colour</span>${swatches("look.lineColor", INK, l.lineColor || l.accent || D.THEMES[site.theme] || "")}</div>` : "")) +
       group("Hover colour", swatches("look.hover", ["#f2e27d", "#ffb4a2", "#a5b4fc", "#86efac", "#7dd3fc", "#f9a8d4", "#1c1c1a", "#ffffff"], l.hover), "The glow when visitors point at a link or card.");
   }
 
@@ -267,7 +270,7 @@
     // Same layout classes as the real page, so split/bento/timeline… show their real arrangement.
     return `<div class="tpl-thumb" style="background:${bg}">
       <div class="pb-page tpl-mini ${a.cls}" style="${a.style}">
-        <section class="pb-block pb-profile-block"><div class="tpl-head${side ? " side" : ""}"><img src="${h(tpl.photo)}" alt="" loading="lazy" style="border-radius:${tpl.profile.radius}%"><div><b>${h(s.name)}</b><i></i></div></div></section>
+        <section class="pb-block pb-profile-block"><div class="tpl-head${side ? " tpl-side" : ""}"><img src="${h(tpl.photo)}" alt="" loading="lazy" style="border-radius:${tpl.profile.radius}%"><div><b>${h(s.name)}</b><i></i></div></div></section>
         <section class="pb-block pb-text-block tpl-bar"><i></i><i></i><i class="short"></i></section>
         <section class="pb-block pb-stats-block tpl-row"><span></span><span></span></section>
         <section class="pb-block pb-link-block tpl-link"><span class="pb-link"><span class="pb-link-text"><strong>${h(s.link)}</strong></span></span></section>
@@ -492,8 +495,10 @@
         // Colour and gradient always work, so choosing them shows them straight away.
         if (bgView === "color" && d.bg.type !== "color") change((x) => { x.bg.type = "color"; });
         if (bgView === "gradient" && d.bg.type !== "gradient") change((x) => { x.bg.type = "gradient"; });
-        if (bgView === "image" && d.bg.image.url && d.bg.type !== "image") change((x) => { x.bg.type = "image"; });
-        if (bgView === "video" && D.videoSource(d.bg.video.url) && d.bg.type !== "video") change((x) => { x.bg.type = "video"; });
+        if (bgView === "media" && !["image", "video"].includes(d.bg.type)) {
+          if (d.bg.image.url) change((x) => { x.bg.type = "image"; });
+          else if (D.videoSource(d.bg.video.url)) change((x) => { x.bg.type = "video"; });
+        }
         render();
         return;
       }
@@ -529,7 +534,7 @@
         case "anim": change((d) => { const a = D.ANIMS[t.dataset.val]; const keep = d.bg.type === "anim"; d.bg.type = "anim"; if (!keep || d.bg.anim.preset !== t.dataset.val) d.bg.anim = { preset: t.dataset.val, colors: [...a.colors], base: a.base }; }, { panel: true }); break;
         case "pal": change((d) => { d.bg.anim.colors = [...D.ANIM_PALETTES[Number(t.dataset.i)]]; }, { panel: true }); break;
         case "img-reset": change((d) => { Object.assign(d.bg.image, { zoom: 100, x: 50, y: 50, fit: "cover" }); }, { panel: true }); break;
-        case "video-remove": change((d) => { d.bg.type = d.bg.image.url ? "image" : "color"; d.bg.video.url = ""; }, { panel: true }); bgView = null; render(); break;
+        case "video-remove": change((d) => { d.bg.type = d.bg.image.url ? "image" : "none"; d.bg.video.url = ""; }, { panel: true }); render(); break;
         case "pexels-more": searchPexels(pexels.q, true); break;
       }
     });
@@ -562,6 +567,25 @@
       if (s.dataset.select) change((d) => setPathValue(d, s.dataset.select, s.value), { panel: true });
       if (s.dataset.check) change((d) => setPathValue(d, s.dataset.check, s.checked));
       if (s.dataset.color) render(); // mark the picked swatch
+      if (s.dataset.bgmedia !== undefined && s.files.length) {
+        const note = $("dz-media-note");
+        const file = s.files[0];
+        note.hidden = false;
+        note.classList.remove("error");
+        try {
+          if (/^image\//.test(file.type)) {
+            note.textContent = "Uploading…";
+            setImage(await uploadImage(file, 2000));
+          } else if (/^video\/(mp4|webm|quicktime)$/.test(file.type)) {
+            if (file.size > 50 * 1024 * 1024) throw new Error("That video is over 50 MB. Try a shorter clip.");
+            if (!window.Cloud || !Cloud.ready) throw new Error("Video uploads turn on once you're signed in. Meanwhile, paste a YouTube link.");
+            note.textContent = "Uploading your video…";
+            const url = await Cloud.upload(file);
+            change((d) => { d.bg.type = "video"; d.bg.video.url = url; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
+          } else throw new Error("Please choose a JPG, PNG, WebP image or an MP4, WebM, MOV video.");
+        } catch (err) { note.textContent = err.message || "Upload failed. Please try again."; note.classList.add("error"); }
+        return;
+      }
       if (s.dataset.bgvideo !== undefined && s.files.length) {
         const note = $("dz-video-note");
         const file = s.files[0];
@@ -589,6 +613,21 @@
       e.preventDefault();
       const val = e.target.elements[f === "pexels" ? "q" : "url"].value.trim();
       if (f === "pexels") { if (val) searchPexels(val); return; }
+      if (f === "medialink") {
+        const note = $("dz-media-link-note");
+        const show = (t, err) => { note.hidden = false; note.textContent = t; note.classList.toggle("error", !!err); };
+        if (!/^https?:\/\/\S+$/i.test(val)) return show("Please paste a full link starting with https://", true);
+        if (D.videoSource(val)) {
+          change((d) => { d.bg.type = "video"; d.bg.video.url = val; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
+          return;
+        }
+        show("Checking the link…");
+        const test = new Image();
+        test.onload = () => setImage(val);
+        test.onerror = () => show("That link didn't open as an image or video. Use a direct image link, a YouTube link, or an .mp4 link.", true);
+        test.src = val;
+        return;
+      }
       if (f === "imgurl") {
         const note = $("dz-url-note");
         if (!/^https?:\/\/\S+$/i.test(val)) { note.textContent = "Please paste a full link starting with https://"; note.classList.add("error"); return; }

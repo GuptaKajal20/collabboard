@@ -422,6 +422,7 @@ function setPath(obj, path, value) {
 // undoNow is the page as last saved. A change pushes it onto the stack first, unless it continues
 // the same edit (same field, within a moment), so a burst of typing or dragging is one step.
 const undoStack = [];
+const redoStack = [];
 let undoNow = null;
 let undoKey = null;
 let undoLastKey = null;
@@ -435,16 +436,24 @@ function recordUndo() {
     undoStack.push(undoNow);
     if (undoStack.length > 30) undoStack.shift();
   }
+  redoStack.length = 0; // a new change replaces anything that was undone
   undoLastKey = undoKey;
   undoKey = null;
   undoAt = Date.now();
   undoNow = snap;
-  const btn = el("pf-undo");
-  if (btn) btn.disabled = !undoStack.length;
+  updateUndoButtons();
 }
-function undo() {
-  const prev = undoStack.pop();
+function updateUndoButtons() {
+  if (el("pf-undo")) el("pf-undo").disabled = !undoStack.length;
+  if (el("pf-redo")) el("pf-redo").disabled = !redoStack.length;
+}
+function undo() { stepHistory(undoStack, redoStack); }
+function redo() { stepHistory(redoStack, undoStack); }
+// Move one step back (undo) or forward (redo): the current page goes onto the other stack.
+function stepHistory(from, to) {
+  const prev = from.pop();
   if (!prev) return;
+  to.push(undoNow);
   const s = JSON.parse(prev);
   Object.assign(site, { blocks: s.blocks, design: s.design || undefined, theme: s.theme });
   undoNow = prev;
@@ -455,7 +464,7 @@ function undo() {
   renderCanvas();
   renderEditPanel();
   if (window.Designs) window.Designs.render();
-  el("pf-undo").disabled = !undoStack.length;
+  updateUndoButtons();
 }
 
 function saveSite({ changed = true, record = true } = {}) {
@@ -1213,19 +1222,20 @@ async function publish() {
     bar.innerHTML = `<span class="dot pending"></span><span>Public links turn on after the one-time Supabase setup. Use Preview to see your portfolio meanwhile.</span>`;
     return;
   }
-  if (!validSlug(site.slug || "")) {
-    openLinkPop(true);
-    el("pf-slug").focus();
-    el("slug-note").textContent = "Choose your link name first: at least 3 lowercase letters, numbers or dashes.";
-    el("slug-note").classList.add("error");
-    return;
-  }
+  ensureSlug();
   const samples = window.Designs ? site.blocks.filter((b) => window.Designs.isUntouchedSample(b)) : [];
   if (samples.length && !confirm(`${samples.length === 1 ? "One module still has" : `${samples.length} modules still have`} sample text from your template (${samples.map((b) => P.BLOCKS[b.type].name).join(", ")}). Publish anyway?`)) return;
   btn.disabled = true;
   btn.textContent = "Publishing…";
   try {
-    if (!(await Cloud.slugFree(site.slug))) throw new Error("That link name is taken. Try another.");
+    // Taken by someone else? Try riya-sharma-2, -3…
+    if (!(await Cloud.slugFree(site.slug))) {
+      const base = site.slug.replace(/-\d+$/, "").slice(0, 36);
+      let n = 2;
+      while (n < 50 && !(await Cloud.slugFree(`${base}-${n}`))) n++;
+      if (n >= 50) throw new Error("Couldn't find a free link. Please try again.");
+      site.slug = `${base}-${n}`;
+    }
     const { dirty, publishedAt, ...data } = site;
     await Cloud.publish(site.slug, data);
     if (!site.publishedAt && window.cpTrack) window.cpTrack("portfolio_publish", { first: true });
@@ -1235,7 +1245,6 @@ async function publish() {
   } catch (err) {
     bar.hidden = false;
     bar.innerHTML = `<span class="dot pending"></span><span class="error">${escapeHtml(err.message || "Could not publish. Please try again.")}</span>`;
-    if (/link name/.test(err.message || "")) openLinkPop(true);
   } finally {
     btn.disabled = false;
     btn.textContent = "Publish";
@@ -1243,18 +1252,22 @@ async function publish() {
 }
 
 // The link button: shows the portfolio link, copies it, and lets the creator change the link name.
-function updateLinkPop() {
-  const url = validSlug(site.slug || "") ? shareUrl() : "";
-  el("pf-linkurl").textContent = url ? url.replace(/^https?:\/\//, "") : "Choose a link name below";
-  el("pf-copy").disabled = !url;
-  el("pf-linknote").textContent = !url ? "" : site.publishedAt ? (site.dirty ? "Publish to update what brands see at this link." : "Live now. Share it with brands.") : "This link works after you click Publish.";
+// The link name comes from the creator's name (riya-sharma); a number is added if it's taken.
+function ensureSlug() {
+  if (validSlug(site.slug || "")) return;
+  let base = slugify((findBlock((site.blocks.find((b) => b.type === "profile") || {}).id) || {}).name || (profile && profile.name) || "");
+  if (base.length < 3) base = `${base || "creator"}-portfolio`.replace(/^-/, "");
+  site.slug = base.slice(0, 40);
+  saveSite({ record: false });
 }
-function openLinkPop(focusSlug) {
-  const pop = el("pf-linkpop");
-  pop.hidden = false;
+function updateLinkPop() {
+  ensureSlug();
+  el("pf-linkurl").textContent = shareUrl().replace(/^https?:\/\//, "");
+}
+function openLinkPop() {
+  el("pf-linkpop").hidden = false;
   el("pf-link").setAttribute("aria-expanded", "true");
   updateLinkPop();
-  if (focusSlug) el("pf-slug").focus();
 }
 function setupLinkPop() {
   const pop = el("pf-linkpop");
@@ -1264,13 +1277,14 @@ function setupLinkPop() {
     const url = shareUrl();
     try { await navigator.clipboard.writeText(url); el("pf-copy").textContent = "Copied"; setTimeout(() => { el("pf-copy").textContent = "Copy"; }, 1500); } catch { prompt("Copy your link:", url); }
   });
-  el("pf-slug").addEventListener("input", updateLinkPop);
   el("pf-undo").addEventListener("click", undo);
+  el("pf-redo").addEventListener("click", redo);
   document.addEventListener("keydown", (e) => {
-    if (!(e.metaKey || e.ctrlKey) || e.shiftKey || e.key.toLowerCase() !== "z" || el("page-portfolio").hidden) return;
+    const key = e.key.toLowerCase();
+    if (!(e.metaKey || e.ctrlKey) || !["z", "y"].includes(key) || el("page-portfolio").hidden) return;
     if (e.target.closest("input, textarea, select, [contenteditable]")) return; // let text fields undo their own typing
     e.preventDefault();
-    undo();
+    if (key === "y" || e.shiftKey) redo(); else undo();
   });
 }
 
@@ -1338,7 +1352,11 @@ async function setupPortfolio() {
   const fitCanvas = () => {
     const c = el("canvas");
     const avail = c.parentElement.clientWidth - 16;
-    c.style.setProperty("--cz", Math.min(1, avail / (c.dataset.device === "mobile" ? 390 : 860)).toFixed(3));
+    const cz = Math.min(1, avail / (c.dataset.device === "mobile" ? 390 : 860));
+    c.style.setProperty("--cz", cz.toFixed(3));
+    // The background stays in view: as tall as the visible preview area.
+    const visible = Math.min(c.parentElement.clientHeight || innerHeight, innerHeight);
+    c.style.setProperty("--bgh", `${Math.round(visible / cz)}px`);
   };
   new ResizeObserver(fitCanvas).observe(el("canvas").parentElement);
   document.querySelectorAll(".seg [data-device]").forEach((b) => b.addEventListener("click", () => {
@@ -1364,16 +1382,7 @@ async function setupPortfolio() {
     renderCanvas();
   });
 
-  el("slug-host").textContent = location.host;
-  el("pf-slug").value = site.slug || "";
-  el("pf-slug").addEventListener("input", (e) => {
-    const clean = slugify(e.target.value);
-    if (clean !== e.target.value) e.target.value = clean;
-    site.slug = clean;
-    el("slug-note").classList.remove("error");
-    el("slug-note").textContent = validSlug(clean) ? `Your link: ${location.host}/p/${clean}` : "At least 3 lowercase letters, numbers or dashes.";
-    saveSite();
-  });
+
 
   el("pf-preview").addEventListener("click", () => {
     store.set("cb_site", site);

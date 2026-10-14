@@ -233,14 +233,12 @@
           </div>
           <div class="pf-actions">
             <button type="button" class="icon-btn" id="pf-undo" title="Undo (Ctrl/Cmd + Z)" aria-label="Undo last change" disabled><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+            <button type="button" class="icon-btn" id="pf-redo" title="Redo (Ctrl/Cmd + Shift + Z)" aria-label="Redo" disabled><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
             <div class="pf-linkwrap">
               <button type="button" class="icon-btn" id="pf-link" title="Your portfolio link" aria-label="Your portfolio link" aria-expanded="false" aria-controls="pf-linkpop"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg></button>
               <div class="pf-linkpop" id="pf-linkpop" hidden>
-                <p class="panel-label">Your link</p>
-                <div class="pf-linkrow"><span class="pf-linkurl" id="pf-linkurl"></span><button type="button" class="btn small primary" id="pf-copy">Copy</button></div>
-                <p class="fine" id="pf-linknote"></p>
-                <label class="slug"><span class="lbl">Link name</span><span class="slug-row"><span id="slug-host"></span>/p/<input id="pf-slug" maxlength="40" placeholder="your-name" autocomplete="off"></span></label>
-                <p class="fine" id="slug-note">Lowercase letters, numbers and dashes.</p>
+                <span class="pf-linkurl" id="pf-linkurl"></span>
+                <button type="button" class="btn small primary" id="pf-copy">Copy link</button>
               </div>
             </div>
             <div class="seg" role="group" aria-label="Preview size">
