@@ -1242,3 +1242,6 @@ label.switch { font-weight: 600; }
 .tpl-none-thumb { display: grid; place-content: center; gap: 2px; text-align: center; height: 180px; background: repeating-linear-gradient(135deg, var(--card) 0 10px, var(--tag-bg) 10px 20px); border: 1.5px dashed var(--line); }
 .tpl-none-thumb span { font: 400 20px var(--serif); color: var(--text); }
 .tpl-none-thumb small { font-size: 12px; color: var(--muted); }
+
+/* Text editor: a small divider before the alignment buttons */
+.rte-sep { width: 1px; align-self: stretch; margin: 4px 2px; background: var(--line); opacity: 0.4; }

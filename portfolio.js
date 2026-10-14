@@ -96,6 +96,9 @@
         if (tag === "DIV" || tag === "P") wrap("div");
         if (tag === "UL" || tag === "OL" || tag === "LI") wrap(tag.toLowerCase());
         if (/^H[1-6]$/.test(tag)) wrap("h2");
+        // Paragraph alignment (left / centre / right) from the Text module's toolbar.
+        const al = String((n.style && n.style.textAlign) || (n.getAttribute && n.getAttribute("align")) || "").toLowerCase();
+        if (/^(DIV|P|LI|H[1-6])$/.test(tag) && ["left", "center", "right"].includes(al)) target.style.textAlign = al;
         if ((n.classList && n.classList.contains("pb-upper")) || (n.style && n.style.textTransform === "uppercase")) { wrap("span"); target.className = "pb-upper"; }
         if (tag === "B" || tag === "STRONG" || /^(bold|[6-9]00)$/.test(n.style ? n.style.fontWeight : "")) wrap("b");
         if (tag === "I" || tag === "EM" || (n.style && n.style.fontStyle === "italic")) wrap("i");

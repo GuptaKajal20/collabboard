@@ -714,6 +714,10 @@ function renderEditPanel() {
           <button type="button" data-cmd="italic" title="Italic" aria-label="Italic"><i>I</i></button>
           <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="7" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="5" cy="17" r="1.6"/><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="2.5" y="9" font-size="7" font-weight="700">1</text><text x="2.5" y="19" font-size="7" font-weight="700">2</text><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
+          <span class="rte-sep" aria-hidden="true"></span>
+          <button type="button" data-cmd="left" title="Align left" aria-label="Align left"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg></button>
+          <button type="button" data-cmd="center" title="Align centre" aria-label="Align centre"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg></button>
+          <button type="button" data-cmd="right" title="Align right" aria-label="Align right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M10 10h10M4 14h16M10 18h10"/></svg></button>
           <button type="button" data-color-toggle title="Text colour" aria-label="Text colour" aria-expanded="false"><span class="rte-a">A</span></button>
           <select data-style aria-label="Text style" title="Text style"><option value="normal">Normal</option><option value="heading">Heading</option><option value="upper">UPPERCASE</option></select>
           <select data-size aria-label="Text size" title="Text size">${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
@@ -919,6 +923,13 @@ function setupTextEditor(b) {
     if (btn.dataset.cmd === "italic") document.execCommand("italic");
     if (btn.dataset.cmd === "ul") document.execCommand("insertUnorderedList");
     if (btn.dataset.cmd === "ol") document.execCommand("insertOrderedList");
+    // Alignment applies to the whole paragraph the cursor is in (or every selected paragraph).
+    const align = { left: "justifyLeft", center: "justifyCenter", right: "justifyRight" }[btn.dataset.cmd];
+    if (align) {
+      document.execCommand("styleWithCSS", false, true);
+      document.execCommand(align);
+      document.execCommand("styleWithCSS", false, false);
+    }
     remember();
     commit();
     showFormat();
@@ -950,7 +961,7 @@ function setupTextEditor(b) {
     sizeMenu.value = String(near);
     const blk = blockOf(sel.anchorNode);
     styleMenu.value = blk && blk.tagName === "H2" ? "heading" : upperOf(sel.anchorNode) ? "upper" : "normal";
-    for (const [cmd, q] of [["bold", "bold"], ["italic", "italic"], ["ul", "insertUnorderedList"], ["ol", "insertOrderedList"]]) {
+    for (const [cmd, q] of [["bold", "bold"], ["italic", "italic"], ["ul", "insertUnorderedList"], ["ol", "insertOrderedList"], ["left", "justifyLeft"], ["center", "justifyCenter"], ["right", "justifyRight"]]) {
       const b = panel.querySelector(`[data-cmd="${cmd}"]`);
       const on = document.queryCommandState(q);
       b.classList.toggle("on", on);
