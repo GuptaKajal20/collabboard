@@ -489,3 +489,6 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .canvas .pb-editable:hover { outline: calc(2.5px / var(--cz, 1)) solid var(--hover) !important;
   box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover-soft) 60%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover) 55%, transparent) !important; }
 .canvas .pb-glow { background: linear-gradient(120deg, var(--hover), var(--hover-soft) 50%, var(--hover)); }
+
+/* Carousel: YouTube slides */
+.pb-slide iframe { width: 100%; height: 100%; border: 0; display: block; background: #000; }

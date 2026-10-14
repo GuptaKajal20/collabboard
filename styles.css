@@ -1245,3 +1245,6 @@ label.switch { font-weight: 600; }
 
 /* Text editor: a small divider before the alignment buttons */
 .rte-sep { width: 1px; align-self: stretch; margin: 4px 2px; background: var(--line); opacity: 0.4; }
+
+/* File module: a play mark on video thumbnails */
+.thumb .thumb-play { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 18px; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6); pointer-events: none; }

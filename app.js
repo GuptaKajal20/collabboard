@@ -746,13 +746,15 @@ function renderEditPanel() {
         const sel = /^items\.(\d+)$/.test(cropOpen || "") ? Number(cropOpen.split(".")[1]) : -1;
         body += `<div class="pick-field"><span class="lbl">Size</span>${seg("size", b.size || "landscape", [["portrait", "4:5"], ["square", "1:1"], ["landscape", "4:3"], ["wide", "16:9"]])}</div>
           <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb${sel === i ? " on" : ""}">
-              <button type="button" class="thumb-btn" data-crop="items.${i}" ${sel === i ? `data-crop-preview="items.${i}"` : ""} title="Edit ${escapeHtml(m.name || "photo")}" aria-pressed="${sel === i}">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="${escapeHtml(m.name || "")}" style="${P.cropStyle(m.zoom, m.posY)}">`}</button>
+              <button type="button" class="thumb-btn" data-crop="items.${i}" ${sel === i ? `data-crop-preview="items.${i}"` : ""} title="Edit ${escapeHtml(m.name || "photo")}" aria-pressed="${sel === i}">${m.type === "youtube" ? `<img src="https://i.ytimg.com/vi/${escapeHtml(m.id)}/hqdefault.jpg" alt="${escapeHtml(m.name || "YouTube video")}"><span class="thumb-play" aria-hidden="true">▶</span>` : m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="${escapeHtml(m.name || "")}" style="${P.cropStyle(m.zoom, m.posY)}">`}</button>
               <button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(m.name || "photo")}">✕</button>
             </div>`).join("")}
             <label class="thumb add" title="Add images"><input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"><span aria-hidden="true">＋</span><span class="sr">Add images</span></label>
-          </div>` +
+          </div>
+          <form class="dz-search" data-carousel-link><input type="url" name="url" placeholder="Or paste an image, video or YouTube link" aria-label="Image or video link"><button type="submit" class="btn small primary">Add</button></form>
+          <p class="fine" id="carousel-link-note" hidden></p>` +
           (sel < 0 && (b.items || []).length ? `<p class="fine">Click a photo to select it, then adjust its zoom and position.</p>` : "") +
-          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? `<p class="fine">Editing photo ${sel + 1} of ${b.items.length}.</p>` + cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"], null, false) : "");
+          (sel >= 0 && b.items[sel] && !["video", "youtube"].includes(b.items[sel].type) ? `<p class="fine">Editing photo ${sel + 1} of ${b.items.length}.</p>` + cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"], null, false) : "");
       } else if (b.kind === "pdf") {
         body += (b.items || []).map((f, i) => `<div class="picked"><span class="pdf-ic" aria-hidden="true">PDF</span><span class="fname">${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(f.name || "PDF")}">✕</button></div>`).join("") +
           `<label class="pick"><input type="file" accept=".pdf,application/pdf" data-upload="pdf"><span>＋ Add PDF</span></label>`;
@@ -1137,6 +1139,40 @@ function setupPanel() {
       const url = P.safeUrl(e.target.elements.url.value);
       if (!url) return note("Please paste a full image link starting with https://", true);
       Object.assign(b, { coverImg: url, coverImgName: "Image from a link", coverX: 50, coverY: 50, coverZoom: 100 });
+    } else if (e.target.matches("[data-carousel-link]")) {
+      // File module: paste one or more links; each becomes a slide in the carousel.
+      e.preventDefault();
+      const note = el("carousel-link-note");
+      const show = (t, err) => { note.hidden = false; note.textContent = t; note.classList.toggle("error", !!err); };
+      const links = e.target.elements.url.value.split(/\s+/).map((u) => u.trim()).filter(Boolean);
+      if (!links.length) return;
+      const ytId = (u) => (u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/))([\w-]{11})/i) || [])[1];
+      const isImage = (u) => new Promise((ok) => { const i = new Image(); i.onload = () => ok(true); i.onerror = () => ok(false); i.src = u; });
+      show("Adding…");
+      let added = 0;
+      const bad = [];
+      for (const raw of links) {
+        const url = P.safeUrl(raw);
+        if (!url) { bad.push(raw); continue; }
+        const yt = ytId(url);
+        if (yt) b.items.push({ type: "youtube", id: yt, url: `https://www.youtube.com/watch?v=${yt}`, name: "YouTube video" });
+        else if (/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url)) b.items.push({ type: "video", url, name: url.split("/").pop().split("?")[0] || "Video" });
+        else if (await isImage(url)) b.items.push({ type: "image", url, name: url.split("/").pop().split("?")[0] || "Image", zoom: 100, posY: 50 });
+        else { bad.push(raw); continue; }
+        added += 1;
+      }
+      if (!added) return show("That link didn't open as an image or video. Use a direct image link, a YouTube link, or an .mp4 link.", true);
+      cropOpen = b.items[b.items.length - 1].type === "image" ? `items.${b.items.length - 1}` : null;
+      saveSite();
+      renderOne(b.id);
+      renderEditPanel();
+      if (bad.length) {
+        const n = el("carousel-link-note"); // the panel was redrawn, so find the message again
+        n.hidden = false;
+        n.classList.add("error");
+        n.textContent = `Added ${added}. ${bad.length === 1 ? "One link" : `${bad.length} links`} didn't open as an image or video.`;
+      }
+      return;
     } else if (e.target.matches("[data-cover-search]")) {
       e.preventDefault();
       const box = el("cover-results");

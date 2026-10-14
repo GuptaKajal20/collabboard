@@ -279,7 +279,9 @@
           const items = (b.items || []).filter((m) => safeMedia(m.url));
           if (!items.length) return empty("Upload photos in the panel on the right.");
           const slides = items
-            .map((m) => m.type === "video"
+            .map((m) => m.type === "youtube"
+              ? `<div class="pb-slide"><iframe src="https://www.youtube-nocookie.com/embed/${esc(m.id)}?playsinline=1&rel=0" title="YouTube video" loading="lazy" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`
+              : m.type === "video"
               ? `<div class="pb-slide"><video src="${esc(safeMedia(m.url))}" controls playsinline preload="metadata"></video></div>`
               : `<div class="pb-slide"><button type="button" class="pb-photo"><img src="${esc(safeMedia(m.url))}" alt="" loading="lazy" style="${cropStyle(m.zoom, m.posY)}"></button></div>`)
             .join("");
