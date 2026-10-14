@@ -29,6 +29,8 @@ export const NICHES = {
   Lifestyle: { yt: "day in my life|lifestyle vlog|productivity", ig: "day in my life OR lifestyle", tags: ["lifestyle", "dayinmylife", "vlog"] },
   Parenting: { yt: "parenting tips|baby care|mom life", ig: "parenting OR mom life OR baby", tags: ["parenting", "momlife", "parentingtips"] },
   Gaming: { yt: "gaming|gameplay|bgmi", ig: "gaming OR gameplay", tags: ["gaming", "bgmi", "gamer"] },
+  // Branded content: how brands are promoted, and which creators they work with.
+  Advertisement: { yt: "sponsored|#ad|paid partnership|brand collab|use my code|ad film", ig: "\"paid partnership\" OR #ad OR #sponsored OR #gifted brand", tags: ["ad", "sponsored", "paidpartnership"], promo: true },
 };
 // Searches run for India. Two language passes (English, Hindi) plus a "posted in the last 2 days" pass,
 // so the Today filter always has fresh videos. 6 searches per niche = about 6,000 of 10,000 free daily units.
@@ -62,7 +64,16 @@ const MUST = {
   Lifestyle: /day in (my|the) life|vlog|routine|lifestyle|productiv|morning|night|\bhome\b|self ?care|\blife\b|aesthetic/,
   Parenting: /\bbaby|\bkids?\b|child|\bmom|\bmum|\bparent|toddler|pregnan|newborn|family|mother|father|dad\b/,
   Gaming: /\bgame|gaming|gameplay|bgmi|pubg|minecraft|\bgta|free ?fire|valorant|fortnite|roblox|gamer|cod\b|esports/,
+  Advertisement: /#ad\b|#ads\b|#sponsored|sponsor|paid partnership|paid promotion|in (paid )?(collaboration|partnership) with|partnered with|use (my )?code|discount code|promo code|coupon|#gifted|pr package|ad film|\bad\b|advert|commercial|\btvc\b|campaign|brand/,
 };
+
+// Hashtags written in a title or description, so a search for #sunscreen finds them.
+const hashtags = (text = "") => [...new Set((text.match(/#[\p{L}\p{N}_]+/gu) || []).map((t) => t.slice(1).toLowerCase()))];
+// The brand a sponsored video names, e.g. "in partnership with Nykaa" or "sponsored by @mamaearth".
+function brandOf(text = "") {
+  const m = text.match(/(?:sponsored by|in (?:paid )?(?:partnership|collaboration) with|partnered with|thanks to|brought to you by|powered by)\s+@?([A-Z0-9][\w&.'-]*(?: [A-Z0-9][\w&.'-]*){0,2})/i);
+  return m ? m[1].replace(/[.,'-]+$/, "").slice(0, 40) : null;
+}
 // Titles in scripts our audiences don't read (Vietnamese, Chinese, Japanese, Korean, Arabic, Thai).
 const FOREIGN = /[\u1EA0-\u1EF9đĐơƠưƯ\u3040-\u30ff\u4e00-\u9fff\uac00-\ud7af\u0600-\u06ff\u0e00-\u0e7f]/;
 const relevant = (niche, text) => MUST[niche].test(text.toLowerCase()) && !FOREIGN.test(text);
@@ -102,10 +113,15 @@ async function fetchYouTube(key) {
         const search = await yt("search", params, key);
         const ids = (search.items || []).map((i) => i.id.videoId).filter(Boolean);
         if (!ids.length) continue;
-        const details = await yt("videos", { part: "snippet,statistics,contentDetails", id: ids.join(",") }, key);
+        const details = await yt("videos", { part: "snippet,statistics,contentDetails,paidProductPlacementDetails", id: ids.join(",") }, key);
         for (const v of details.items || []) {
           const sn = v.snippet;
-          if (!relevant(niche, `${sn.title} ${(sn.tags || []).join(" ")} ${(sn.description || "").slice(0, 300)}`) || FOREIGN.test(sn.title)) continue;
+          const desc = (sn.description || "").slice(0, 1500);
+          // YouTube marks videos the creator declared as paid promotion.
+          const paid = !!(v.paidProductPlacementDetails && v.paidProductPlacementDetails.hasPaidProductPlacement);
+          if (!(n.promo && paid) && !relevant(niche, `${sn.title} ${(sn.tags || []).join(" ")} ${desc.slice(0, 300)}`)) continue;
+          if (FOREIGN.test(sn.title)) continue;
+          const brand = brandOf(`${sn.title}\n${desc}`);
           const len = seconds(v.contentDetails.duration);
           const s = v.statistics || {};
           items.set(`${v.id}|${niche}`, {
@@ -122,7 +138,9 @@ async function fetchYouTube(key) {
             views: +s.viewCount || 0,
             likes: s.likeCount !== undefined ? +s.likeCount : null, // some channels hide likes
             comments: s.commentCount !== undefined ? +s.commentCount : null,
-            tags: (sn.tags || []).slice(0, 12).map((t) => t.toLowerCase()),
+            tags: [...new Set([...(sn.tags || []).slice(0, 12).map((t) => t.toLowerCase()), ...hashtags(`${sn.title} ${desc}`).slice(0, 12)])],
+            ...(paid ? { paid: true } : {}),
+            ...(brand ? { brand } : {}),
           });
         }
         console.log(`YouTube ${niche} ${pass.format} ${pass.lang || "last 2 days"}: ${ids.length}`);
@@ -149,6 +167,7 @@ async function tavily(body, key) {
 }
 
 const COLLAB_WORDS = /\bcollab|collaboration|\bapply\b|fill (the|this) form|influencers? wanted|creators? wanted|looking for (creators|influencers)|barter|paid partnership opportunit|registration/i;
+const HIRING_WORDS = /\bapply\b|fill (the|this) form|influencers? wanted|creators? wanted|looking for (creators|influencers)|registration/i;
 const clean = (s = "") => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 
 async function fetchInstagram(key, previous) {
@@ -157,13 +176,22 @@ async function fetchInstagram(key, previous) {
     try {
       const results = await tavily({ query: `instagram reels ${n.ig} India`, include_domains: ["instagram.com"], time_range: "week" }, key);
       for (const r of results) {
-        const m = String(r.url).match(/instagram\.com\/(?:[\w.]+\/)?(reel|p)\/([\w-]+)/i);
+        const m = String(r.url).match(/instagram\.com\/(?:([\w.]+)\/)?(reel|p)\/([\w-]+)/i);
         if (!m) continue;
-        const code = m[2];
-        // Brand calls ("collab", "apply", "DM for paid…") belong in Find Collabs, not trends.
-        if (COLLAB_WORDS.test(`${r.title} ${r.content}`)) continue;
+        const code = m[3];
+        const text = `${r.title || ""} ${r.content || ""}`;
+        // Brand calls ("apply", "DM for paid…") belong in Find Collabs, not trends.
+        if ((n.promo ? HIRING_WORDS : COLLAB_WORDS).test(text)) continue;
+        // Account name: from the link, or from a page title like "Name (@handle) • Instagram".
+        const account = (m[1] && !/^(reels?|p|explore)$/i.test(m[1]) ? m[1] : (text.match(/@([\w.]{2,30})/) || [])[1]) || null;
         const old = reels.get(code);
-        reels.set(code, { code, kind: m[1].toLowerCase() === "reel" ? "reel" : "post", url: `https://www.instagram.com/${m[1].toLowerCase()}/${code}/`, niche, caption: clean(r.content).slice(0, 220), found: old ? old.found : today.slice(0, 10) });
+        reels.set(code, {
+          code, kind: m[2].toLowerCase() === "reel" ? "reel" : "post", url: `https://www.instagram.com/${m[2].toLowerCase()}/${code}/`, niche,
+          caption: clean(r.content).slice(0, 220), found: old ? old.found : today.slice(0, 10),
+          ...(account ? { account: account.toLowerCase() } : {}),
+          tags: hashtags(text).slice(0, 15),
+          ...(n.promo ? { brand: brandOf(text) || undefined } : {}),
+        });
       }
       console.log(`Instagram ${niche}: ${results.length} results`);
     } catch (err) {
@@ -198,7 +226,7 @@ async function main() {
     if (!d) return console.log("No YouTube file to refilter.");
     const before = d.items.length;
     const seen = new Map();
-    for (const v of d.items.filter((x) => relevant(x.niche, `${x.title} ${x.channel}`))) {
+    for (const v of d.items.filter((x) => (x.paid || relevant(x.niche, `${x.title} ${x.channel} ${(x.tags || []).join(" ")}`)))) {
       const k = `${v.id}|${v.niche}`;
       const { country, ...rest } = v;
       if (!rest.lang) rest.lang = languageOf({ title: v.title }, "en");
@@ -222,7 +250,7 @@ async function main() {
       const cutoff = Date.now() - 30 * 864e5;
       const merged = new Map();
       for (const v of previous.items || []) {
-        if (Date.parse(v.published) < cutoff || !relevant(v.niche, `${v.title} ${v.channel}`)) continue;
+        if (Date.parse(v.published) < cutoff || !(v.paid || relevant(v.niche, `${v.title} ${v.channel} ${(v.tags || []).join(" ")}`))) continue;
         const { country, ...rest } = v;
         if (!rest.lang) rest.lang = languageOf({ title: v.title }, "en");
         merged.set(`${v.id}|${v.niche}`, rest);

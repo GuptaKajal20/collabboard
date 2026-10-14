@@ -413,7 +413,7 @@ const hasProfile = () => site.blocks.some((b) => b.type === "profile");
 function setPath(obj, path, value) {
   const keys = path.split(".");
   let o = obj;
-  for (const k of keys.slice(0, -1)) o = o[k];
+  for (const k of keys.slice(0, -1)) o = o[k] ??= {};
   o[keys.at(-1)] = value;
 }
 
@@ -490,9 +490,11 @@ function renderPalette() {
     .join("");
 }
 
-const REQ = `<span class="star" aria-hidden="true">*</span>`;
-const field = (label, name, value, attrs = "") => `<label>${label}<input data-f="${name}" value="${escapeHtml(value ?? "")}" ${attrs}></label>`;
-const slider = (label, name, value, min, max, unit = "") => `<label class="slider">${label}<span class="slider-row"><input type="range" data-f="${name}" data-num min="${min}" max="${max}" value="${value}"><output>${value}${unit}</output></span></label>`;
+const REQ = `<span class="req-mark" aria-hidden="true">*</span>`;
+const field = (label, name, value, attrs = "") => `<label><span class="lbl">${label}</span><input data-f="${name}" value="${escapeHtml(value ?? "")}" ${attrs}></label>`;
+// Range sliders show their filled part, so the chosen value is easy to read (see --fill in styles.css).
+const fill = (value, min, max) => `--fill:${(((value - min) / (max - min)) * 100).toFixed(1)}%`;
+const slider = (label, name, value, min, max, unit = "") => `<label class="slider"><span class="lbl">${label}</span><span class="slider-row"><input type="range" data-f="${name}" data-num data-unit="${unit}" min="${min}" max="${max}" step="1" value="${value}" style="${fill(value, min, max)}"><output>${value}${unit}</output></span></label>`;
 // A row of choices that sets one field, e.g. layout or image side.
 const seg = (fieldName, current, options, attrs = "") =>
   `<div class="seg wide" role="group" ${attrs}>${options.map(([v, label, disabled]) => `<button type="button" data-set="${fieldName}" data-val="${v}" class="${String(current) === String(v) ? "active" : ""}" ${disabled ? "disabled" : ""}>${label}</button>`).join("")}</div>`;
@@ -521,7 +523,7 @@ function cropEditor(b, key, url, ratio, radius) {
 
 // One image slot: "+ Add image" when empty, otherwise thumbnail, file name, Crop and ✕.
 function imagePicker(label, url, name, uploadKey, cropKey, required = false) {
-  const head = `<span class="lbl">${label}${required ? REQ : ""}</span>`;
+  const head = `<span class="lbl">${required ? REQ : ""}${label}</span>`;
   if (!url) return `<div class="pick-field">${head}<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp" data-upload="${uploadKey}"><span>＋ Add image</span></label></div>`;
   return `<div class="pick-field">${head}<div class="picked">
     <img src="${escapeHtml(P.safeMedia(url))}" alt="">
@@ -555,16 +557,19 @@ function renderEditPanel() {
     case "profile":
       body = imagePicker("Profile photo", b.photo, b.photoName, "photo", "photo") +
         (b.photo && cropOpen === "photo" ? cropEditor(b, "photo", b.photo, "1 / 1", b.radius ?? 50) : "") +
-        (b.photo ? slider("Radius", "radius", b.radius ?? 50, 0, 50, "") : "") +
+        slider("Photo size", "size", b.size ?? 104, 64, 200, "px") +
+        (b.photo ? slider("Corner roundness", "radius", b.radius ?? 50, 0, 50, "") : "") +
         `<div class="pick-field"><span class="lbl">Layout</span>${seg("layout", b.layout || "stack", [["stack", "Image on top"], ["side", "Side by side"]])}</div>` +
         (b.layout === "side" ? seg("flip", !!b.flip, [[false, "Text on right"], [true, "Text on left"]]) : "") +
-        field(`Name${REQ}`, "name", b.name, 'aria-required="true"') +
+        field(`${REQ}Name`, "name", b.name, 'aria-required="true"') +
         `<label>Bio<textarea data-f="bio" rows="4">${escapeHtml(b.bio || "")}</textarea></label>`;
       break;
     case "text":
       body = `<div class="rte-bar" role="toolbar" aria-label="Text formatting">
           <button type="button" data-cmd="bold" title="Bold" aria-label="Bold"><b>B</b></button>
           <button type="button" data-cmd="italic" title="Italic" aria-label="Italic"><i>I</i></button>
+          <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="7" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="5" cy="17" r="1.6"/><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
+          <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="2.5" y="9" font-size="7" font-weight="700">1</text><text x="2.5" y="19" font-size="7" font-weight="700">2</text><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-cmd="normal" title="Normal text" aria-label="Normal text">Normal</button>
           <select data-size aria-label="Text size"><option value="">Size</option>${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
           <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
@@ -573,8 +578,8 @@ function renderEditPanel() {
         <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here">${P.cleanHtml(b.html || "")}</div>`;
       break;
     case "link":
-      body = field(`Text${REQ}`, "text", b.text, 'placeholder="Watch my latest campaign" aria-required="true"') +
-        field(`Link${REQ}`, "url", b.url, `placeholder="YouTube, PDF, Google Drive or any link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
+      body = field(`${REQ}Text`, "text", b.text, 'placeholder="Watch my latest campaign" aria-required="true"') +
+        field(`${REQ}Link`, "url", b.url, `placeholder="YouTube, PDF, Google Drive or any link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
         imagePicker("Image", b.image, b.imageName, "image", "image") +
         (b.image && cropOpen === "image" ? cropEditor(b, "image", b.image, "4 / 3") : "") +
         (b.image ? seg("side", b.side === "right" ? "right" : "left", [["left", "Image left"], ["right", "Image right"]]) : "");
@@ -615,17 +620,44 @@ function renderEditPanel() {
       break;
     case "instagram": {
       const plat = b.platform || "instagram";
+      const accounts = P.previewAccounts(b);
       const [, label, ph] = SOCIAL_PREVIEW.find(([id]) => id === plat) || SOCIAL_PREVIEW[0];
-      body = `<div class="plat-pick" role="group" aria-label="Platform">${SOCIAL_PREVIEW.map(([id]) => {
-          const p = P.platformById(id);
-          return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}" title="${escapeHtml(p.name)}" aria-label="${escapeHtml(p.name)}">${P.icon(p)}</button>`;
-        }).join("")}</div>` +
-        field(`${label}${REQ}`, "value", b.value ?? b.handle ?? "", `placeholder="${escapeHtml(ph)}" autocapitalize="none" aria-required="true"`);
+      const p = P.platformById(plat);
+      const value = accounts[plat] || "";
+      const check = previewCheck(plat, value);
+      body = `<div class="pick-field"><span class="lbl">Platform</span>
+        <div class="plat-pick" role="group" aria-label="Platform">${SOCIAL_PREVIEW.map(([id]) => {
+          const q = P.platformById(id);
+          const set = !!accounts[id];
+          return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}${set ? " set" : ""}" title="${escapeHtml(q.name)}${set ? " (added)" : " (not added yet)"}" aria-label="${escapeHtml(q.name)}${set ? ", added" : ", not added yet"}" aria-pressed="${plat === id}">${P.icon(q)}<span>${escapeHtml(q.name)}</span></button>`;
+        }).join("")}</div>
+        <p class="fine">Faded platforms aren't added yet. Your page shows the one that's selected.</p></div>` +
+        `<label><span class="lbl">${REQ}Your ${escapeHtml(p.name)} ${escapeHtml(label.toLowerCase())}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></label>
+        <p class="fine plat-check${check.ok === false ? " error" : ""}" id="plat-check">${escapeHtml(check.text)}</p>`;
       break;
     }
   }
-  panel.innerHTML = `<div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
+  panel.innerHTML = `<h2 class="edit-title">${escapeHtml(P.BLOCKS[b.type] ? P.BLOCKS[b.type].name : "Module")}</h2><div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
   if (b.type === "text") setupTextEditor(b);
+}
+
+// What we can tell about a Social preview account as it's typed.
+function previewCheck(plat, raw) {
+  const v = String(raw || "").trim();
+  const name = P.platformById(plat).name;
+  if (!v) return { ok: null, text: `Add your ${name} account to show a preview.` };
+  const handle = /^@?[\w.]{1,30}$/.test(v);
+  const url = (re) => re.test(v) && !!P.safeUrl(v);
+  const rules = {
+    instagram: [handle || url(/instagram\.com\/[\w.]+/i), "Shows your Instagram profile and latest posts.", "Use @username or an instagram.com profile link."],
+    facebook: [handle || url(/facebook\.com\/.+/i), "Shows your public Facebook page.", "Use your page name or a facebook.com page link."],
+    youtube: [handle || url(/youtube\.com|youtu\.be/i), /(?:youtu\.be\/|[?&]v=|\/shorts\/)[\w-]{11}/.test(v) ? "Shows this video, playable on your page." : "Shows a link to your channel. Paste a video link to show a playable video.", "Use @channel, a channel link or a video link."],
+    linkedin: [handle || url(/linkedin\.com\/.+/i), /activity[-:]\d{10,}/.test(v) ? "Shows this LinkedIn post." : "Shows a link to your profile. Paste a post link to show the post.", "Use a linkedin.com profile or post link."],
+    threads: [handle || url(/threads\.(net|com)\/@?[\w.]+/i), "Threads doesn't allow previews on other sites, so your page shows a profile card.", "Use @username or a threads.net link."],
+    x: [handle || url(/(x|twitter)\.com\/[\w]+/i), "X doesn't allow previews without its script, so your page shows a profile card.", "Use @username or an x.com link."],
+  };
+  const [ok, good, bad] = rules[plat] || [true, "Shows a link card.", ""];
+  return { ok, text: ok ? `${good}` : `That doesn't look like a ${name} account. ${bad}` };
 }
 
 function updateCropPreviews(b) {
@@ -682,6 +714,8 @@ function setupTextEditor(b) {
     restore();
     if (btn.dataset.cmd === "bold") document.execCommand("bold");
     if (btn.dataset.cmd === "italic") document.execCommand("italic");
+    if (btn.dataset.cmd === "ul") document.execCommand("insertUnorderedList");
+    if (btn.dataset.cmd === "ol") document.execCommand("insertOrderedList");
     if (btn.dataset.cmd === "normal") document.execCommand("removeFormat");
     remember();
     commit();
@@ -770,8 +804,17 @@ function setupPanel() {
     const v = e.target.type === "checkbox" ? e.target.checked : e.target.dataset.num !== undefined ? Number(e.target.value) : e.target.value;
     setPath(b, f, v);
     if (e.target.type === "range") {
-      e.target.nextElementSibling.textContent = `${v}${f === "radius" ? "" : "%"}`;
+      e.target.nextElementSibling.textContent = `${v}${e.target.dataset.unit || ""}`;
+      e.target.style.cssText = fill(v, Number(e.target.min), Number(e.target.max));
       updateCropPreviews(b);
+    }
+    if (f.startsWith("accounts.")) {
+      const c = previewCheck(b.platform || "instagram", v);
+      e.target.classList.toggle("invalid", c.ok === false);
+      const n = el("plat-check");
+      n.textContent = c.text;
+      n.classList.toggle("error", c.ok === false);
+      panel.querySelectorAll(".plat-pick button").forEach((btn) => btn.classList.toggle("set", !!(b.accounts || {})[btn.dataset.val]));
     }
     if (f === "url") e.target.classList.toggle("invalid", !!e.target.value.trim() && !P.safeUrl(e.target.value));
     saveSite();
@@ -1252,6 +1295,7 @@ function showPage() {
   const current = PAGES.includes(page) ? page : "dashboard";
   for (const p of PAGES) el(`page-${p}`).hidden = p !== current;
   document.querySelectorAll(".menu a").forEach((a) => a.classList.toggle("active", a.dataset.page === current));
+  (current === "portfolio" ? document.querySelector("#page-portfolio .pf-top") : document.querySelector(".main")).prepend(el("menu-open"));
   if (current === "dashboard") renderDashboard();
   if (current === "collabs") setView(["saved", "applied"].includes(sub) ? sub : "all");
   if (current === "trends" && window.TrendRadar) window.TrendRadar.open(profile);

@@ -25,9 +25,9 @@
 .pb-empty { margin: 0; padding: 18px; border: 1px dashed var(--line); border-radius: 12px; color: var(--soft); font-size: 14px; text-align: center; }
 
 .pb-profile { display: grid; justify-items: center; text-align: center; gap: 6px; padding-bottom: 8px; }
-.pb-avatar { width: 120px; height: 120px; overflow: hidden; border: 4px solid #fff; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.35); background: var(--k-soft); }
+.pb-avatar { width: var(--av, 104px); height: var(--av, 104px); overflow: hidden; border: 4px solid #fff; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.35); background: var(--k-soft); }
 .pb-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.pb-initial { display: grid; place-items: center; color: var(--k); font-size: 46px; font-weight: 600; }
+.pb-initial { display: grid; place-items: center; color: var(--k); font-size: calc(var(--av, 104px) * 0.38); font-weight: 600; }
 .pb-profile h1 { margin: 10px 0 0; font-size: 32px; line-height: 1.15; font-weight: 700; letter-spacing: -0.01em; }
 .pb-bio { margin: 0; max-width: 520px; font-size: 16px; color: #3d3c38; white-space: pre-wrap; }
 .pb-profile-text { display: grid; gap: 6px; justify-items: inherit; }
@@ -41,6 +41,8 @@
 
 .pb-rich { font-size: 16px; overflow-wrap: anywhere; }
 .pb-rich div { min-height: 1em; }
+.pb-rich ul, .pb-rich ol { margin: 6px 0; padding-left: 1.4em; }
+.pb-rich li { margin: 2px 0; }
 
 .pb-link {
   display: flex;
@@ -187,8 +189,10 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-contact a { color: var(--k-ink); font-weight: 600; }
 
 /* ---------- builder-only: tools, selection, typing hints, drop line ---------- */
-.pb-editable { border-radius: 12px; outline: 1px dashed transparent; outline-offset: 6px; transition: outline-color 0.15s ease; }
-.pb-editable:hover { outline-color: #c9c4ef; }
+/* Every module keeps a visible outline; hover brightens it to yellow, selection uses the page colour. */
+.pb-editable { border-radius: 12px; outline: 1px dashed #d6d2c4; outline-offset: 6px; transition: outline-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease; }
+.pb-editable:hover { outline: 2px solid #e6cf3c; background-color: rgba(242, 226, 125, 0.16); box-shadow: 0 0 0 6px rgba(242, 226, 125, 0.16); }
+.pb-editable:hover .pb-empty { border-color: #e6cf3c; }
 .pb-selected, .pb-selected:hover { outline: 2px solid var(--k); }
 .pb-dragging { opacity: 0.4; }
 .pb-tools {
@@ -230,7 +234,8 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
   .pb-profile h1 { font-size: 26px; }
   .pb-link-img { width: 88px; height: 72px; }
   .pb-profile.pb-side { gap: 14px; }
-  .pb-profile.pb-side .pb-avatar { width: 84px; height: 84px; }
+  .pb-avatar { width: min(var(--av, 104px), 160px); height: min(var(--av, 104px), 160px); }
+  .pb-profile.pb-side .pb-avatar { width: calc(min(var(--av, 104px), 160px) * 0.7); height: calc(min(var(--av, 104px), 160px) * 0.7); }
   .pb-igp iframe { height: 540px; }
   .pb-modal-box { width: 100%; min-width: 0; height: 88vh; }
 }

@@ -80,7 +80,7 @@
       ? `<span class="pb-ic" style="--c:${p.color};--ink:${p.ink || "#fff"};--m:url('${ICONS}${p.icon}.svg')"></span>`
       : `<span class="pb-ic pb-ic-text" style="--c:${p.color};--ink:${p.ink || "#fff"}">${esc(p.text)}</span>`;
 
-  // ---------- rich text: only bold, italic, line breaks and font size survive ----------
+  // ---------- rich text: only bold, italic, lists, line breaks and font size survive ----------
 
   function cleanHtml(html = "") {
     const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
@@ -94,6 +94,7 @@
         let target = dst;
         const wrap = (t) => { const e = document.createElement(t); target.appendChild(e); target = e; };
         if (tag === "DIV" || tag === "P") wrap("div");
+        if (tag === "UL" || tag === "OL" || tag === "LI") wrap(tag.toLowerCase());
         if (tag === "B" || tag === "STRONG" || /^(bold|[6-9]00)$/.test(n.style ? n.style.fontWeight : "")) wrap("b");
         if (tag === "I" || tag === "EM" || (n.style && n.style.fontStyle === "italic")) wrap("i");
         const px = parseInt(n.style ? n.style.fontSize : "", 10);
@@ -209,10 +210,11 @@
         const radius = Math.max(0, Math.min(50, Number(b.radius ?? 50)));
         const posY = Math.max(0, Math.min(100, Number(b.posY ?? 50)));
         const zoom = Math.max(100, Math.min(250, Number(b.zoom ?? 100)));
+        const size = Math.max(64, Math.min(200, Number(b.size ?? 104)));
         const initial = esc((b.name || "?").trim().charAt(0).toUpperCase() || "?");
         const avatar = photo
-          ? `<div class="pb-avatar" style="border-radius:${radius}%"><img src="${esc(photo)}" alt="" style="${cropStyle(zoom, posY)}"></div>`
-          : `<div class="pb-avatar pb-initial" style="border-radius:${radius}%">${initial}</div>`;
+          ? `<div class="pb-avatar" style="border-radius:${radius}%;--av:${size}px"><img src="${esc(photo)}" alt="" style="${cropStyle(zoom, posY)}"></div>`
+          : `<div class="pb-avatar pb-initial" style="border-radius:${radius}%;--av:${size}px">${initial}</div>`;
         const layout = b.layout === "side" ? ` pb-side${b.flip ? " pb-flip" : ""}` : "";
         return `<header class="pb-profile${layout}">${avatar}
           <div class="pb-profile-text">
@@ -278,7 +280,7 @@
       case "instagram": {
         // "Social preview": what each platform lets other sites show.
         const plat = b.platform || "instagram";
-        const raw = String(b.value ?? b.handle ?? "").trim();
+        const raw = String(previewAccounts(b)[plat] || "").trim();
         if (!raw) return empty("Add your profile in the panel on the right.");
         const p = platformById(plat);
         const fromUrl = (re) => (raw.match(re) || [])[1];
@@ -311,6 +313,15 @@
       default:
         return "";
     }
+  }
+
+  // Social preview keeps one account per platform. Older pages saved a single value for one platform.
+  function previewAccounts(b) {
+    const accounts = { ...(b.accounts || {}) };
+    const legacy = b.value ?? b.handle;
+    const plat = b.platform || "instagram";
+    if (legacy && !(plat in accounts)) accounts[plat] = legacy;
+    return accounts;
   }
 
   function wrapBlock(b, edit, selected) {
@@ -433,5 +444,5 @@
     pdfThumbs(root);
   }
 
-  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
+  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
 })();

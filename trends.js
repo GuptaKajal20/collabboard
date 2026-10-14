@@ -8,13 +8,13 @@
   const test = new URLSearchParams(location.search).has("test");
   const file = (name) => `data/${test ? "test-" : ""}${name}.json`;
 
-  const NICHES = ["Beauty", "Fashion", "Food", "Fitness", "Tech", "Travel", "Finance", "Lifestyle", "Parenting", "Gaming"];
+  const NICHES = ["Beauty", "Fashion", "Food", "Fitness", "Tech", "Travel", "Finance", "Lifestyle", "Parenting", "Gaming", "Advertisement"];
   // Used before the first Instagram refresh has run.
   const DEFAULT_TAGS = {
     Beauty: ["skincare", "skincareindia", "makeup"], Fashion: ["fashion", "outfitideas", "ootdindia"], Food: ["foodie", "indianfood", "recipes"],
     Fitness: ["fitness", "workout", "yoga"], Tech: ["tech", "gadgets", "unboxing"], Travel: ["travel", "incredibleindia", "travelreels"],
     Finance: ["personalfinance", "investing", "moneytips"], Lifestyle: ["lifestyle", "dayinmylife", "vlog"], Parenting: ["parenting", "momlife", "parentingtips"],
-    Gaming: ["gaming", "bgmi", "gamer"],
+    Gaming: ["gaming", "bgmi", "gamer"], Advertisement: ["ad", "sponsored", "paidpartnership"],
   };
   const PAGE = 12;
 
@@ -35,7 +35,15 @@
 
   // Every search word must appear somewhere in the text.
   const words = (q) => q.toLowerCase().split(/\s+/).filter(Boolean);
-  const matches = (text, q) => { const t = text.toLowerCase(); return words(q).every((w) => t.includes(w)); };
+  // "#sunscreen" matches the word or the hashtag; "beautybyisraa" matches the channel "Beauty By Israa".
+  const squash = (t) => t.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+  const matches = (text, q) => {
+    const t = text.toLowerCase();
+    const flat = squash(text);
+    return words(q).every((w) => { const bare = w.replace(/^[#@]+/, ""); return !bare || t.includes(bare) || (squash(bare) && flat.includes(squash(bare))); });
+  };
+  const ytText = (v) => `${v.title} ${v.channel} ${(v.tags || []).join(" ")} ${v.brand || ""}`;
+  const igText = (r) => `${r.caption || ""} ${r.account || ""} ${(r.tags || []).join(" ")} ${r.brand || ""}`;
 
   // "Today" and "this week" count back from the last update, so they never go empty later in the day.
   const latest = () => Math.min(Date.now(), Date.parse(yt && yt.updated) || Date.now());
@@ -71,13 +79,14 @@
   };
 
   // ---------- YouTube ----------
-  function ytFiltered() {
-    const since = latest() - f.days * 864e5;
+  // wide: when a search finds nothing in the chosen filters, look across every niche, language and format this month.
+  function ytFiltered(wide) {
+    const since = latest() - (wide ? 30 : f.days) * 864e5;
     const seen = new Set();
     const list = (yt ? yt.items : []).filter((v) => {
       if (seen.has(v.id)) return false; // older files listed a video once per country
-      const ok = v.niche === f.niche && (!f.lang || langOf(v) === f.lang) && (f.format === "all" || v.format === f.format) &&
-        Date.parse(v.published) >= since && (!f.q || matches(`${v.title} ${v.channel} ${(v.tags || []).join(" ")}`, f.q));
+      const ok = (wide || (v.niche === f.niche && (!f.lang || langOf(v) === f.lang) && (f.format === "all" || v.format === f.format))) &&
+        Date.parse(v.published) >= since && (!f.q || matches(ytText(v), f.q));
       if (ok) seen.add(v.id);
       return ok;
     });
@@ -100,6 +109,7 @@
       <div class="tr-body">
         <h3 title="${esc(v.title)}">${esc(v.title)}</h3>
         <p class="tr-channel">${esc(v.channel)} · ${ago(v.published)}${rising ? ' <span class="tr-hot">🔥 Rising fast</span>' : ""}</p>
+        ${v.paid || v.brand ? `<p class="tr-promo">${v.paid ? '<span class="tr-paid">Paid promotion</span>' : ""}${v.brand ? `with <strong>${esc(v.brand)}</strong>` : ""}</p>` : ""}
         <div class="tr-stats">
           <span title="Views">${ICON.views}${compact(v.views)}</span>
           <span title="${v.likes === null ? "Likes hidden by the creator" : "Likes"}">${ICON.likes}${v.likes === null ? "hidden" : compact(v.likes)}</span>
@@ -118,15 +128,25 @@
       $("tr-more").hidden = true;
       return;
     }
-    const list = ytFiltered();
+    if (!f.q && !yt.items.some((v) => v.niche === f.niche)) {
+      $("tr-summary").textContent = "";
+      grid.innerHTML = `<div class="empty">${esc(f.niche)} videos will appear after the next daily update. Check back tomorrow morning.</div>`;
+      $("tr-more").hidden = true;
+      return;
+    }
+    let list = ytFiltered();
+    const widened = !list.length && !!f.q && ytFiltered(true).length > 0;
+    if (widened) list = ytFiltered(true);
     const rates = list.map(perHour).sort((a, b) => b - a);
     const risingCut = rates.length >= 5 ? rates[Math.floor(rates.length * 0.15)] : Infinity;
     const label = { views: "most viewed", likes: "most liked", comments: "most commented", rising: "rising fastest" }[f.sort];
     const time = { 1: "today", 7: "this week", 30: "this month" }[f.days];
     const lang = f.lang || "all languages";
-    $("tr-summary").textContent = list.length
-      ? `${list.length} ${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} · ${f.niche} · ${lang} · posted ${time}${f.q ? ` · matching “${f.q}”` : ""} · ${label} first`
-      : "";
+    $("tr-summary").innerHTML = widened
+      ? `<span class="tr-note">Nothing for “${esc(f.q)}” in ${esc(f.niche)} with these filters, so here ${list.length === 1 ? "is 1 match" : `are ${list.length} matches`} from all niches and languages this month.</span>`
+      : list.length
+        ? esc(`${list.length} ${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} · ${f.niche} · ${lang} · posted ${time}${f.q ? ` · matching “${f.q}”` : ""} · ${label} first`)
+        : "";
     grid.innerHTML = list.length
       ? list.slice(0, ytShown).map((v, i) => ytCard(v, i, risingCut)).join("")
       : emptyMessage(`${f.format === "short" ? "Shorts" : f.format === "long" ? "long videos" : "videos"} in ${f.niche} · ${lang} · posted ${time}`, [
@@ -138,11 +158,19 @@
   }
 
   // A clear "no results" message that names what was searched and offers ways to widen it.
+  // With a search, it also links to the same search on the platform itself, which covers far more than our daily list.
   function emptyMessage(what, options) {
     const opts = options.filter(Boolean);
+    const tag = f.q.trim().replace(/^#/, "");
+    const outside = !f.q ? "" : f.platform === "youtube"
+      ? `<a class="tr-open" href="https://www.youtube.com/results?search_query=${encodeURIComponent(f.q)}" target="_blank" rel="noopener noreferrer">Search “${esc(f.q)}” on YouTube ↗</a>`
+      : /^[\p{L}\p{N}_]+$/u.test(tag)
+        ? `<a class="tr-open" href="https://www.instagram.com/explore/tags/${encodeURIComponent(tag.toLowerCase())}/" target="_blank" rel="noopener noreferrer">See #${esc(tag.toLowerCase())} on Instagram ↗</a>`
+        : "";
     return `<div class="empty tr-empty"><strong>${f.q ? `No results for “${esc(f.q)}”` : "Nothing here yet"}</strong>
-      <span>We looked for ${esc(what)}.</span>
+      <span>We looked for ${esc(what)}${f.q ? ", across every niche this month too" : ""}.</span>
       ${opts.length ? `<span class="tr-widen">Try: ${opts.map(([k, t]) => `<button type="button" class="link-btn" data-widen="${k}">${t}</button>`).join("")}</span>` : ""}
+      ${outside}
     </div>`;
   }
 
@@ -151,7 +179,14 @@
     const tags = (ig && ig.tags && ig.tags[f.niche]) || DEFAULT_TAGS[f.niche] || [];
     $("ig-tags").innerHTML = tags.map((t) => `<a class="tr-tag" href="https://www.instagram.com/explore/tags/${encodeURIComponent(t)}/" target="_blank" rel="noopener noreferrer">#${esc(t)} <span aria-hidden="true">↗</span></a>`).join("");
 
-    const reels = ((ig && ig.reels) || []).filter((r) => r.niche === f.niche && (!f.q || matches(r.caption || "", f.q)));
+    const all = (ig && ig.reels) || [];
+    let reels = all.filter((r) => r.niche === f.niche && (!f.q || matches(igText(r), f.q)));
+    const widened = !reels.length && !!f.q && all.some((r) => matches(igText(r), f.q));
+    if (widened) {
+      const seen = new Set();
+      reels = all.filter((r) => matches(igText(r), f.q) && !seen.has(r.code) && seen.add(r.code));
+    }
+    $("ig-note").innerHTML = widened ? `<span class="tr-note">Nothing for “${esc(f.q)}” in ${esc(f.niche)}, so here ${reels.length === 1 ? "is 1 match" : `are ${reels.length} matches`} from all niches.</span>` : "";
     // The preview loads by itself as the card scrolls into view; the cover shows until it does.
     $("ig-grid").innerHTML = reels.length
       ? reels.slice(0, igShown).map((r) => `<article class="tr-card ig-card" data-ig="${esc(r.code)}" data-kind="${esc(r.kind)}">
@@ -160,7 +195,8 @@
             <iframe src="https://www.instagram.com/${r.kind === "post" ? "p" : "reel"}/${encodeURIComponent(r.code)}/embed/" title="Instagram Reel preview" loading="lazy" scrolling="no" allowfullscreen onload="this.classList.add('ready')"></iframe>
           </div>
           <div class="tr-body">
-            <p class="tr-channel">Found ${ago(r.found + "T08:00:00")}</p>
+            <p class="tr-channel">${r.account ? `@${esc(r.account)} · ` : ""}Found ${ago(r.found + "T08:00:00")}</p>
+            ${r.brand ? `<p class="tr-promo">with <strong>${esc(r.brand)}</strong></p>` : ""}
             <a class="tr-open" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Open on Instagram ↗</a>
           </div>
         </article>`).join("")

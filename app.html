@@ -187,7 +187,7 @@
           </div>
           <form class="tr-searchbox" role="search">
             <label class="sr-only" for="tr-q">Search trending videos</label>
-            <span class="tr-searchwrap"><input id="tr-q" type="search" placeholder="Search titles, channels, tags — e.g. sunscreen, GRWM" autocomplete="off" enterkeyhint="search"><button type="button" class="tr-clear" data-clear aria-label="Clear search">×</button></span>
+            <span class="tr-searchwrap"><input id="tr-q" type="search" placeholder="Search titles, channels, tags — e.g. sunscreen, GRWM" autocomplete="off" enterkeyhint="search"><button type="button" class="tr-clear" data-clear aria-label="Clear search" title="Clear search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>
             <button type="submit" class="btn primary">Search</button>
           </form>
           <p class="count" id="tr-summary"></p>
@@ -202,7 +202,7 @@
           </div>
           <form class="tr-searchbox" role="search">
             <label class="sr-only" for="ig-q">Search trending videos</label>
-            <span class="tr-searchwrap"><input id="ig-q" type="search" placeholder="Search Reel captions — e.g. sunscreen" autocomplete="off" enterkeyhint="search"><button type="button" class="tr-clear" data-clear aria-label="Clear search">×</button></span>
+            <span class="tr-searchwrap"><input id="ig-q" type="search" placeholder="Search Reel captions — e.g. sunscreen" autocomplete="off" enterkeyhint="search"><button type="button" class="tr-clear" data-clear aria-label="Clear search" title="Clear search"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span>
             <button type="submit" class="btn primary">Search</button>
           </form>
           <section class="tr-block">
@@ -213,6 +213,7 @@
           <section class="tr-block">
             <h2>Reels found this week</h2>
             <p class="fine">Found on the public web for your niche. Instagram doesn't share view counts with other apps, so these are shown newest first, not ranked.</p>
+            <p class="count" id="ig-note"></p>
             <div class="tr-grid ig-grid" id="ig-grid"></div>
             <div class="tr-more"><button type="button" class="btn" id="ig-more" hidden>Show more</button></div>
           </section>
