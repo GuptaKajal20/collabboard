@@ -1229,3 +1229,11 @@ label.switch { font-weight: 600; }
 .pa-count { min-width: 36px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 .pa-hint { margin: 0; }
 @media (max-width: 600px) { .pa-modules li { grid-template-columns: minmax(0, 1fr) auto; } .pa-bar { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Add panel: module buttons get the same yellow border and soft glow as modules on hover (light and dark mode). */
+.pal-item { transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+.pal-item:hover, .pal-item:focus-visible { transform: translateY(-1px); border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(242, 226, 125, 0.25), 0 0 18px rgba(242, 226, 125, 0.35); outline: none; }
+.pal-item.off:hover { transform: none; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(242, 226, 125, 0.18); }
+/* Keyboard focus on the panel tabs: yellow instead of the browser's blue ring. */
+.panel-tabs button:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.panel-tabs button:focus:not(:focus-visible) { outline: none; }
