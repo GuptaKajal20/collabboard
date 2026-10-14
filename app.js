@@ -494,7 +494,19 @@ function renderOne(id) {
   if (m && b.type === "file" && id === selectedId) showSlide(id, Number(m[1]));
 }
 
+// A header image switched on but never chosen goes back off when the creator moves on.
+function tidyHeaderSwitch(exceptId) {
+  for (const b of site.blocks) {
+    if (b.type === "profile" && b.coverOn && !b.coverImg && b.id !== exceptId) {
+      b.coverOn = false;
+      saveSite({ record: false });
+      renderOne(b.id);
+    }
+  }
+}
+
 function selectBlock(id) {
+  tidyHeaderSwitch(id);
   if (id !== selectedId) cropOpen = null;
   selectedId = id;
   document.querySelectorAll("#canvas .pb-editable").forEach((s) => s.classList.toggle("pb-selected", s.dataset.block === id));
@@ -530,6 +542,7 @@ function moveBlock(id, to) {
 // ----- right panel -----
 
 function showPanel(name) {
+  if (name !== "edit") tidyHeaderSwitch(null);
   document.querySelectorAll(".panel-tabs [data-panel]").forEach((b) => b.classList.toggle("active", b.dataset.panel === name));
   for (const p of ["add", "edit", "look"]) el(`panel-${p}`).hidden = p !== name;
 }
@@ -662,7 +675,8 @@ function renderEditPanel() {
             </div>`).join("")}
             <label class="thumb add" title="Add images"><input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"><span aria-hidden="true">＋</span><span class="sr">Add images</span></label>
           </div>` +
-          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"], null, false) : "");
+          (sel < 0 && (b.items || []).length ? `<p class="fine">Click a photo to select it, then adjust its zoom and position.</p>` : "") +
+          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? `<p class="fine">Editing photo ${sel + 1} of ${b.items.length}.</p>` + cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"], null, false) : "");
       } else if (b.kind === "pdf") {
         body += (b.items || []).map((f, i) => `<div class="picked"><span class="pdf-ic" aria-hidden="true">PDF</span><span class="fname">${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(f.name || "PDF")}">✕</button></div>`).join("") +
           `<label class="pick"><input type="file" accept=".pdf,application/pdf" data-upload="pdf"><span>＋ Add PDF</span></label>`;
@@ -692,7 +706,7 @@ function renderEditPanel() {
         <div class="plat-pick" role="group" aria-label="Platform">${SOCIAL_PREVIEW.map(([id]) => {
           const q = P.platformById(id);
           const set = !!P.handleFor(id, accounts[id]);
-          return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}${set ? " set" : ""}" title="${escapeHtml(q.name)}${set ? " (added)" : " (not added yet)"}" aria-label="${escapeHtml(q.name)}${set ? ", added" : ", not added yet"}" aria-pressed="${plat === id}">${P.icon(q)}<span>${escapeHtml(q.name)}</span></button>`;
+          return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}" title="${escapeHtml(q.name)}${set ? " (handle saved)" : ""}" aria-label="${escapeHtml(q.name)}${set ? ", handle saved" : ""}" aria-pressed="${plat === id}">${P.icon(q)}<span>${escapeHtml(q.name)}</span></button>`;
         }).join("")}</div></div>` +
         `<label><span class="lbl">Your ${escapeHtml(p.name)} handle${REQ}</span><span class="handle-field"><span class="handle-pre">${escapeHtml(pre)}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></span></label>
         <p class="fine plat-check${check.ok === false ? " error" : ""}" id="plat-check">${escapeHtml(check.text)}</p>`;
@@ -968,7 +982,6 @@ function setupPanel() {
       const n = el("plat-check");
       n.textContent = c.text;
       n.classList.toggle("error", c.ok === false);
-      panel.querySelectorAll(".plat-pick button").forEach((btn) => btn.classList.toggle("set", !!P.handleFor(btn.dataset.val, (b.accounts || {})[btn.dataset.val])));
       lookupSocial(b);
     }
     if (f === "url") {
@@ -1030,7 +1043,7 @@ function setupPanel() {
       b[`${key}Name`] = "";
       if (key === "photo") b.photoSample = false;
       if (cropOpen === key) cropOpen = null;
-    } else if (t.dataset.crop) cropOpen = cropOpen === t.dataset.crop ? null : t.dataset.crop;
+    } else if (t.dataset.crop) cropOpen = /^items\./.test(t.dataset.crop) ? t.dataset.crop : cropOpen === t.dataset.crop ? null : t.dataset.crop;
     else if (t.dataset.set) {
       const raw = t.dataset.val;
       b[t.dataset.set] = raw === "true" ? true : raw === "false" ? false : raw;
@@ -1099,7 +1112,9 @@ function setupCanvas() {
       renderEditPanel();
       return;
     }
-    if (e.target.closest("a")) e.preventDefault(); // links don't open while editing
+    // Links don't open while editing, except a Social preview, which opens the profile like the live page does.
+    const a = e.target.closest("a");
+    if (a && !a.classList.contains("pb-sp-link")) e.preventDefault();
     if (selectedId !== id) selectBlock(id);
   });
 
@@ -1269,6 +1284,7 @@ async function setupPortfolio() {
   }
   saveSite({ changed: false });
 
+  tidyHeaderSwitch(null);
   renderCanvas();
   renderEditPanel();
   setupCanvas();

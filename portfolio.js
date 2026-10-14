@@ -337,8 +337,8 @@
     const ok = plat === "linkedin" ? /^[\w-]{3,100}$/ : plat === "youtube" || plat === "facebook" ? /^[\w.-]{2,80}$/ : /^[\w.]{1,30}$/;
     return ok.test(v) ? v : "";
   }
-  // A see-through link over the whole preview: clicking anywhere opens the profile (not in the builder).
-  const boxLink = (plat, url, h, edit) => (edit ? "" : `<a class="pb-sp-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Open @${esc(h)} on ${esc(platformById(plat).name)}"></a>`);
+  // A see-through link over the whole preview: clicking anywhere opens the profile, for every platform.
+  const boxLink = (plat, url, h) => (`<a class="pb-sp-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Open @${esc(h)} on ${esc(platformById(plat).name)}"></a>`);
   // Profile card for YouTube, LinkedIn, Threads and X. snap = what /api/social returned (or null while loading).
   function socialCard(plat, h, snap, edit) {
     const p = platformById(plat);

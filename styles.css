@@ -668,13 +668,15 @@ input.invalid { border-color: var(--error); box-shadow: 0 0 0 3px rgba(180, 35, 
 .crop-frame { justify-self: center; width: 100%; max-width: 180px; overflow: hidden; border-radius: 10px; background: #111; }
 .crop-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .thumb .thumb-btn { width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
-.thumb.on { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* The photo being edited: a yellow frame with a tick. */
+.thumb.on::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: start start; padding: 5px 9px; border: 3px solid var(--yellow); border-radius: 8px; box-shadow: inset 0 0 0 1.5px #141413; color: #141413; font-size: 11px; font-weight: 800; pointer-events: none; z-index: 2; }
+.thumb.on::before { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; border-radius: 50%; background: var(--yellow); pointer-events: none; z-index: 1; }
+.thumb:not(.on):hover { box-shadow: 0 0 0 2px var(--yellow); }
 .thumb.add { position: relative; display: grid; place-items: center; background: var(--card); border: 1.5px dashed var(--border); color: var(--accent); font-size: 24px; cursor: pointer; }
 .thumb.add:hover { border-color: var(--accent); background: var(--accent-soft); }
 .plat-pick { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
 .plat-pick button { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; border: 1.5px solid var(--line); border-radius: 14px; background: var(--card); color: var(--text); font: inherit; font-size: 12px; cursor: pointer; opacity: 0.45; filter: grayscale(0.6); transition: opacity 0.15s ease, filter 0.15s ease, background 0.15s ease; }
 .plat-pick button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.plat-pick button.set { opacity: 1; filter: none; }
 .plat-pick button:hover { opacity: 1; filter: none; }
 .plat-pick button.active { opacity: 1; filter: none; background: var(--yellow); color: #141413; border-color: #141413; }
 .plat-pick .pb-ic { width: 34px; height: 34px; font-size: 12px; box-shadow: none; }

@@ -326,15 +326,18 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 
 /* ---------- builder-only: tools, selection, typing hints, drop line ---------- */
 /* Every module keeps its border. On hover a soft, glowing yellow gradient border appears around it. */
-/* --cz is the builder preview's scale, so borders and glow look the same size at any preview width. */
-.pb-editable { border-radius: 12px; outline: calc(1px / var(--cz, 1)) solid color-mix(in srgb, var(--ink, #1c1c1a) 22%, transparent); outline-offset: 6px; transition: outline-color 0.15s ease; }
+/* --cz is the builder preview's scale, so borders and glow look the same size at any preview width.
+   Every module keeps its border. On hover: a yellow border with a soft glow, drawn above the
+   neighbouring modules so nothing covers it (also when the module is selected). */
+.pb-editable { border-radius: 12px; outline: calc(1px / var(--cz, 1)) solid color-mix(in srgb, var(--ink, #1c1c1a) 22%, transparent); outline-offset: 6px; transition: outline-color 0.15s ease, box-shadow 0.2s ease; }
+.pb-editable:hover { z-index: 4; outline: calc(2.5px / var(--cz, 1)) solid var(--hover, #f2e27d);
+  box-shadow: 0 0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 30%, transparent), 0 0 calc(28px / var(--cz, 1)) calc(8px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent) !important; }
 .pb-glow { position: absolute; inset: calc(-8px / var(--cz, 1)); z-index: 1; border-radius: calc(16px / var(--cz, 1)); padding: calc(2.5px / var(--cz, 1)); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
   background: linear-gradient(120deg, var(--hover, #f2e27d), #fff6c2 35%, var(--hover, #f2e27d) 55%, #ffd166 80%, var(--hover, #f2e27d));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  filter: drop-shadow(0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 85%, transparent)) drop-shadow(0 0 calc(14px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent)); }
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
 .pb-editable:hover > .pb-glow { opacity: 1; }
 .pb-editable:hover .pb-empty { border-color: var(--hover, #f2e27d); }
-.pb-selected, .pb-selected:hover { outline: calc(2px / var(--cz, 1)) solid var(--k); }
+.pb-selected { outline: calc(2px / var(--cz, 1)) solid var(--k); }
 .pb-dragging { opacity: 0.4; }
 .pb-tools {
   position: absolute;
@@ -386,3 +389,22 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 .pb-sp-link { position: absolute; inset: 0; z-index: 1; border-radius: 16px; }
 .pb-sp-post { position: relative; z-index: 2; }
 .pb-igp:has(.pb-sp-link:hover) iframe, .pb-sp:has(.pb-sp-link:hover) { box-shadow: 0 0 0 3px color-mix(in srgb, var(--hover, var(--k)) 40%, transparent), 0 12px 28px -12px color-mix(in srgb, var(--hover, var(--k)) 80%, transparent); }
+
+/* ---------- consistent modules ----------
+   Every module fills the column, with the same outline, the same inner padding and equal left/right space. */
+.pb-block { box-sizing: border-box; width: 100%; padding: 14px 16px; }
+.pb-page:is(.pb-cards-card, .pb-cards-transparent, .pb-cards-outline) .pb-block { padding: 18px 20px; }
+.pb-igp iframe, .pb-igp .pb-social-card { max-width: none; width: 100%; }
+.pb-sp, .pb-link, .pb-pdf, .pb-carousel, .pb-video { width: 100%; box-sizing: border-box; }
+.pb-page:not(.pb-cards-card):not(.pb-cards-transparent):not(.pb-cards-outline) .pb-cover-img { margin: -14px -16px 0; border-radius: 12px 12px 0 0; }
+/* Magazine: the section number sits above the content, so left and right padding stay equal. */
+.pb-layout-magazine > .pb-block:not(.pb-profile-block) { padding-left: 16px !important; padding-right: 16px !important; }
+.pb-layout-magazine > .pb-block:not(.pb-profile-block)::before { position: static; display: block; margin-bottom: 10px; }
+/* Timeline: a centred dot and connector between modules instead of a line down one side. */
+.pb-layout-timeline { gap: 34px; }
+.pb-layout-timeline > .pb-block:not(.pb-profile-block) { margin-left: 0; }
+.pb-layout-timeline > .pb-block:not(.pb-profile-block)::before { left: 50%; top: -34px; bottom: auto; height: 34px; width: 2px; translate: -1px 0; }
+.pb-layout-timeline > .pb-block:not(.pb-profile-block)::after { left: 50%; top: -25px; width: 14px; height: 14px; translate: -7px 0; }
+.pb-layout-timeline > .pb-block:last-child::before { bottom: auto; }
+/* Offset: same size and straight, just the heavy border. */
+.pb-layout-offset > .pb-block:nth-child(n) { transform: none; }
