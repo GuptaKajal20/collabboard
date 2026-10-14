@@ -1221,3 +1221,9 @@ label.switch { font-weight: 600; }
 .pal-item.off:hover { border-color: var(--line); }
 /* The three panel tabs: yellow text and outline on hover. */
 .panel-tabs button:not(.active):hover { color: var(--yellow); box-shadow: inset 0 0 0 1.5px var(--yellow); }
+
+/* Panel boxes (e.g. Header image): content always fits inside, long file names shorten with "…". */
+.sub-box { min-width: 0; overflow: hidden; }
+.sub-box > *, .sub-box .pick-field, .sub-box .picked { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.sub-box .toggle-row { width: 100%; box-sizing: border-box; }
+.sub-box .slider-row { min-width: 0; }

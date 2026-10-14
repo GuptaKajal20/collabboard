@@ -642,7 +642,7 @@ function renderEditPanel() {
         `<div class="sub-box"><p class="panel-label">Name style</p>${slider("Font size", "nameScale", b.nameScale ?? 100, 60, 180, "%")}${slider("Letter spacing", "nameSpacing", b.nameSpacing ?? 0, -4, 12, "")}</div>` +
         `<div class="sub-box"><label class="toggle-row"><span class="lbl">Header image</span><input type="checkbox" role="switch" class="toggle" data-f="coverOn" ${b.coverOn ? "checked" : ""} aria-checked="${b.coverOn ? "true" : "false"}"></label>
           ${b.coverOn ? imagePicker("Image", b.coverImg, b.coverImgName, "coverImg", null) +
-            (b.coverImg ? slider("Left / right", "coverX", b.coverX ?? 50, 0, 100, "%") + slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
+            (b.coverImg ? slider("Zoom", "coverZoom", b.coverZoom ?? 100, 100, 300, "%") + slider("Left / right", "coverX", b.coverX ?? 50, 0, 100, "%") + slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
               <form class="dz-search" data-cover-search><input type="search" name="q" placeholder="Search free photos" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form><div class="dz-results" id="cover-results"></div>`) : ""}
         </div>`;
       break;
@@ -1005,6 +1005,11 @@ function setupPanel() {
     }
     setPath(b, f, v);
     undoKey = `${b.id}:${f}`;
+    if (f === "coverX" && (b.coverZoom ?? 100) < 130) {
+      b.coverZoom = 130;
+      const z = panel.querySelector('[data-f="coverZoom"]');
+      if (z) { z.value = 130; z.nextElementSibling.textContent = "130%"; z.style.cssText = fill(130, 100, 300); }
+    }
     if (e.target.type === "range") {
       e.target.nextElementSibling.textContent = `${v}${e.target.dataset.unit || ""}`;
       e.target.style.cssText = fill(v, Number(e.target.min), Number(e.target.max));
@@ -1046,7 +1051,7 @@ function setupPanel() {
       e.preventDefault();
       const url = P.safeUrl(e.target.elements.url.value);
       if (!url) return note("Please paste a full image link starting with https://", true);
-      Object.assign(b, { coverImg: url, coverImgName: "Image from a link", coverY: 50 });
+      Object.assign(b, { coverImg: url, coverImgName: "Image from a link", coverX: 50, coverY: 50, coverZoom: 100 });
     } else if (e.target.matches("[data-cover-search]")) {
       e.preventDefault();
       const box = el("cover-results");
@@ -1070,7 +1075,7 @@ function setupPanel() {
     if (!b || !t || t.disabled) return;
     if (t.dataset.coverPick !== undefined) {
       const p = el("cover-results").photos[Number(t.dataset.coverPick)];
-      Object.assign(b, { coverImg: p.url, coverImgName: p.title || "Free photo", coverY: 50, coverCredit: { name: p.photographer, url: p.photographerUrl, source: p.source, license: p.license } });
+      Object.assign(b, { coverImg: p.url, coverImgName: p.title || "Free photo", coverX: 50, coverY: 50, coverZoom: 100, coverCredit: { name: p.photographer, url: p.photographerUrl, source: p.source, license: p.license } });
       saveSite();
       renderOne(b.id);
       renderEditPanel();
@@ -1114,7 +1119,7 @@ function setupPanel() {
         else if (kind === "image") Object.assign(b, { image: await uploadImage(file, 800), imageName: file.name, imgZoom: 100, imgPosY: 50 });
         else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name, zoom: 100, posY: 50 });
         else if (kind === "pdf") b.items.push({ type: "pdf", url: await uploadPdf(file), name: file.name });
-        else if (kind === "coverImg") Object.assign(b, { coverImg: await uploadImage(file, 1600), coverImgName: file.name, coverY: 50, coverOn: true });
+        else if (kind === "coverImg") Object.assign(b, { coverImg: await uploadImage(file, 1600), coverImgName: file.name, coverX: 50, coverY: 50, coverZoom: 100, coverOn: true });
       }
       // Open the crop tools straight away for a newly chosen image.
       if (kind === "photo" || kind === "image") cropOpen = kind;
