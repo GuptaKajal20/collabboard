@@ -325,17 +325,22 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
 }
 
 /* ---------- builder-only: tools, selection, typing hints, drop line ---------- */
-/* Every module keeps a visible border; hover adds a yellow border with a soft glow. */
-.pb-editable { border-radius: 12px; outline: 1px solid color-mix(in srgb, var(--ink, #1c1c1a) 22%, transparent); outline-offset: 6px; transition: outline-color 0.15s ease, box-shadow 0.2s ease; }
-.pb-editable:hover { outline: 2px solid var(--hover, #f2e27d); box-shadow: 0 0 0 6px color-mix(in srgb, var(--hover, #f2e27d) 22%, transparent), 0 0 26px 6px color-mix(in srgb, var(--hover, #f2e27d) 40%, transparent); }
+/* Every module keeps its border. On hover a soft, glowing yellow gradient border appears around it. */
+/* --cz is the builder preview's scale, so borders and glow look the same size at any preview width. */
+.pb-editable { border-radius: 12px; outline: calc(1px / var(--cz, 1)) solid color-mix(in srgb, var(--ink, #1c1c1a) 22%, transparent); outline-offset: 6px; transition: outline-color 0.15s ease; }
+.pb-glow { position: absolute; inset: calc(-8px / var(--cz, 1)); z-index: 1; border-radius: calc(16px / var(--cz, 1)); padding: calc(2.5px / var(--cz, 1)); pointer-events: none; opacity: 0; transition: opacity 0.2s ease;
+  background: linear-gradient(120deg, var(--hover, #f2e27d), #fff6c2 35%, var(--hover, #f2e27d) 55%, #ffd166 80%, var(--hover, #f2e27d));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  filter: drop-shadow(0 0 calc(6px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 85%, transparent)) drop-shadow(0 0 calc(14px / var(--cz, 1)) color-mix(in srgb, var(--hover, #f2e27d) 55%, transparent)); }
+.pb-editable:hover > .pb-glow { opacity: 1; }
 .pb-editable:hover .pb-empty { border-color: var(--hover, #f2e27d); }
-.pb-selected, .pb-selected:hover { outline: 2px solid var(--k); }
+.pb-selected, .pb-selected:hover { outline: calc(2px / var(--cz, 1)) solid var(--k); }
 .pb-dragging { opacity: 0.4; }
 .pb-tools {
   position: absolute;
   top: -14px;
   right: 6px;
-  z-index: 2;
+  z-index: 3;
   display: none;
   gap: 2px;
   padding: 3px;
@@ -375,3 +380,9 @@ a.pb-social-card[href]:hover { border-color: var(--k); transform: translateY(-1p
   .pb-igp iframe { height: 540px; }
   .pb-modal-box { width: 100%; min-width: 0; height: 88vh; }
 }
+
+/* Social preview: the whole box opens the profile. Video links inside stay clickable. */
+.pb-igp, .pb-sp { position: relative; }
+.pb-sp-link { position: absolute; inset: 0; z-index: 1; border-radius: 16px; }
+.pb-sp-post { position: relative; z-index: 2; }
+.pb-igp:has(.pb-sp-link:hover) iframe, .pb-sp:has(.pb-sp-link:hover) { box-shadow: 0 0 0 3px color-mix(in srgb, var(--hover, var(--k)) 40%, transparent), 0 12px 28px -12px color-mix(in srgb, var(--hover, var(--k)) 80%, transparent); }

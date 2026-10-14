@@ -304,14 +304,14 @@
         if (!h) return empty("Add your handle in the panel on the right.");
         const profile = SOCIAL_URL[plat](h);
         if (plat === "instagram") {
-          return `<div class="pb-igp"><iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>${socialFoot(plat, profile, h, edit)}</div>`;
+          return `<div class="pb-igp"><iframe src="https://www.instagram.com/${esc(h)}/embed/" loading="lazy" title="Instagram profile of @${esc(h)}" scrolling="no"></iframe>${boxLink(plat, profile, h, edit)}</div>`;
         }
         if (plat === "facebook") {
           const src = `https://www.facebook.com/plugins/page.php?href=${encodeURIComponent(profile)}&tabs=timeline&width=500&height=600&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true`;
-          return `<div class="pb-igp"><iframe src="${esc(src)}" loading="lazy" title="Facebook page" scrolling="no" allow="encrypted-media"></iframe>${socialFoot(plat, profile, h, edit)}</div>`;
+          return `<div class="pb-igp"><iframe src="${esc(src)}" loading="lazy" title="Facebook page" scrolling="no" allow="encrypted-media"></iframe>${boxLink(plat, profile, h, edit)}</div>`;
         }
         const snap = b.social && b.social[plat] && b.social[plat].handle === h ? b.social[plat] : null;
-        return `<div class="pb-sp" data-social="${plat}" data-handle="${esc(h)}">${socialCard(plat, h, snap, edit)}</div>`;
+        return `<div class="pb-sp" data-social="${plat}" data-handle="${esc(h)}">${socialCard(plat, h, snap, edit)}${boxLink(plat, profile, h, edit)}</div>`;
       }
       default:
         return "";
@@ -337,14 +337,11 @@
     const ok = plat === "linkedin" ? /^[\w-]{3,100}$/ : plat === "youtube" || plat === "facebook" ? /^[\w.-]{2,80}$/ : /^[\w.]{1,30}$/;
     return ok.test(v) ? v : "";
   }
-  const socialFoot = (plat, url, h, edit) => {
-    const p = platformById(plat);
-    return `<a class="pb-social-card" ${edit ? "" : `href="${esc(url)}" target="_blank" rel="noopener noreferrer"`}>${icon(p)}<span><strong>@${esc(h)}</strong><small>View on ${esc(p.name)} ↗</small></span></a>`;
-  };
+  // A see-through link over the whole preview: clicking anywhere opens the profile (not in the builder).
+  const boxLink = (plat, url, h, edit) => (edit ? "" : `<a class="pb-sp-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer" aria-label="Open @${esc(h)} on ${esc(platformById(plat).name)}"></a>`);
   // Profile card for YouTube, LinkedIn, Threads and X. snap = what /api/social returned (or null while loading).
   function socialCard(plat, h, snap, edit) {
     const p = platformById(plat);
-    const url = SOCIAL_URL[plat](h);
     const link = (u, inner, cls = "") => (edit ? `<span class="${cls}">${inner}</span>` : `<a class="${cls}" href="${esc(u)}" target="_blank" rel="noopener noreferrer">${inner}</a>`);
     const pic = snap && safeUrl(snap.image);
     const posts = (snap && snap.posts) || [];
@@ -356,7 +353,7 @@
       ${snap && snap.bio ? `<p class="pb-sp-bio">${esc(snap.bio)}</p>` : snap ? "" : `<p class="pb-sp-bio pb-sp-loading">Loading profile…</p>`}
       ${posts.length ? `<div class="pb-sp-posts">${posts.slice(0, 5).map((v) => link(v.url, `<span class="pb-sp-thumb"><img src="${esc(safeUrl(v.image))}" alt="" loading="lazy"></span><span class="pb-sp-title">${esc(v.title)}</span>`, "pb-sp-post")).join("")}</div>` : ""}
       ${note ? `<p class="pb-note">${esc(note)}</p>` : ""}
-      ${link(url, `View profile on ${esc(p.name)} ↗`, "pb-sp-btn")}`;
+`;
   }
 
   // Social preview keeps one account per platform. Older pages saved a single value for one platform.
@@ -372,6 +369,7 @@
     const inner = renderBlock(b, edit);
     if (!edit) return inner ? `<section class="pb-block pb-${b.type}-block">${inner}</section>` : "";
     return `<section class="pb-block pb-${b.type}-block pb-editable${b.id === selected ? " pb-selected" : ""}" data-block="${esc(b.id)}">
+      <span class="pb-glow" aria-hidden="true"></span>
       <div class="pb-tools" aria-label="${esc(BLOCKS[b.type] ? BLOCKS[b.type].name : "Module")} tools">
         <span class="pb-grip" draggable="true" title="Drag to move">⠿</span>
         <button type="button" data-move="-1" title="Move up" aria-label="Move up">↑</button>

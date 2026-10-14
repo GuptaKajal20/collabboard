@@ -563,12 +563,12 @@ function cropFields(key) {
 }
 const getPath = (obj, path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
 
-function cropEditor(b, key, url, ratio, radius) {
+function cropEditor(b, key, url, ratio, radius, frame = true) {
   const f = cropFields(key);
   const zoom = getPath(b, f.zoom) ?? 100;
   const posY = getPath(b, f.posY) ?? 50;
   return `<div class="crop-box">
-    <div class="crop-frame" data-crop-preview="${key}" style="aspect-ratio:${ratio};${radius != null ? `border-radius:${radius}%;` : ""}"><img src="${escapeHtml(P.safeMedia(url))}" alt="" style="${P.cropStyle(zoom, posY)}"></div>
+    ${frame ? `<div class="crop-frame" data-crop-preview="${key}" style="aspect-ratio:${ratio};${radius != null ? `border-radius:${radius}%;` : ""}"><img src="${escapeHtml(P.safeMedia(url))}" alt="" style="${P.cropStyle(zoom, posY)}"></div>` : ""}
     ${slider("Zoom", f.zoom, zoom, 100, 250, "%")}
     ${slider("Up / down", f.posY, posY, 0, 100, "%")}
   </div>`;
@@ -576,7 +576,7 @@ function cropEditor(b, key, url, ratio, radius) {
 
 // One image slot: "+ Add image" when empty, otherwise thumbnail, file name, Crop and ✕.
 function imagePicker(label, url, name, uploadKey, cropKey, required = false) {
-  const head = `<span class="lbl">${required ? REQ : ""}${label}</span>`;
+  const head = `<span class="lbl">${label}${required ? REQ : ""}</span>`;
   if (!url) return `<div class="pick-field">${head}<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp" data-upload="${uploadKey}"><span>＋ Add image</span></label></div>`;
   return `<div class="pick-field">${head}<div class="picked">
     <img src="${escapeHtml(P.safeMedia(url))}" alt="">
@@ -615,10 +615,10 @@ function renderEditPanel() {
         (b.photo ? slider("Corner roundness", "radius", b.radius ?? 50, 0, 50, "") : "") +
         `<div class="pick-field"><span class="lbl">Layout</span>${seg("layout", b.layout || "stack", [["stack", "Image on top"], ["side", "Side by side"]])}</div>` +
         (b.layout === "side" ? seg("flip", !!b.flip, [[false, "Text on right"], [true, "Text on left"]]) : "") +
-        field(`${REQ}Name`, "name", b.name, 'aria-required="true"') +
+        field(`Name${REQ}`, "name", b.name, 'aria-required="true"') +
         `<label>Bio<textarea data-f="bio" rows="4">${escapeHtml(b.bio || "")}</textarea></label>` +
         `<div class="sub-box"><p class="panel-label">Name style</p>${slider("Font size", "nameScale", b.nameScale ?? 100, 60, 180, "%")}${slider("Letter spacing", "nameSpacing", b.nameSpacing ?? 0, -4, 12, "")}</div>` +
-        `<div class="sub-box"><label class="check switch"><input type="checkbox" data-f="coverOn" ${b.coverOn ? "checked" : ""}> <span>Header image</span></label>
+        `<div class="sub-box"><label class="toggle-row"><span class="lbl">Header image</span><input type="checkbox" role="switch" class="toggle" data-f="coverOn" ${b.coverOn ? "checked" : ""} aria-checked="${b.coverOn ? "true" : "false"}"></label>
           ${b.coverOn ? imagePicker("Image", b.coverImg, b.coverImgName, "coverImg", null) +
             (b.coverImg ? slider("Up / down", "coverY", b.coverY ?? 50, 0, 100, "%") : `<form class="dz-search" data-cover-link><input type="url" name="url" placeholder="Or paste an image link" aria-label="Header image link"><button type="submit" class="btn small">Use</button></form>
               <form class="dz-search" data-cover-search><input type="search" name="q" placeholder="Search free photos" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form><div class="dz-results" id="cover-results"></div>`) : ""}
@@ -631,8 +631,7 @@ function renderEditPanel() {
           <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="7" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="5" cy="17" r="1.6"/><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="2.5" y="9" font-size="7" font-weight="700">1</text><text x="2.5" y="19" font-size="7" font-weight="700">2</text><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-color-toggle title="Text colour" aria-label="Text colour" aria-expanded="false"><span class="rte-a">A</span></button>
-          <button type="button" data-cmd="normal" title="Normal text" aria-label="Normal text">Normal</button>
-          <select data-size aria-label="Text size"><option value="">Size</option>${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
+          <select data-size aria-label="Text size" title="Text size">${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
           <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
         </div>
         <div class="rte-colors" hidden><p class="fine">Select words, then pick a colour.</p><div class="dz-swatches">${TEXT_COLORS.map((c) => `<button type="button" class="dz-sw" data-text-color="${c}" style="background:${c}" aria-label="Colour ${c}" title="${c}"></button>`).join("")}<label class="dz-custom" title="Custom colour"><input type="color" data-text-color-custom value="#5b4bd6" aria-label="Custom text colour"><span aria-hidden="true">+</span></label></div></div>
@@ -640,7 +639,7 @@ function renderEditPanel() {
         <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here">${P.cleanHtml(b.html || "")}</div>`;
       break;
     case "link":
-      body = field(`${REQ}Link`, "url", b.url, `placeholder="Paste any YouTube, website or image link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
+      body = field(`Link${REQ}`, "url", b.url, `placeholder="Paste any YouTube, website or image link" inputmode="url" aria-required="true" class="${b.url && !P.safeUrl(b.url) ? "invalid" : ""}"`) +
         `<p class="fine" id="link-status">${linkStatus(b)}</p>` +
         field("Text", "text", b.text, `placeholder="${escapeHtml((b.preview && b.preview.title) || "e.g. Watch my latest campaign")}"`) +
         imagePicker("Image", b.image, b.imageName, "image", "image") +
@@ -658,12 +657,12 @@ function renderEditPanel() {
         const sel = /^items\.(\d+)$/.test(cropOpen || "") ? Number(cropOpen.split(".")[1]) : -1;
         body += `<div class="pick-field"><span class="lbl">Size</span>${seg("size", b.size || "landscape", [["portrait", "4:5"], ["square", "1:1"], ["landscape", "4:3"], ["wide", "16:9"]])}</div>
           <div class="thumbs">${(b.items || []).map((m, i) => `<div class="thumb${sel === i ? " on" : ""}">
-              <button type="button" class="thumb-btn" data-crop="items.${i}" title="Crop ${escapeHtml(m.name || "photo")}">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="${escapeHtml(m.name || "")}">`}</button>
+              <button type="button" class="thumb-btn" data-crop="items.${i}" ${sel === i ? `data-crop-preview="items.${i}"` : ""} title="Edit ${escapeHtml(m.name || "photo")}" aria-pressed="${sel === i}">${m.type === "video" ? `<video src="${escapeHtml(P.safeMedia(m.url))}" muted></video>` : `<img src="${escapeHtml(P.safeMedia(m.url))}" alt="${escapeHtml(m.name || "")}" style="${P.cropStyle(m.zoom, m.posY)}">`}</button>
               <button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(m.name || "photo")}">✕</button>
             </div>`).join("")}
             <label class="thumb add" title="Add images"><input type="file" accept="image/png,image/jpeg,image/webp" multiple data-upload="images"><span aria-hidden="true">＋</span><span class="sr">Add images</span></label>
           </div>` +
-          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"]) : "");
+          (sel >= 0 && b.items[sel] && b.items[sel].type !== "video" ? cropEditor(b, `items.${sel}`, b.items[sel].url, P.ASPECTS[b.size || "landscape"], null, false) : "");
       } else if (b.kind === "pdf") {
         body += (b.items || []).map((f, i) => `<div class="picked"><span class="pdf-ic" aria-hidden="true">PDF</span><span class="fname">${escapeHtml(f.name || "Document.pdf")}</span><button type="button" class="x" data-del-item="${i}" aria-label="Remove ${escapeHtml(f.name || "PDF")}">✕</button></div>`).join("") +
           `<label class="pick"><input type="file" accept=".pdf,application/pdf" data-upload="pdf"><span>＋ Add PDF</span></label>`;
@@ -695,7 +694,7 @@ function renderEditPanel() {
           const set = !!P.handleFor(id, accounts[id]);
           return `<button type="button" data-set="platform" data-val="${id}" class="${plat === id ? "active" : ""}${set ? " set" : ""}" title="${escapeHtml(q.name)}${set ? " (added)" : " (not added yet)"}" aria-label="${escapeHtml(q.name)}${set ? ", added" : ", not added yet"}" aria-pressed="${plat === id}">${P.icon(q)}<span>${escapeHtml(q.name)}</span></button>`;
         }).join("")}</div></div>` +
-        `<label><span class="lbl">${REQ}Your ${escapeHtml(p.name)} handle</span><span class="handle-field"><span class="handle-pre">${escapeHtml(pre)}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></span></label>
+        `<label><span class="lbl">Your ${escapeHtml(p.name)} handle${REQ}</span><span class="handle-field"><span class="handle-pre">${escapeHtml(pre)}</span><input data-f="accounts.${plat}" value="${escapeHtml(value)}" placeholder="${escapeHtml(ph)}" autocapitalize="none" autocomplete="off" spellcheck="false" aria-required="true" class="${check.ok === false ? "invalid" : ""}"></span></label>
         <p class="fine plat-check${check.ok === false ? " error" : ""}" id="plat-check">${escapeHtml(check.text)}</p>`;
       break;
     }
@@ -834,13 +833,12 @@ function setupTextEditor(b) {
     if (btn.dataset.cmd === "italic") document.execCommand("italic");
     if (btn.dataset.cmd === "ul") document.execCommand("insertUnorderedList");
     if (btn.dataset.cmd === "ol") document.execCommand("insertOrderedList");
-    if (btn.dataset.cmd === "normal") document.execCommand("removeFormat");
     remember();
     commit();
+    showFormat();
   });
   panel.querySelector("[data-size]").addEventListener("change", (e) => {
     const px = e.target.value;
-    e.target.value = "";
     if (!px) return;
     restore();
     // The browser marks the selection with <font size="7">; we swap that for an exact size.
@@ -855,6 +853,27 @@ function setupTextEditor(b) {
     remember();
     commit();
   });
+  // Show the formatting of the selected text: its size in the menu, and B / I / lists lit up.
+  const sizeMenu = panel.querySelector("[data-size]");
+  function showFormat() {
+    const sel = getSelection();
+    if (!sel.rangeCount || !editor.contains(sel.anchorNode)) return;
+    const node = sel.anchorNode.nodeType === 3 ? sel.anchorNode.parentElement : sel.anchorNode;
+    const px = Math.round(parseFloat(getComputedStyle(node).fontSize));
+    const near = SIZES.reduce((best, [v]) => (Math.abs(v - px) < Math.abs(best - px) ? Number(v) : best), 16);
+    sizeMenu.value = String(near);
+    for (const [cmd, q] of [["bold", "bold"], ["italic", "italic"], ["ul", "insertUnorderedList"], ["ol", "insertOrderedList"]]) {
+      const b = panel.querySelector(`[data-cmd="${cmd}"]`);
+      const on = document.queryCommandState(q);
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    }
+  }
+  editor.addEventListener("keyup", showFormat);
+  editor.addEventListener("mouseup", showFormat);
+  editor.addEventListener("focus", () => setTimeout(showFormat));
+  sizeMenu.addEventListener("change", () => setTimeout(showFormat));
+
   panel.querySelector(".emoji-grid").addEventListener("click", (e) => {
     const btn = e.target.closest("[data-emoji]");
     if (!btn) return;
