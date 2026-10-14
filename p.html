@@ -95,6 +95,38 @@
         document.querySelector('meta[name="description"]').content = `${profile.name}'s creator portfolio${bio ? `: ${bio}` : ""}`.slice(0, 160);
       }
 
+      // ---------- analytics: opens, visits and module clicks (published link only) ----------
+      // A visitor is a random ID kept in their own browser; no names, emails or IP addresses are recorded.
+      // The creator's own views (their draft is in this browser) are not counted.
+      const own = (() => { try { return (JSON.parse(localStorage.getItem("cb_site")) || {}).slug === slug; } catch { return false; } })();
+      if (slug && !params.has("draft") && window.Cloud.ready && !own) {
+        const keep = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { return null; } return v; };
+        const keepSession = (k, v) => { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch { return null; } return v; };
+        let visitor = keep("cp_vid");
+        if (!visitor) visitor = keep("cp_vid", (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()).replace(/-/g, "").slice(0, 32));
+        const seenKey = `cp_seen_${slug}`;
+        const isNew = !keep(seenKey);
+        keep(seenKey, "1");
+        const send = (row) => window.Cloud.trackEvent({ slug, visitor, is_new: isNew, ...row });
+        send({ kind: "open" });
+        // A visit: opens within 30 minutes of each other count once.
+        const visitKey = `cp_visit_${slug}`;
+        const last = Number(keepSession(visitKey) || 0);
+        if (Date.now() - last > 30 * 60 * 1000) send({ kind: "visit" });
+        keepSession(visitKey, String(Date.now()));
+        // Clicks on a module's links, buttons, photos and previews.
+        const lastClick = {};
+        sheet.addEventListener("click", (e) => {
+          const mod = e.target.closest("[data-mid]");
+          if (!mod || !e.target.closest("a, button, [data-pdf], .pb-photo, video")) return;
+          const id = mod.dataset.mid;
+          if (Date.now() - (lastClick[id] || 0) < 800) return; // one double-click is one click
+          lastClick[id] = Date.now();
+          keepSession(visitKey, String(Date.now()));
+          send({ kind: "click", module_id: id.slice(0, 40), module_type: (mod.dataset.mtype || "").slice(0, 20), label: (mod.dataset.mlabel || "").slice(0, 120) });
+        }, true);
+      }
+
       // Tap a photo to see it large.
       const zoom = document.getElementById("zoom");
       sheet.addEventListener("click", (e) => {

@@ -359,7 +359,69 @@ function portfolioCompletion() {
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }
 
+// ---------- portfolio analytics (dashboard) ----------
+// Real numbers from the creator's published link only (see analytics-setup.sql). Nothing is made up:
+// before anything is published or recorded, the section says so.
+let paRange = store.get("cb_pa_range") || "today";
+function paSince(range) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  if (range === "week") d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // since Monday
+  if (range === "month") d.setDate(1);
+  return d;
+}
+async function renderAnalytics() {
+  const body = el("pa-body");
+  if (!body) return;
+  document.querySelectorAll("#pa-range [data-range]").forEach((b) => { b.classList.toggle("active", b.dataset.range === paRange); b.setAttribute("aria-pressed", String(b.dataset.range === paRange)); });
+  const msg = (t, cta = "") => { body.innerHTML = `<div class="pa-empty"><p>${t}</p>${cta}</div>`; };
+  if (!Cloud.ready || !(await Cloud.user())) return msg("Sign in and publish your portfolio to see who visits it and what they click.");
+  if (!site || !site.publishedAt || !site.slug) return msg("Publish your portfolio to start tracking visits and clicks on your link.", `<a class="btn primary small" href="#/portfolio">Go to My Portfolio</a>`);
+  body.classList.add("loading");
+  let stats;
+  try {
+    stats = await Cloud.portfolioStats(site.slug, paSince(paRange));
+  } catch (err) {
+    body.classList.remove("loading");
+    return msg(err.message === "not-set-up" ? "Analytics are almost ready: they switch on after a one-time database update." : "Couldn't load your analytics right now. Please try again in a moment.");
+  }
+  body.classList.remove("loading");
+  const n = (v) => Number(v || 0).toLocaleString("en-IN");
+  const returning = Math.max(0, (stats.unique || 0) - (stats.new || 0));
+  const period = { today: "today", week: "this week", month: "this month" }[paRange];
+  // Every module on the page, with its clicks (0 if none), most clicked first.
+  const counts = new Map((stats.modules || []).map((m) => [m.module_id, m]));
+  const rows = site.blocks.map((b) => ({ id: b.id, label: P.moduleLabel(b), clicks: counts.has(b.id) ? Number(counts.get(b.id).clicks) : 0 }));
+  for (const m of stats.modules || []) if (!site.blocks.some((b) => b.id === m.module_id)) rows.push({ id: m.module_id, label: `${m.label || m.module_type || "Module"} (removed)`, clicks: Number(m.clicks) });
+  rows.sort((a, b) => b.clicks - a.clicks);
+  const top = rows[0] && rows[0].clicks ? rows[0].clicks : 0;
+  body.innerHTML = `
+    <div class="stats pa-stats">
+      <div class="stat"><span class="stat-num">${n(stats.visits)}</span><span class="stat-label">visits</span></div>
+      <div class="stat"><span class="stat-num">${n(stats.unique)}</span><span class="stat-label">unique visitors</span><span class="pa-sub">${n(returning)} returning</span></div>
+      <div class="stat"><span class="stat-num">${n(stats.new)}</span><span class="stat-label">new visitors</span></div>
+      <div class="stat"><span class="stat-num">${n(stats.opens)}</span><span class="stat-label">times your link was opened</span></div>
+    </div>
+    <div class="pa-modules">
+      <h3>Module clicks <span>${n(stats.clicks)} ${period}</span></h3>
+      ${rows.length ? `<ol>${rows.map((r, i) => `<li class="${i === 0 && r.clicks ? "top" : ""}">
+          <span class="pa-name">${escapeHtml(r.label)}${i === 0 && r.clicks ? ` <em>Most clicked</em>` : ""}</span>
+          <span class="pa-bar"><i style="width:${top ? Math.round((r.clicks / top) * 100) : 0}%"></i></span>
+          <span class="pa-count">${n(r.clicks)}</span>
+        </li>`).join("")}</ol>` : `<p class="fine">Add modules to your portfolio to see their clicks.</p>`}
+    </div>
+    ${!stats.opens ? `<p class="fine pa-hint">No visits ${period} yet. Share your link to start seeing numbers here.</p>` : `<p class="fine pa-hint">Visits count once per visitor every 30 minutes. Your own views aren't counted.</p>`}`;
+}
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("#pa-range [data-range]");
+  if (!b) return;
+  paRange = b.dataset.range;
+  store.set("cb_pa_range", paRange);
+  renderAnalytics();
+});
+
 function renderDashboard() {
+  renderAnalytics();
   const first = (profile.name || "").trim().split(/\s+/)[0];
   el("hello").textContent = `Hi ${first || "there"}`;
   const fits = listings.filter(fitsProfile);

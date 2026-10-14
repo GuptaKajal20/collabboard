@@ -576,6 +576,7 @@ pages.push({
     <li><strong>Portfolio content:</strong> text, links, numbers, images, PDFs and social handles you add. Anything you publish is public.</li>
     <li><strong>Contact messages:</strong> what you send through our contact form.</li>
     <li><strong>Analytics (only with consent):</strong> if you allow analytics cookies, pages visited and actions such as sign-up clicks, collected through Google Analytics.</li>
+    <li><strong>Portfolio visits:</strong> when someone opens a creator's public portfolio link, we count the visit and which modules they click, so the creator can see how their portfolio performs. Each visitor is a random ID stored in their own browser. We don't record names, email addresses or IP addresses, and only the portfolio's creator can see these counts.</li>
     <li><strong>Data stored in your browser:</strong> settings like your menu preference, and a working copy of your data so the app is fast.</li>
   </ul>
   <h2>2. How we use it</h2>

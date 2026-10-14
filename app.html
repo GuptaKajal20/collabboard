@@ -114,6 +114,17 @@
           <a class="stat" href="#/collabs/applied"><span class="stat-num" id="stat-applied">0</span><span class="stat-label">applied</span></a>
           <a class="stat" href="#/portfolio"><span class="stat-num" id="stat-portfolio">0%</span><span class="stat-label">portfolio complete</span></a>
         </div>
+        <section class="pa" id="pa" aria-labelledby="pa-title">
+          <div class="section-head pa-head">
+            <h2 id="pa-title">Portfolio analytics</h2>
+            <div class="seg" role="group" aria-label="Time period" id="pa-range">
+              <button type="button" data-range="today" class="active" aria-pressed="true">Today</button>
+              <button type="button" data-range="week" aria-pressed="false">This week</button>
+              <button type="button" data-range="month" aria-pressed="false">This month</button>
+            </div>
+          </div>
+          <div class="pa-body" id="pa-body" aria-live="polite"></div>
+        </section>
         <div class="section-head">
           <h2>Best matches for you</h2>
           <a href="#/collabs" class="link">See all collabs</a>

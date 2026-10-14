@@ -123,6 +123,21 @@
     return data;
   }
 
+  // ---------- portfolio analytics ----------
+
+  // Records one open, visit or module click on a published portfolio (from the public page).
+  async function trackEvent(row) {
+    if (!client) return;
+    try { await client.from("portfolio_events").insert(row); } catch { /* never disturb the visitor */ }
+  }
+
+  // The owner's totals since a date. Throws "not-set-up" if the analytics script hasn't been run yet.
+  async function portfolioStats(slug, since) {
+    const { data, error } = await client.rpc("portfolio_stats", { p_slug: slug, p_since: since.toISOString() });
+    if (error) throw new Error(/function|schema cache|does not exist|relation/i.test(error.message || "") ? "not-set-up" : error.message);
+    return data;
+  }
+
   // Uploads one file into the creator's own folder and returns its public link.
   async function upload(file) {
     const uid = await userId();
@@ -133,5 +148,5 @@
     return client.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
   }
 
-  window.Cloud = { ready, sendContact, user, signUp, logIn, logOut, sendReset, setPassword, onRecovery, loadState, saveState, loadMine, slugFree, publish, fetchPublic, upload };
+  window.Cloud = { ready, sendContact, user, signUp, logIn, logOut, sendReset, setPassword, onRecovery, loadState, saveState, loadMine, slugFree, publish, fetchPublic, upload, trackEvent, portfolioStats };
 })();

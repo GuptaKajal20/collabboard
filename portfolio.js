@@ -375,9 +375,23 @@
     return accounts;
   }
 
+  // A short, human name for a module, shown in the creator's analytics ("Link: Book a call").
+  function moduleLabel(b) {
+    const name = BLOCKS[b.type] ? BLOCKS[b.type].name : "Module";
+    const strip = (t) => String(t || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    let detail = "";
+    if (b.type === "link") detail = b.text || (b.preview && b.preview.title) || String(b.url || "").replace(/^https?:\/\/(www\.)?/, "");
+    if (b.type === "instagram") { const plat = b.platform || "instagram"; detail = `${platformById(plat).name} @${handleFor(plat, previewAccounts(b)[plat]) || ""}`; }
+    if (b.type === "file") detail = b.kind === "pdf" ? "PDF" : b.kind === "images" ? `${(b.items || []).length} photos` : "";
+    if (b.type === "text") detail = strip(b.html).slice(0, 40);
+    if (b.type === "profile") detail = b.name || "";
+    return (detail ? `${name}: ${detail}` : name).slice(0, 110);
+  }
+
   function wrapBlock(b, edit, selected) {
     const inner = renderBlock(b, edit);
-    if (!edit) return inner ? `<section class="pb-block pb-${b.type}-block">${inner}</section>` : "";
+    // On the public page each module carries its id and a short name, so clicks can be counted per module.
+    if (!edit) return inner ? `<section class="pb-block pb-${b.type}-block" data-mid="${esc(b.id)}" data-mtype="${esc(b.type)}" data-mlabel="${esc(moduleLabel(b))}">${inner}</section>` : "";
     return `<section class="pb-block pb-${b.type}-block pb-editable${b.id === selected ? " pb-selected" : ""}" data-block="${esc(b.id)}">
       <span class="pb-glow" aria-hidden="true"></span>
       <div class="pb-tools" aria-label="${esc(BLOCKS[b.type] ? BLOCKS[b.type].name : "Module")} tools">
@@ -513,5 +527,5 @@
     });
   }
 
-  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, coverStyle, handleFor, socialCard, SOCIAL_URL, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
+  window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, moduleLabel, coverStyle, handleFor, socialCard, SOCIAL_URL, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };
 })();
