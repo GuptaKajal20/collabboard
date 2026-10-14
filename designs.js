@@ -304,12 +304,12 @@
       <p class="fine">${h(cat[2])}.</p>
       <div class="tpl-grid">
       <article class="tpl-card${!current ? " on" : ""}">
-        <button type="button" class="tpl-open tpl-none" data-act="tpl-none" aria-label="No template"><span class="tpl-thumb tpl-none-thumb"><span>No template</span><small>Plain page</small></span></button>
-        <div class="tpl-meta"><strong>No template</strong>${!current ? `<span class="tpl-inuse">In use</span>` : ""}<span>The plain look. Your modules stay as they are.</span></div>
+        <button type="button" class="tpl-open tpl-none" data-act="tpl-none" aria-label="No template"><span class="tpl-thumb tpl-none-thumb"><span>No template</span></span></button>
+        <div class="tpl-meta"><strong>No template</strong>${!current ? `<span class="tpl-inuse">In use</span>` : ""}</div>
         <div class="tpl-actions"><button type="button" class="btn small primary" data-act="tpl-none" ${!current ? "disabled" : ""}>${!current ? "In use" : "Use"}</button></div>
       </article>${list.map((tpl) => `<article class="tpl-card${tpl.id === current ? " on" : ""}">
         <button type="button" class="tpl-open" data-tpl-preview="${tpl.id}" aria-label="Preview ${h(tpl.name)}">${thumb(tpl)}</button>
-        <div class="tpl-meta"><strong>${h(tpl.name)}</strong>${tpl.id === current ? `<span class="tpl-inuse">In use</span>` : ""}<span>${h(tpl.about)}</span></div>
+        <div class="tpl-meta"><strong>${h(tpl.name)}</strong>${tpl.id === current ? `<span class="tpl-inuse">In use</span>` : ""}</div>
         <div class="tpl-actions"><button type="button" class="btn small" data-tpl-preview="${tpl.id}">Preview</button><button type="button" class="btn small primary" data-tpl-use="${tpl.id}">Use</button></div>
       </article>`).join("")}</div>`;
   }
