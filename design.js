@@ -70,7 +70,7 @@
         type: ["none", "color", "gradient", "image", "video", "anim"].includes(bg.type) ? bg.type : "none",
         color: hex(bg.color, "#f7f6f2"),
         gradient: { a: hex((bg.gradient || {}).a, "#fbe7c6"), b: hex((bg.gradient || {}).b, "#f6b6c4"), angle: clamp((bg.gradient || {}).angle, 0, 360, 135) },
-        image: { url: String(img.url || ""), zoom: clamp(img.zoom, 100, 300, 100), x: clamp(img.x, 0, 100, 50), y: clamp(img.y, 0, 100, 50), fit: img.fit === "contain" ? "contain" : "cover", credit: img.credit && typeof img.credit === "object" ? { name: String(img.credit.name || "").slice(0, 80), url: String(img.credit.url || "") } : null },
+        image: { url: String(img.url || ""), zoom: clamp(img.zoom, 100, 300, 100), x: clamp(img.x, 0, 100, 50), y: clamp(img.y, 0, 100, 50), fit: img.fit === "contain" ? "contain" : "cover", credit: img.credit && typeof img.credit === "object" ? Object.fromEntries(["name", "url", "title", "page", "source", "license", "licenseUrl"].map((k) => [k, String(img.credit[k] || "").slice(0, 200)])) : null },
         video: { url: String((bg.video || {}).url || "") },
         anim: { preset, colors: [0, 1, 2].map((i) => hex((anim.colors || [])[i], ANIMS[preset].colors[i])), base: hex(anim.base, ANIMS[preset].base) },
         tone: bg.tone === "light" ? "light" : bg.tone === "dark" ? "dark" : "auto",
@@ -201,6 +201,14 @@
     }
     const scrim = b.scrim ? `<div class="pb-scrim" style="background:${tone === "light" ? "#ffffff" : "#000000"};opacity:${b.scrim / 100}"></div>` : "";
     return `<div class="pb-bg${fixed ? " pb-bg-fixed" : ""}" aria-hidden="true" style="background:${base}">${inner}${scrim}</div>`;
+  }
+
+  // "Photo by X (CC BY 2.0) via Openverse": the credit free photos ask for. Links only to http(s).
+  function creditHtml(c) {
+    if (!c || !c.name) return "";
+    const link = (u, t) => (/^https?:\/\//.test(u || "") ? `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a>` : esc(t));
+    const what = c.title ? `“${link(c.page, c.title)}”` : "Photo";
+    return `${what} by ${link(c.url, c.name)}${c.license ? ` · ${link(c.licenseUrl, c.license)}` : ""}${c.source ? ` · via ${esc(c.source)}` : ""}`;
   }
 
   // ---------- fonts ----------
@@ -356,5 +364,5 @@
     root.querySelectorAll(".pb-bg-video[data-video]").forEach(startVideo);
   }
 
-  window.PortfolioDesign = { COLORS, GRADIENTS, FONTS, ANIMS, ANIM_PALETTES, THEMES, normalize, pageAttrs, bgHtml, bgTone, cardStyle, videoSource, loadFonts, mount, fontStack, lum };
+  window.PortfolioDesign = { COLORS, GRADIENTS, FONTS, ANIMS, ANIM_PALETTES, THEMES, normalize, pageAttrs, bgHtml, bgTone, cardStyle, videoSource, loadFonts, creditHtml, mount, fontStack, lum };
 })();

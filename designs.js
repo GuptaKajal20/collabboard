@@ -129,7 +129,7 @@
     if (imgSource === "pexels") {
       body += `<form class="dz-search" data-form="pexels"><input type="search" name="q" value="${h(pexels.q)}" placeholder="Search e.g. beach, pastel, city" aria-label="Search free photos"><button type="submit" class="btn small primary">Search</button></form>
         <div class="dz-results" id="dz-pexels">${pexelsResults()}</div>
-        <p class="fine"><a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer">Photos provided by Pexels</a>. Free to use.</p>`;
+        <p class="fine" id="dz-source">${sourceNote()}</p>`;
     }
     if (imgSource === "upload") body += `<label class="pick"><input type="file" accept="image/png,image/jpeg,image/webp" data-bgupload><span>＋ Upload from your device</span></label><p class="upload-note" id="dz-upload-note" hidden></p>`;
     if (imgSource === "url") body += `<form class="dz-search" data-form="imgurl"><input type="url" name="url" placeholder="https://…/photo.jpg" aria-label="Image link"><button type="submit" class="btn small primary">Use</button></form><p class="fine" id="dz-url-note">Paste a direct link to a JPG, PNG or WebP image.</p>`;
@@ -139,7 +139,7 @@
         ${range("Zoom", "bg.image.zoom", img.zoom, 100, 300, "%")}${range("Left / right", "bg.image.x", img.x, 0, 100, "%")}${range("Up / down", "bg.image.y", img.y, 0, 100, "%")}
         <div class="pick-field"><span class="lbl">Fit</span>${segRow("bg.image.fit", img.fit, [["cover", "Fill the page"], ["contain", "Show whole photo"]])}</div>
         <button type="button" class="btn small" data-act="img-reset">Reset position</button>
-        ${img.credit && img.credit.name ? `<p class="fine">Photo by <a href="${h(img.credit.url)}" target="_blank" rel="noopener noreferrer">${h(img.credit.name)}</a> on Pexels</p>` : ""}`);
+        ${img.credit && img.credit.name ? `<p class="fine">${D.creditHtml(img.credit)}</p>` : ""}`);
     }
     return body;
   }
@@ -152,20 +152,56 @@
       (pexels.more ? `<button type="button" class="btn small dz-more" data-act="pexels-more" ${pexels.busy ? "disabled" : ""}>${pexels.busy ? "Loading…" : "More photos"}</button>` : "");
   }
 
+  // Free photos: Pexels when its key is set up on the server, otherwise Openverse
+  // (Creative Commons photos, no key needed, searched straight from the browser).
+  let pexelsReady = null;
+  const openverse = async (q, page) => {
+    const qs = new URLSearchParams({ q: q || "abstract background", page, page_size: 20, license_type: "commercial,modification", category: "photograph", mature: "false" });
+    const res = await fetch(`https://api.openverse.org/v1/images/?${qs}`);
+    if (res.status === 429) throw new Error("Too many searches for now. Please wait a minute and try again.");
+    if (!res.ok) throw new Error("Couldn't reach the photo library. Please try again.");
+    const data = await res.json();
+    const lic = (r) => `${r.license === "cc0" ? "CC0" : r.license === "pdm" ? "Public domain" : `CC ${String(r.license).toUpperCase()}`}${r.license_version && !["cc0", "pdm"].includes(r.license) ? ` ${r.license_version}` : ""}`;
+    return {
+      more: page < (data.page_count || 1),
+      photos: (data.results || []).filter((r) => r.url && /^https:/.test(r.url)).map((r) => ({
+        id: r.id, thumb: r.thumbnail, url: r.url, alt: r.title || "", avg: "",
+        photographer: r.creator || "Unknown", photographerUrl: r.creator_url || r.foreign_landing_url, page: r.foreign_landing_url,
+        title: r.title || "", source: "Openverse", license: lic(r), licenseUrl: r.license_url || "",
+      })),
+    };
+  };
+  const pexelsApi = async (q, page) => {
+    const res = await fetch(`/api/pexels?q=${encodeURIComponent(q)}&page=${page}`);
+    if (res.status === 503) { pexelsReady = false; return null; }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error("Couldn't reach the photo library. Please try again.");
+    pexelsReady = true;
+    return { more: !!data.more, photos: (data.photos || []).map((p) => ({ ...p, source: "Pexels", license: "Pexels License", licenseUrl: "https://www.pexels.com/license/" })) };
+  };
+
+  let searchId = 0;
   async function searchPexels(q, more = false) {
+    const id = ++searchId; // only the latest search may show its results
     pexels = more ? { ...pexels, busy: true, error: "" } : { q, items: [], page: 1, busy: true, error: "", more: false };
     if ($("dz-pexels")) $("dz-pexels").innerHTML = pexelsResults();
     try {
       const page = more ? pexels.page + 1 : 1;
-      const res = await fetch(`/api/pexels?q=${encodeURIComponent(pexels.q)}&page=${page}`);
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error === "not-configured" ? "Free photo search is being set up. Meanwhile, upload a photo or paste a link." : "Couldn't reach the photo library. Please try again.");
-      pexels = { ...pexels, items: [...pexels.items, ...(data.photos || [])], page, busy: false, more: !!data.more };
+      const data = (pexelsReady !== false && (await pexelsApi(pexels.q, page))) || (await openverse(pexels.q, page));
+      if (id !== searchId) return;
+      pexels = { ...pexels, items: [...pexels.items, ...data.photos], page, busy: false, more: data.more };
     } catch (err) {
-      pexels = { ...pexels, busy: false, error: err.message };
+      if (id !== searchId) return;
+      pexels = { ...pexels, busy: false, error: err.message || "Couldn't reach the photo library. Please try again." };
     }
     if ($("dz-pexels")) $("dz-pexels").innerHTML = pexelsResults();
+    const src = $("dz-source");
+    if (src) src.innerHTML = sourceNote();
   }
+
+  const sourceNote = () => (pexelsReady
+    ? `<a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer">Photos provided by Pexels</a>. Free to use.`
+    : `Free Creative Commons photos from <a href="https://openverse.org" target="_blank" rel="noopener noreferrer">Openverse</a>. The photographer's credit is shown on your page.`);
 
   function setImage(url, credit = null) {
     change((d) => { d.bg.type = "image"; d.bg.image = { url, zoom: 100, x: 50, y: 50, fit: "cover", credit }; if (d.bg.scrim === 0) d.bg.scrim = 20; }, { panel: true });
@@ -495,7 +531,7 @@
       }
       if (t.dataset.pexel) {
         const p = pexels.items.find((x) => String(x.id) === t.dataset.pexel);
-        if (p) setImage(p.url, { name: p.photographer, url: p.photographerUrl || p.page });
+        if (p) setImage(p.url, { name: p.photographer, url: p.photographerUrl || p.page, title: p.title || "", page: p.page || "", source: p.source, license: p.license, licenseUrl: p.licenseUrl });
         return;
       }
       switch (t.dataset.act) {

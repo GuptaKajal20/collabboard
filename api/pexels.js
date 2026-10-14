@@ -1,5 +1,6 @@
 // Free photo search for portfolio backgrounds (Designs → Background → Image).
-// Runs on Vercel so the Pexels key stays private. Set PEXELS_API_KEY in Vercel → Settings → Environment Variables.
+// Runs on Vercel so the Pexels key stays private. Optional: set PEXELS_API_KEY in Vercel → Settings → Environment Variables.
+// Without it the editor searches Openverse (Creative Commons photos) instead.
 // GET /api/pexels?q=beach&page=1  →  { photos: [{ id, thumb, url, alt, avg, photographer, photographerUrl, page }], more }
 
 export default async function handler(req, res) {
