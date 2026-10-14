@@ -80,7 +80,7 @@
       ? `<span class="pb-ic" style="--c:${p.color};--ink:${p.ink || "#fff"};--m:url('${ICONS}${p.icon}.svg')"></span>`
       : `<span class="pb-ic pb-ic-text" style="--c:${p.color};--ink:${p.ink || "#fff"}">${esc(p.text)}</span>`;
 
-  // ---------- rich text: only bold, italic, lists, line breaks and font size survive ----------
+  // ---------- rich text: only bold, italic, lists, line breaks, font size and colour survive ----------
 
   function cleanHtml(html = "") {
     const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
@@ -99,6 +99,8 @@
         if (tag === "I" || tag === "EM" || (n.style && n.style.fontStyle === "italic")) wrap("i");
         const px = parseInt(n.style ? n.style.fontSize : "", 10);
         if (px >= 12 && px <= 48) { wrap("span"); target.style.fontSize = `${px}px`; }
+        const color = (n.style && n.style.color) || (tag === "FONT" && n.getAttribute("color")) || "";
+        if (/^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\))$/i.test(color.trim())) { wrap("span"); target.style.color = color.trim(); }
         walk(n, target);
       }
     };
@@ -206,7 +208,7 @@
     const empty = (msg) => (edit ? `<p class="pb-empty">${msg}</p>` : "");
     switch (b.type) {
       case "profile": {
-        const photo = safeMedia(b.photo);
+        const photo = b.photoSample && !edit ? "" : safeMedia(b.photo);
         const radius = Math.max(0, Math.min(50, Number(b.radius ?? 50)));
         const posY = Math.max(0, Math.min(100, Number(b.posY ?? 50)));
         const zoom = Math.max(100, Math.min(250, Number(b.zoom ?? 100)));
@@ -216,7 +218,8 @@
           ? `<div class="pb-avatar" style="border-radius:${radius}%;--av:${size}px"><img src="${esc(photo)}" alt="" style="${cropStyle(zoom, posY)}"></div>`
           : `<div class="pb-avatar pb-initial" style="border-radius:${radius}%;--av:${size}px">${initial}</div>`;
         const layout = b.layout === "side" ? ` pb-side${b.flip ? " pb-flip" : ""}` : "";
-        return `<header class="pb-profile${layout}">${avatar}
+        const sampleTag = b.photoSample && edit && photo ? `<span class="pb-sample-tag">Sample photo · add yours in the panel</span>` : "";
+        return `<header class="pb-profile${layout}">${avatar}${sampleTag}
           <div class="pb-profile-text">
             <h1${ed("name", "Your name")}>${esc(b.name)}</h1>
             ${b.bio || edit ? `<p class="pb-bio"${ed("bio", "A short bio")}>${esc(b.bio)}</p>` : ""}
@@ -275,6 +278,7 @@
       }
       case "rates": {
         const items = (b.items || []).filter((r) => r.price || edit);
+        if (!items.length && !b.barter) return "";
         return `<ul class="pb-rates">${items.map((r, i) => `<li><span${ed(`items.${i}.label`, "What")}>${esc(r.label)}</span><strong${ed(`items.${i}.price`, "₹ price")}>${edit ? esc(r.price) : formatRupees(r.price)}</strong></li>`).join("")}</ul>${b.barter ? `<p class="pb-note">Open to barter collaborations</p>` : ""}`;
       }
       case "instagram": {
@@ -338,9 +342,16 @@
     </section>`;
   }
 
-  function renderPortfolio(p, { edit = false, selected = null } = {}) {
+  // The page with its design (background, fonts, cards). fixedBg: the background fills the whole browser window.
+  function renderPortfolio(p, { edit = false, selected = null, fixedBg = false } = {}) {
     const blocks = (p.blocks || []).map((b) => wrapBlock(b, edit, selected)).join("");
-    return `<div class="pb-page pb-theme-${esc(p.theme || "violet")}">${blocks || (edit ? `<p class="pb-empty pb-start">Drag a module here from the right, or click one to add it.</p>` : "")}</div>`;
+    const D = window.PortfolioDesign;
+    const theme = esc(p.theme || "violet");
+    const body = blocks || (edit ? `<p class="pb-empty pb-start">Drag a module here from the right, or click one to add it.</p>` : "");
+    if (!D) return `<div class="pb-page pb-theme-${theme}">${body}</div>`;
+    D.loadFonts(p.design);
+    const a = D.pageAttrs(p.design, p.theme);
+    return `<div class="pb-root">${D.bgHtml(p.design, { fixed: fixedBg })}<div class="pb-page pb-theme-${theme} ${a.cls}" style="${a.style}">${body}</div></div>`;
   }
 
   // ---------- live parts: carousel, PDF thumbnails and reader ----------
@@ -442,6 +453,7 @@
       }, true);
     }
     pdfThumbs(root);
+    if (window.PortfolioDesign) window.PortfolioDesign.mount(root);
   }
 
   window.Portfolio = { cropStyle, ASPECTS, BLOCKS, PLATFORMS, platformById, socialUrl, renderPortfolio, wrapBlock, previewAccounts, migrate, cleanHtml, enhance, safeUrl, safeMedia, isPdf, icon, esc };

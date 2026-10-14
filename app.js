@@ -385,6 +385,7 @@ let selectedId = null;
 const newId = () => Math.random().toString(36).slice(2, 10);
 const slugify = (s = "") => s.toLowerCase().normalize("NFKD").replace(/[^\w\s-]/g, "").trim().replace(/[\s_]+/g, "-").replace(/-+/g, "-").slice(0, 40);
 const EMOJIS = ["😊", "😍", "🔥", "✨", "💯", "🙌", "❤️", "👍", "🙏", "🎉", "⭐", "📸", "🎥", "🎬", "💄", "👗", "👟", "🍲", "☕", "📱", "💻", "✈️", "🏖️", "💪", "🧘", "💰", "📈", "🤝", "🌸", "🌿", "🇮🇳", "📍"];
+const TEXT_COLORS = ["#1c1c1a", "#6b6a65", "#ffffff", "#5b4bd6", "#2563eb", "#0f6e56", "#16a34a", "#d85a30", "#e11d74", "#b42318", "#ca8a04", "#f2e27d"];
 const SIZES = [["14", "Small"], ["16", "Normal"], ["20", "Large"], ["26", "Extra large"], ["34", "Huge"]];
 
 // First visit: start from the sign-up details (and the older form, if it was used).
@@ -570,10 +571,12 @@ function renderEditPanel() {
           <button type="button" data-cmd="italic" title="Italic" aria-label="Italic"><i>I</i></button>
           <button type="button" data-cmd="ul" title="Bulleted list" aria-label="Bulleted list"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="7" r="1.6"/><circle cx="5" cy="12" r="1.6"/><circle cx="5" cy="17" r="1.6"/><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
           <button type="button" data-cmd="ol" title="Numbered list" aria-label="Numbered list"><svg viewBox="0 0 24 24" aria-hidden="true"><text x="2.5" y="9" font-size="7" font-weight="700">1</text><text x="2.5" y="19" font-size="7" font-weight="700">2</text><path d="M10 7h10M10 12h10M10 17h10"/></svg></button>
+          <button type="button" data-color-toggle title="Text colour" aria-label="Text colour" aria-expanded="false"><span class="rte-a">A</span></button>
           <button type="button" data-cmd="normal" title="Normal text" aria-label="Normal text">Normal</button>
           <select data-size aria-label="Text size"><option value="">Size</option>${SIZES.map(([v, l]) => `<option value="${v}">${l}</option>`).join("")}</select>
           <button type="button" data-emoji-toggle title="Emoji" aria-label="Emoji">😊</button>
         </div>
+        <div class="rte-colors" hidden><p class="fine">Select words, then pick a colour.</p><div class="dz-swatches">${TEXT_COLORS.map((c) => `<button type="button" class="dz-sw" data-text-color="${c}" style="background:${c}" aria-label="Colour ${c}" title="${c}"></button>`).join("")}<label class="dz-custom" title="Custom colour"><input type="color" data-text-color-custom value="#5b4bd6" aria-label="Custom text colour"><span aria-hidden="true">+</span></label></div></div>
         <div class="emoji-grid" hidden>${EMOJIS.map((e) => `<button type="button" data-emoji="${e}">${e}</button>`).join("")}</div>
         <div class="rte" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Text" data-placeholder="Write here">${P.cleanHtml(b.html || "")}</div>`;
       break;
@@ -637,7 +640,8 @@ function renderEditPanel() {
       break;
     }
   }
-  panel.innerHTML = `<h2 class="edit-title">${escapeHtml(P.BLOCKS[b.type] ? P.BLOCKS[b.type].name : "Module")}</h2><div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
+  const sample = window.Designs && window.Designs.isUntouchedSample(b) ? `<p class="sample-note">This is sample content from your template. Edit it to make it yours.</p>` : "";
+  panel.innerHTML = `${sample}<h2 class="edit-title">${escapeHtml(P.BLOCKS[b.type] ? P.BLOCKS[b.type].name : "Module")}</h2><div class="edit-fields">${body}</div><p class="upload-note" id="upload-note" hidden></p>`;
   if (b.type === "text") setupTextEditor(b);
 }
 
@@ -702,6 +706,19 @@ function setupTextEditor(b) {
   // Keep the text selection when the toolbar is clicked.
   panel.querySelector(".rte-bar").addEventListener("mousedown", (e) => { if (e.target.closest("button")) e.preventDefault(); });
   panel.querySelector(".emoji-grid").addEventListener("mousedown", (e) => e.preventDefault());
+  // Colour only the selected words. It stays even if the page's text colour changes in Designs.
+  const colorize = (c) => {
+    restore();
+    document.execCommand("styleWithCSS", false, true);
+    document.execCommand("foreColor", false, c);
+    document.execCommand("styleWithCSS", false, false);
+    remember();
+    commit();
+  };
+  const colors = panel.querySelector(".rte-colors");
+  colors.addEventListener("mousedown", (e) => { if (e.target.closest("button")) e.preventDefault(); });
+  colors.addEventListener("click", (e) => { const b = e.target.closest("[data-text-color]"); if (b) colorize(b.dataset.textColor); });
+  colors.querySelector("[data-text-color-custom]").addEventListener("change", (e) => colorize(e.target.value));
 
   panel.querySelector(".rte-bar").addEventListener("click", (e) => {
     const btn = e.target.closest("button");
@@ -709,6 +726,12 @@ function setupTextEditor(b) {
     if (btn.dataset.emojiToggle !== undefined) {
       const g = panel.querySelector(".emoji-grid");
       g.hidden = !g.hidden;
+      return;
+    }
+    if (btn.dataset.colorToggle !== undefined) {
+      const c = panel.querySelector(".rte-colors");
+      c.hidden = !c.hidden;
+      btn.setAttribute("aria-expanded", String(!c.hidden));
       return;
     }
     restore();
@@ -833,6 +856,7 @@ function setupPanel() {
       const key = t.dataset.clear;
       b[key] = "";
       b[`${key}Name`] = "";
+      if (key === "photo") b.photoSample = false;
       if (cropOpen === key) cropOpen = null;
     } else if (t.dataset.crop) cropOpen = cropOpen === t.dataset.crop ? null : t.dataset.crop;
     else if (t.dataset.set) {
@@ -857,7 +881,7 @@ function setupPanel() {
     note(`Uploading ${files.length > 1 ? `${files.length} files` : "your file"}…`);
     try {
       for (const file of files) {
-        if (kind === "photo") Object.assign(b, { photo: await uploadImage(file, 600), photoName: file.name, zoom: 100, posY: 50 });
+        if (kind === "photo") Object.assign(b, { photo: await uploadImage(file, 600), photoName: file.name, zoom: 100, posY: 50, photoSample: false });
         else if (kind === "image") Object.assign(b, { image: await uploadImage(file, 800), imageName: file.name, imgZoom: 100, imgPosY: 50 });
         else if (kind === "images") b.items.push({ type: "image", url: await uploadImage(file, 1600), name: file.name, zoom: 100, posY: 50 });
         else if (kind === "pdf") b.items.push({ type: "pdf", url: await uploadPdf(file), name: file.name });
@@ -1006,11 +1030,14 @@ async function publish() {
   }
   if (!validSlug(site.slug || "")) {
     showPanel("look");
+    if (window.Designs) window.Designs.showSection("page");
     el("pf-slug").focus();
     el("slug-note").textContent = "Choose your link name first: at least 3 lowercase letters, numbers or dashes.";
     el("slug-note").classList.add("error");
     return;
   }
+  const samples = window.Designs ? site.blocks.filter((b) => window.Designs.isUntouchedSample(b)) : [];
+  if (samples.length && !confirm(`${samples.length === 1 ? "One module still has" : `${samples.length} modules still have`} sample text from your template (${samples.map((b) => P.BLOCKS[b.type].name).join(", ")}). Publish anyway?`)) return;
   btn.disabled = true;
   btn.textContent = "Publishing…";
   try {
@@ -1024,7 +1051,7 @@ async function publish() {
   } catch (err) {
     bar.hidden = false;
     bar.innerHTML = `<span class="dot pending"></span><span class="error">${escapeHtml(err.message || "Could not publish. Please try again.")}</span>`;
-    if (/link name/.test(err.message || "")) showPanel("look");
+    if (/link name/.test(err.message || "")) { showPanel("look"); if (window.Designs) window.Designs.showSection("page"); }
   } finally {
     btn.disabled = false;
     btn.textContent = "Publish";
@@ -1056,6 +1083,7 @@ async function setupPortfolio() {
     });
   }));
 
+  if (window.Designs) window.Designs.init();
   const markTheme = () => document.querySelectorAll("#themes [data-theme]").forEach((b) => b.classList.toggle("active", b.dataset.theme === (site.theme || "violet")));
   markTheme();
   el("themes").addEventListener("click", (e) => {
