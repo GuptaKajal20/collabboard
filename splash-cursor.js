@@ -38,7 +38,7 @@
   const BACK_COLOR = { r: 0.5, g: 0, b: 0 };
   const TRANSPARENT = true;
   const RAINBOW_MODE = true;
-  const COLOR = "#f5c542";
+  const COLOR = "#f2e27d";
 
   const wrapper = document.createElement("div");
   wrapper.className = "splash-cursor";

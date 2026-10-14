@@ -30,8 +30,7 @@ const ICONS = {
 const icon = (name, size = 22) => `<svg class="ic" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${ICONS[name] || ICONS.spark}</svg>`;
 
 const logo = `<a class="brand" href="/" aria-label="Collab Pro home">
-  <img src="/assets/logo-mark.svg" alt="" width="38" height="38">
-  <span class="wordmark">Collab <em>Pro</em></span>
+  <img class="brand-logo" src="/assets/logo.png" alt="Collab Pro" width="68" height="56">
 </a>`;
 
 // ---------- photos (Unsplash, see assets/photos/CREDITS.md) ----------
@@ -65,7 +64,7 @@ function head(p) {
   const canonical = abs(p.path);
   const ld = [];
   if (p.path === "/") {
-    ld.push({ "@context": "https://schema.org", "@type": "Organization", name: SITE.name, url: SITE.url, logo: `${SITE.url}/assets/logo-mark.svg`, description: SITE.description });
+    ld.push({ "@context": "https://schema.org", "@type": "Organization", name: SITE.name, url: SITE.url, logo: `${SITE.url}/assets/logo.png`, description: SITE.description });
     ld.push({ "@context": "https://schema.org", "@type": "WebSite", name: SITE.name, url: SITE.url, inLanguage: "en-IN", description: SITE.description });
   } else if (!p.noindex) {
     ld.push({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
@@ -84,8 +83,8 @@ function head(p) {
   <meta name="description" content="${esc(p.description)}">
   <meta name="robots" content="${p.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large"}">
   ${p.noindex ? "" : `<link rel="canonical" href="${canonical}">`}
-  <meta name="theme-color" content="#f6f0dc" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111611" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#ebe8de" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121210" media="(prefers-color-scheme: dark)">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${SITE.name}">
