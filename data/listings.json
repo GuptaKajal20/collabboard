@@ -1,7 +1,660 @@
 {
-  "updated": "2026-10-19",
-  "count": 454,
+  "updated": "2026-10-20",
+  "count": 480,
   "listings": [
+    {
+      "id": "https://www.instagram.com/reel/Dd502EQB_Zp",
+      "title": "✨ Follow us & comment “Link” to get the collaboration form! ...",
+      "description": "Follow us & comment “Link” to get the collaboration form! Receive PR packages Work with multiple beauty brands",
+      "url": "https://www.instagram.com/reel/Dd502EQB_Zp",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.facebook.com/rajeev.ralhan.336/videos/october-collaboration-form-influencer-marketing-collaboration/961765536983935",
+      "title": "October collaboration form #influencer #marketing # ...",
+      "description": "As an introductory offer, the paid promotion charges are ₹1000 per post for the first 5 businesses/people. Please note that the reach and promotion of your",
+      "url": "https://www.facebook.com/rajeev.ralhan.336/videos/october-collaboration-form-influencer-marketing-collaboration/961765536983935",
+      "hostname": "facebook.com",
+      "source": "Facebook",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeMW9c8Diy4",
+      "title": "PAID COLLABORATION FORM OPEN! ✨ No followers ...",
+      "description": "Creators of all sizes can apply. Looking for paid brand collaborations, influencer collaborations & creator opportunities? This form is for you! ✨",
+      "url": "https://www.instagram.com/p/DeMW9c8Diy4",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeoQHFNTQ0r",
+      "title": "💗 Want to collaborate with Dot & Key? 💋✨ The ...",
+      "description": "? ✨ The Dot & Key Jelly Lip Balm Collaboration Form is here! Looking for beauty brand collaborations, paid collaboration opportunities, influencer",
+      "url": "https://www.instagram.com/reel/DeoQHFNTQ0r",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.reddit.com/r/indianstartups/comments/1xa4dr8/query_partnering_with_influencers_to_promote_an",
+      "title": "Query: Partnering with influencers to promote an application",
+      "description": "Under one pvt company, if I have developed 3 SaaS products, then can I form a collaboration with an influencer to split the share of only one app?",
+      "url": "https://www.reddit.com/r/indianstartups/comments/1xa4dr8/query_partnering_with_influencers_to_promote_an",
+      "hostname": "reddit.com",
+      "source": "Website",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DerZdK-oF9L",
+      "title": "“If you are a content creator looking for paid collaborations ...",
+      "description": "Brand collaboration forms & campaign updates in one community! Brands are looking for creators for exciting barter collaborations across beauty, lifestyle,",
+      "url": "https://www.instagram.com/reel/DerZdK-oF9L",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid + barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.bennett.edu.in/media-center/blog/fashion-design-course-for-the-instagram-influencer-era",
+      "title": "Fashion Design Course for the Instagram & Influencer Era",
+      "description": "Discover how fashion design programs prepare you for Instagram and influencer marketing. Build creative and digital skills at Bennett University.",
+      "url": "https://www.bennett.edu.in/media-center/blog/fashion-design-course-for-the-instagram-influencer-era",
+      "hostname": "bennett.edu.in",
+      "source": "Website",
+      "niches": [
+        "Fashion"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://aveoreach.com/campaign/india-ugc-creators-bengaluru-chennai-coimbatore-goa-ikawn-mirror",
+      "title": "India UGC Creators | Bengaluru, Chennai - aveoreach",
+      "description": "iKawn Inc. is hiring 8 creators for \"India UGC Creators | Bengaluru, Chennai, Coimbatore & Goa | iKawn Mirror\". This campaign runs on INSTAGRAM and",
+      "url": "https://aveoreach.com/campaign/india-ugc-creators-bengaluru-chennai-coimbatore-goa-ikawn-mirror",
+      "hostname": "aveoreach.com",
+      "source": "Website",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdlmI6eOOHa",
+      "title": "If you are a micro creator who creates UGC content, this is ...",
+      "description": "Wanted Casting is open for UGC Creators based. Male and female content creators fluent in regional languages are required. Comment “UGC” for the audition link.",
+      "url": "https://www.instagram.com/reel/DdlmI6eOOHa",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeA4n8JMhRI",
+      "title": "ATTN Brands and Creators! We shoot UGC and content in ...",
+      "description": "We're hiring professionals UGC creators to add to our existing roster. If you make AMAZING high quality UGC and content we want to see it. DM us your work.",
+      "url": "https://www.instagram.com/reel/DeA4n8JMhRI",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.foundit.in/job/ugc-freelance-content-creator-passionbits-hyderabad-secunderabad-telangana-65581717",
+      "title": "UGC Freelance content creator with 0 - passionbits",
+      "description": "This is a remote freelance role for a UGC Creator / Anchor / Presenter at Passionbits. The primary focus will be on creating authentic, high-performing UGC-",
+      "url": "https://www.foundit.in/job/ugc-freelance-content-creator-passionbits-hyderabad-secunderabad-telangana-65581717",
+      "hostname": "foundit.in",
+      "source": "Website",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://theinfluenceco.in/blog/barter-vs-paid-collaborations",
+      "title": "Barter vs Paid Collaborations for Influencers in India",
+      "description": "A barter collaboration is a deal where a brand gives an influencer a product or service instead of money, and the influencer creates agreed content about it",
+      "url": "https://theinfluenceco.in/blog/barter-vs-paid-collaborations",
+      "hostname": "theinfluenceco.in",
+      "source": "Website",
+      "niches": [
+        "Finance"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid + barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.threads.com/@neha_tyagi_09/post/Derrk-REgXZ/interested",
+      "title": "Interested",
+      "description": "Looking for bold Indian women content creators & influencers for a PAID collaboration. We're looking for creators with: • 2K–10K followers • Strong engagement &",
+      "url": "https://www.threads.com/@neha_tyagi_09/post/Derrk-REgXZ/interested",
+      "hostname": "threads.com",
+      "source": "Threads",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": 10000,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeckYuUi34M",
+      "title": "Comment “Form” to apply for this paid collaboration!! ...",
+      "description": "Fill out the form linked in our bio • Comment “DONE” once you've submitted it We'll go through each profile and reach out to creators with suitable",
+      "url": "https://www.instagram.com/reel/DeckYuUi34M",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/_t/reel/DerTWdkiz9M",
+      "title": "Content creators of India 🔥 Athreix is actively looking to ...",
+      "description": "Content creators of India Athreix is actively looking to collaborate with you no matter what niche you create in and whether you have 500 or 50,000",
+      "url": "https://www.instagram.com/_t/reel/DerTWdkiz9M",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/_c/reel/DeqtP83ATlR",
+      "title": "Got 5K+ followers? A brand wants to pay you for ONE reel ...",
+      "description": "This is a paid brand collaboration open to small creators, nano influencers and UGC creators across India. Comment CREATE and we'll send you the application",
+      "url": "https://www.instagram.com/_c/reel/DeqtP83ATlR",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Paid",
+      "minFollowers": 5000,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DerQPDvMHBh",
+      "title": "A very warm welcome to all the content creators, micro/ ...",
+      "description": "Our collaboration opportunities are open to Indian creators only. ... collab , micro influencer , nano influencer , influencer program , influencers villa ,",
+      "url": "https://www.instagram.com/p/DerQPDvMHBh",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/_c/reel/DergMF-R13E",
+      "title": "A very warm welcome to all the content creator, micro/nano ...",
+      "description": "We are here to provide collaboration opportunities for you to grow . For small creators and influencers its very difficult to get collabs from brands , but we",
+      "url": "https://www.instagram.com/_c/reel/DergMF-R13E",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeLyLs0NyAU",
+      "title": "CastIN Talents is looking for Pan India Influencers & UGC ...",
+      "description": "CastIN Talents is looking for Pan India Influencers & UGC Content Creators for upcoming Diwali Brand Campaigns. Mini Influencers • Micro Influencers",
+      "url": "https://www.instagram.com/p/DeLyLs0NyAU",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeXTOeET_pl",
+      "title": "Paid collaborations, influencers, brand deals, creators, LynkUp No comments yet.",
+      "description": "Paid collaborations, influencers, brand deals, creators, LynkUp No comments yet. Start the conversation. Log in to like or comment. More posts from lynkupindia Photo by LynkUp | Influencer Marketing Platform on July 06, 2025. Photo by LynkUp | Influencer Marketing Platform on July 05, 2025. Photo by LynkUp | Influencer Marketing Platform on July 04, 2025. [...] Log In Sign Up lynkupindia's profile",
+      "url": "https://www.instagram.com/reel/DeXTOeET_pl",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdokoicSTZB",
+      "title": "Paid Collaboration Opportunity for 10000 Creators✨️ . . . . ...",
+      "description": "Creators, this opportunity is for you! Are you a content creator with 10K+ followers? Get a chance to collaborate with brands and earn ₹3,000 + a FREE",
+      "url": "https://www.instagram.com/reel/DdokoicSTZB",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": 10000,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DedyYvXlE8r",
+      "title": "Ready to create content for leading brands across beauty ...",
+      "description": "Ready to create content for leading brands across beauty, lifestyle, electronics and more? Birth Marque connects talented creators with exciting brand",
+      "url": "https://www.instagram.com/reel/DedyYvXlE8r",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty",
+        "Tech",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeqMU5yAQXq",
+      "title": "20 Days Interested creators, DM NOW on whatsapp!📩 ✅ ...",
+      "description": "CREATORS REQUIREMENT — PAID COLLABORATION OPPORTUNITY! Minimum 10K+ Followers Required Payout: ₹1,500 Per Reel Paid Duration: 20 Days",
+      "url": "https://www.instagram.com/reel/DeqMU5yAQXq",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Paid",
+      "minFollowers": 10000,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdpEKjCyq0P",
+      "title": "No minimum follower criteria! 👀 If you're good at storytelling ...",
+      "description": "No minimum follower criteria! If you're good at storytelling, creating engaging content, and showcasing aesthetics, we'd love to collaborate with you!",
+      "url": "https://www.instagram.com/reel/DdpEKjCyq0P",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": 0,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DesHl3kT1yy",
+      "title": "15 followers? Still dreaming big! 💛🖤 Who said you need ...",
+      "description": "Micro & Nano influencers, this is YOUR chance! ✨ No minimum follower requirement Let's grow together Want to collaborate?",
+      "url": "https://www.instagram.com/p/DesHl3kT1yy",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": 0,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeUaWaxFn1S",
+      "title": "Tired of reaching out to brands? We want to save you the ...",
+      "description": "Beauty creators, this one's for you. Skincare, makeup and haircare brands are looking for creators across India, nano to macro. Comment \"INTERESTED\" and we'",
+      "url": "https://www.instagram.com/reel/DeUaWaxFn1S",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeqtIkJtkDR",
+      "title": "BOMBAY BROWN is now open for collaborations for the ...",
+      "description": "To apply, DM us “COLLAB” with your profile, city and portfolio or sample work. Let's create something meaningful together. [UGC Collaboration, Indian Fashion",
+      "url": "https://www.instagram.com/p/DeqtIkJtkDR",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Fashion"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Ddw2mgiSPxu",
+      "title": "1.3 Million ki reach 😳 brands where are you? . . . # ...",
+      "description": "BRAND COLLAB ALERT Creators, we have an exciting opportunity with a well-established international clothing company. They're offering products worth ₹",
+      "url": "https://www.instagram.com/reel/Ddw2mgiSPxu",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Fashion"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeoJ1fQtBzm",
+      "title": "Tech Creators Wanted! 🚀 Are you a ...",
+      "description": "Creating content around Tech, AI, Apps or Gadgets? Creator Bridge India is building a network of creators and connecting them with relevant brand collaboration",
+      "url": "https://www.instagram.com/p/DeoJ1fQtBzm",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DejicW5ButP",
+      "title": "🎧 Tech Creators, This One Is for You! 🚀 Do you create ...",
+      "description": "Creating content around Tech, AI, Apps or Gadgets? Creator Bridge India is building a network of creators and connecting them with relevant brand collaboration",
+      "url": "https://www.instagram.com/reel/DejicW5ButP?__d=11",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DerNUAMjGDx",
+      "title": "📱 Tech creators, this one's for you. Brands are looking ...",
+      "description": "Shosial is looking for creators who make honest reviews, unboxings, tutorials, product demos, and real-opinion content around technology. Upcoming collaboration",
+      "url": "https://www.instagram.com/p/DerNUAMjGDx",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeqyXfgTm-y",
+      "title": "let this video be a reminder of how quickly life can change ...",
+      "description": "... tech UGC creator, brand deals for creators, make money creating content online) ... Hey we are looking for UGC creators to create for our brand. DM us know",
+      "url": "https://www.instagram.com/reel/DeqyXfgTm-y",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech",
+        "Finance"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdjM-TrAgNW",
+      "title": "My first month as a Tech UGC Creator, here what happens ...",
+      "description": "Get comfortable on camera 2. Make the profile brand-ready 3. Create product videos + spec ads 4. Build a portfolio 5. Start pitching brands",
+      "url": "https://www.instagram.com/reel/DdjM-TrAgNW",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeVl3isxkBT",
+      "title": "👀 Hey Creators! Something BIG is brewing! 🔥 A ...",
+      "description": "1,500 creators? We said… why stop there? We're building a community where creators connect, collaborate & grow together.",
+      "url": "https://www.instagram.com/reel/DeVl3isxkBT",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-20"
+    },
     {
       "id": "https://www.facebook.com/exposemedia1/posts/are-you-a-content-creator-or-influencer-looking-for-brand-collaboration-opportun/1147886387582372",
       "title": "Are you a Content Creator or Influencer looking for brand ...",
@@ -157,25 +810,6 @@
       "firstSeen": "2026-10-19"
     },
     {
-      "id": "https://www.instagram.com/reel/DefG2DwTUNF",
-      "title": "Paid collaboration word ₹3000 by the brand L'Oreal. ...",
-      "description": "Paid collaboration word ₹3000 by the brand L'Oreal. With no follower criteria. Hurry up and fill up the form. It's a trial reel, so do check out my profile",
-      "url": "https://www.instagram.com/reel/DefG2DwTUNF",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Paid",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
       "id": "https://www.instagram.com/reel/Deel7QsNwHP",
       "title": "Sign up on HaulPack and register for the paid campaign ...",
       "description": "I have a groupchat where i share barter and paid collaboration forms and you can bag the opportunities to work with different brands on PAID basis. To join: 1.",
@@ -214,44 +848,6 @@
       "firstSeen": "2026-10-19"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd4D-g7J5-I",
-      "title": "Comment “Collab” to get the form link & Start earning ...",
-      "description": "I found a creator opportunity where you can apply directly, create content, and earn based on the campaign terms. No endless brand pitching. I'm sharing it only",
-      "url": "https://www.instagram.com/reel/Dd4D-g7J5-I",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/p/DeZWCz7ibQb",
-      "title": "Nano/Fresh Creators/Influencers Wanted! 📩 DM “FESTIVE” ...",
-      "description": "Want to be considered for upcoming collaborations? DM “CREATOR ... collaboration, creator partnerships, local influencers India, regional influencers",
-      "url": "https://www.instagram.com/p/DeZWCz7ibQb",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
       "id": "https://www.facebook.com/groups/formediainfluencers/posts/1734028424324535",
       "title": "Looking for micro influencers/agencies who can great good ...",
       "description": "We are seeking to onboard Influencers and UGC Creators for PAID brand partnerships and collaborations. Active campaigns: K-Beauty, Male Haircare, Yoga/",
@@ -266,25 +862,6 @@
         "UGC"
       ],
       "pay": "Paid",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DedBVBopWMZ",
-      "title": "WE ARE LOOKING FOR 50+ MICRO-INFLUENCERS! ...",
-      "description": "WE ARE LOOKING FOR 50+ MICRO-INFLUENCERS! ✨ Are you a content creator, Instagram influencer, or social media enthusiast? Here's your chance to",
-      "url": "https://www.instagram.com/reel/DedBVBopWMZ",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -329,44 +906,6 @@
       "firstSeen": "2026-10-19"
     },
     {
-      "id": "https://www.instagram.com/reel/DemBE3BAGT6",
-      "title": "✨ Your Beauty Brand. Your Vision. Our Manufacturing ...",
-      "description": "Your Beauty Brand. Your Vision. Our Manufacturing Expertise. Want to launch your own cosmetics brand without setting up a manufacturing facility?",
-      "url": "https://www.instagram.com/reel/DemBE3BAGT6",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Beauty"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DeTb5nRxkBL",
-      "title": "Calling all fashion creators & influencers! 👗✨ Want to ...",
-      "description": "We're looking for creators for a clothing brand barter collaboration! 🛍️ Requirements: ✨ Minimum 2,000 followers ✨ Age 28",
-      "url": "https://www.instagram.com/reel/DeTb5nRxkBL",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Fashion"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Barter",
-      "minFollowers": 2000,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
       "id": "https://www.instagram.com/reel/DemUnMttbUV",
       "title": "We're looking for fashion creators to join the Musclemind ...",
       "description": "INFLUENCERS WANTED FOR BARTER COLLABORATION Are you a fitness, wellness, or lifestyle content creator passionate about healthy living and weight-loss",
@@ -382,67 +921,6 @@
         "Any"
       ],
       "pay": "Barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DdokTFnurdm",
-      "title": "The truth about influencer marketing 🫣 DM me now to book ...",
-      "description": "HEY CREATORS, THIS ONE'S FOR YOU! ✨ Your next exciting BRAND COLLABORATION is calling! We're bringing you an amazing opportunity to collaborate with",
-      "url": "https://www.instagram.com/reel/DdokTFnurdm",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Den5Fu6tZ3N",
-      "title": "Drool-worthy food photography & recipe reel to lifestyle ...",
-      "description": "Looking for brands that want UGC + Reels + authentic creator content rather than just another advertisement. DM “COLLAB”to discuss And brands, say hi in the",
-      "url": "https://www.instagram.com/reel/Den5Fu6tZ3N",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Food",
-        "Lifestyle"
-      ],
-      "platforms": [
-        "Instagram",
-        "UGC"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DeTlH-ISojr",
-      "title": "Hi Brands! ✨ I'm open to both barter & paid collaborations. ...",
-      "description": "Hi Brands! ✨ I'm open to both barter & paid collaborations. Looking for Fashion, Lifestyle, Food & Restaurant collaborations. 🍽️ ✨",
-      "url": "https://www.instagram.com/reel/DeTlH-ISojr",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Fashion",
-        "Food",
-        "Lifestyle"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Paid + barter",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -481,44 +959,6 @@
         "Any"
       ],
       "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Dem4vTJSOUN",
-      "title": "and we're just getting started! 💻⚡ I'm officially OPEN FOR ...",
-      "description": "Tech creators, your next collab could start here. Shosial is looking for creators who make honest reviews, unboxings, tutorials, product demos, and real-opinion",
-      "url": "https://www.instagram.com/reel/Dem4vTJSOUN",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-19"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Dd3jkkvydcc",
-      "title": "We're building Lensroom - verified photographers in ...",
-      "description": "Gadgets Destiny is looking for UGC creators who show their face in videos. Paid & unpaid collaborations are open! Send your portfolio via WhatsApp: 9442244924",
-      "url": "https://www.instagram.com/reel/Dd3jkkvydcc",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "UGC"
-      ],
-      "pay": "Paid",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -659,8 +1099,8 @@
     },
     {
       "id": "https://thecompletecollab.in/blog/creator-marketing-campaigns",
-      "title": "Creator Marketing Campaigns for Brands - The Complete Collab",
-      "description": "Learn how to plan, launch and measure creator marketing campaigns that drive sales. A practical guide for Indian brands by The Complete Collab.",
+      "title": "Creator Marketing Campaigns for Brands | The Complete Collab",
+      "description": "Creator marketing campaigns have become one of the most effective ways for brands to reach buyers who ignore traditional ads. Instead of paying for a banner, brands partner with creators whose audiences already trust them. For D2C and local businesses across India, a well-planned creator marketing strategy can build awareness, content and sales at the same time. At The Complete Collab in Coimbator",
       "url": "https://thecompletecollab.in/blog/creator-marketing-campaigns",
       "hostname": "thecompletecollab.in",
       "source": "Website",
@@ -670,7 +1110,7 @@
       "platforms": [
         "Any"
       ],
-      "pay": "Not stated",
+      "pay": "Paid",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -1024,25 +1464,6 @@
       "firstSeen": "2026-10-18"
     },
     {
-      "id": "https://www.instagram.com/p/DemXsgxGNzx",
-      "title": "🚀 Creators, ready to collaborate with tech brands? Meet ...",
-      "description": "Creators, ready to collaborate with tech brands? Meet AINZoo — a creator marketplace that helps creators discover opportunities to connect with tech brands.",
-      "url": "https://www.instagram.com/p/DemXsgxGNzx",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-18"
-    },
-    {
       "id": "https://www.facebook.com/shashanktyagisolarclap/videos/amazoncreatorsconnect-amazon-influencer-program-contentcreators-indiancreators/4562921523977402",
       "title": "This post announces the launch of the Amazon India \"Creator University,\" a new platform for fashion",
       "description": "This post announces the launch of the Amazon India \"Creator University,\" a new platform for fashion and content creators. ... creators, brands, and new",
@@ -1078,6 +1499,64 @@
       "minFollowers": null,
       "languages": [],
       "published": null,
+      "firstSeen": "2026-10-18"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Dd4N6NSM4Ty",
+      "title": "We’re looking for influencers, micro-influencers & UGC creators to collaborate with us!",
+      "description": "We’re looking for influencers, micro-influencers & UGC creators to collaborate with us! ✨ We’ll be selecting creators for our upcoming campaigns and will contact the selected creators directly. 🫶🏻 Please don’t spam our DMs or repost this on your story for entries. We can’t wait to discover amazing creators and create something beautiful together! 🤍🌙🌷 #letsgrow #trendingpost #viral nisoo_ugc's",
+      "url": "https://www.instagram.com/reel/Dd4N6NSM4Ty",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-18",
+      "firstSeen": "2026-10-10"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Dd5w7udsHfe",
+      "title": "Your content deserves to reach the right brands ...",
+      "description": "an open creator-brand collaboration app designed to help creators get discovered. Why creators should be on Adintors: • Showcase your profile",
+      "url": "https://www.instagram.com/reel/Dd5w7udsHfe",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-18"
+    },
+    {
+      "id": "https://www.instagram.com/p/DemXsgxGNzx",
+      "title": "kavitashinde2426 • Follow kavitashinde2426 🚀 Creators, ready to collaborate with tech brands?",
+      "description": "Log In Sign Up Never miss a post from kavitashinde2426 Sign up for Instagram to stay in the loop. Sign up Log in Photo by kavita shinde on October 17, 2026. May be a graphic of magazine, poster and text. Photo by kavita shinde on October 17, 2026. May be a graphic of poster and text. kavitashinde2426 • Follow kavitashinde2426 🚀 Creators, ready to collaborate with tech brands? Meet AINZoo — a crea",
+      "url": "https://www.instagram.com/p/DemXsgxGNzx",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech",
+        "Travel"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-17",
       "firstSeen": "2026-10-18"
     },
     {
@@ -1268,25 +1747,6 @@
       ],
       "pay": "Barter",
       "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-17"
-    },
-    {
-      "id": "https://www.instagram.com/p/Dei2IV4RhDH",
-      "title": "your gateway to exciting brand collaborations and event ...",
-      "description": "We're opening up brand barter campaigns specifically for working professionals and parent creators in Bangalore with 1k+ followers. It's the easiest way to",
-      "url": "https://www.instagram.com/p/Dei2IV4RhDH",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Barter",
-      "minFollowers": 1000,
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-17"
@@ -1544,7 +2004,7 @@
     {
       "id": "https://www.facebook.com/Nimit.22/videos/-calling-all-nano-influencers-fashion-creators-fashion-with-easyshop-wants-to-co/1758369388552461",
       "title": "Get Free Clothes for Nano Influencers in Gurgaon",
-      "description": "This post is a call to action from the Indian fashion brand, India Fashion World, seeking influencers and content creators for paid collaborations.",
+      "description": "CALLING ALL NANO INFLUENCERS & FASHION CREATORS! ✨ Fashion with EasyShop wants to collaborate with YOU! 🛍️ Are you a small influencer who loves",
       "url": "https://www.facebook.com/Nimit.22/videos/-calling-all-nano-influencers-fashion-creators-fashion-with-easyshop-wants-to-co/1758369388552461",
       "hostname": "facebook.com",
       "source": "Facebook",
@@ -1554,7 +2014,7 @@
       "platforms": [
         "Any"
       ],
-      "pay": "Paid",
+      "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -1638,6 +2098,68 @@
       "firstSeen": "2026-10-11"
     },
     {
+      "id": "https://www.instagram.com/reel/DeBea1BhWMh",
+      "title": "Skincare, Indian Skincare Brand, Beauty Industry, Product Quality, Daily Skincare, Global Brand, Ind",
+      "description": "Log In Sign Up Never miss a post from thefoundersdreamtfd Sign up for Instagram to stay in the loop. Sign up Log in thefoundersdreamtfd and mens\\_grace\\_official Original audio thefoundersdreamtfd 🌍 Building an Indian Skincare Brand for the World [...] . . . . Skincare, Indian Skincare Brand, Beauty Industry, Product Quality, Daily Skincare, Global Brand, Indian Brands #Hindipodcast #abhishekvyas",
+      "url": "https://www.instagram.com/reel/DeBea1BhWMh",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty",
+        "Travel"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [
+        "Hindi"
+      ],
+      "published": null,
+      "firstSeen": "2026-10-17"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DebtD48DuC2",
+      "title": "[Qwik Stories, influencer marketing, influencer platform, influencer collaboration, brand collaborat",
+      "description": "[Qwik Stories, influencer marketing, influencer platform, influencer collaboration, brand collaboration, work with brands, influencer opportunities, content creators, social media influencers, Indian influencers, Telugu influencers] No comments yet. Start the conversation. 12 Log in to like or comment. More posts from qwikstories Video by QwikStories on October 17, 2026. May be an image of one or ",
+      "url": "https://www.instagram.com/reel/DebtD48DuC2",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [
+        "Telugu"
+      ],
+      "published": "2026-10-17",
+      "firstSeen": "2026-10-14"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Dd3euKTtN-6",
+      "title": "Freshbliss is launching its first-ever creator campaign and we’re looking for creators who genuinely",
+      "description": "Freshbliss is launching its first-ever creator campaign and we’re looking for creators who genuinely love food, experimenting and creating content. No minimum followers. Just bring your creativity. ✨ Want to collaborate with us? Comment “FRESHBLISS” below and we’ll get in touch! 🤍 #Freshbliss #ChennaiCreators #CreatorCollab #ChennaiFoodies #ContentCreators the_longhairgirl06's profile picture the",
+      "url": "https://www.instagram.com/reel/Dd3euKTtN-6",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Food"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": 0,
+      "languages": [],
+      "published": "2026-10-17",
+      "firstSeen": "2026-10-10"
+    },
+    {
       "id": "https://www.instagram.com/reel/DelZK_sIaLo",
       "title": "More posts from ek\\_kolhapuri Video by Ek_Kolhapuri on October 16, 2026.",
       "description": "#brandcollab #indianinfluencer #creatorlife #instacreator #foodcontentcreator tri_with_akee's profile picture tri\\_with\\_akee 👏👏 1 like Reply 161 Log in to like or comment. More posts from ek\\_kolhapuri Video by Ek_Kolhapuri on October 16, 2026. May be an image of brussels sprouts, popcorn, cauliflower and text. Video by Ek_Kolhapuri on October 09, 2026. May be an image of sushi and text. Video ",
@@ -1678,7 +2200,7 @@
     {
       "id": "https://www.instagram.com/_c/reel/Dej337-Bups",
       "title": "\\_women\\_bling\\_ A very warm welcome to all the content creator, micro/nano influencers , bloggers a",
-      "description": "\\_women\\_bling\\_ A very warm welcome to all the content creator, micro/nano influencers , bloggers and vloggers. You are absolutely at the right place. We are here to provide collaboration opportunities for you to grow . For small creators and influencers its very difficult to get collabs from brands , but we help you in this situation. Just follow @\\_women\\_bling\\_ and dm us to get more details. ",
+      "description": "\\_women\\_bling\\_ A very warm welcome to all the content creator, micro/nano influencers , bloggers and vloggers. You are absolutely at the right place. We are here to provide collaboration opportunities for you to grow . For small creators and influencers its very difficult to get collabs from brands , but we help you in this situation. Just follow @\\_women\\_bling\\_ and dm us to get more details.",
       "url": "https://www.instagram.com/_c/reel/Dej337-Bups",
       "hostname": "instagram.com",
       "source": "Instagram",
@@ -1851,7 +2373,7 @@
     {
       "id": "https://www.instagram.com/p/DejidGXFogc",
       "title": "Your next brand collaboration is calling!",
-      "description": "Your next brand collaboration is calling! 🎬✨ We're looking for 10–20 male & female creators across India to create authentic, engaging UGC videos for an exciting brand collaboration! 🇮🇳 🎁 Barter Collaboration 📦 Products shipped to selected creators 🎥 Showcase your creativity and grow your portfolio! 💛 Ready to collaborate? 👇 Comment “COLLAB” below to apply and grab this opportunity! [...]",
+      "description": "Your next brand collaboration is calling! 🎬✨ We're looking for 10–20 male & female creators across India to create authentic, engaging UGC videos for an exciting brand collaboration! 🇮🇳 🎁 Barter Collaboration 📦 Products shipped to selected creators 🎥 Showcase your creativity and grow your portfolio! 💛 Ready to collaborate? 👇 Comment “COLLAB” below to apply and grab this opportunity! [...] ",
       "url": "https://www.instagram.com/p/DejidGXFogc",
       "hostname": "instagram.com",
       "source": "Instagram",
@@ -1861,7 +2383,7 @@
       "platforms": [
         "UGC"
       ],
-      "pay": "Barter",
+      "pay": "Paid + barter",
       "minFollowers": null,
       "languages": [],
       "published": "2026-10-16",
@@ -2065,7 +2587,7 @@
     {
       "id": "https://www.grynow.in/blog/influencer-marketing-for-fashion-brands.html",
       "title": "Influencer Marketing For Fashion Brands (2026)",
-      "description": "Examples Of Influencer Marketing In The Fashion Industry FabIndia x Komal Pandey: FabIndia, a renowned Indian ethnic wear brand, partnered with Komal Pandey, known for her love for traditional Indian fashion. In her content, Komal Pandey promoted FabIndia’s clothes through styling advice, outfit ideas and product reviews. The collaboration enabled FabIndia to reach out to sustainable & ethnic fash",
+      "description": "A well-known women's fashion brand in India, AND, partnered with ‘ThatBohoGirl’ – Kritika Khurana. Kritika Khurana produced exciting content wearing the exquisite pieces by AND that were in line with the latest trends, styled them up with accessories, and offered fashion tips, matching outfits, and glimpses of the brand’s events. This collaboration was beneficial to AND as it increased the coverag",
       "url": "https://www.grynow.in/blog/influencer-marketing-for-fashion-brands.html",
       "hostname": "grynow.in",
       "source": "Website",
@@ -2466,25 +2988,6 @@
       "firstSeen": "2026-10-15"
     },
     {
-      "id": "https://www.instagram.com/reel/DeBea1BhWMh",
-      "title": "With strong product quality, growing customer adoption, and increasing demand, the goal is to build",
-      "description": "Original audio thefoundersdreamtfd's profile picture thefoundersdreamtfd 🌍 Building an Indian Skincare Brand for the World The vision goes beyond selling skincare products—it is about making skincare a simple, daily habit for people everywhere. With strong product quality, growing customer adoption, and increasing demand, the goal is to build a globally recognized Indian skincare brand. abhishekv",
-      "url": "https://www.instagram.com/reel/DeBea1BhWMh",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Beauty"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-15",
-      "firstSeen": "2026-10-17"
-    },
-    {
       "id": "https://www.instagram.com/reel/DegZmcmNSZE",
       "title": "Whether you’re a food, beverage, lifestyle, wellness brand, or beyond, we’d love to explore how we c",
       "description": "Whether you’re a food, beverage, lifestyle, wellness brand, or beyond, we’d love to explore how we can create something special together. For sponsorships & collaborations, contact 0812-8118-0008 or simply click the link in our bio. el.eby1204's profile picture el.eby1204 ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️ Reply princess_choi31's profile picture princess\\_choi31 ❤️ 1 like Reply mariaastukanya's profile pictur",
@@ -2504,6 +3007,83 @@
       "languages": [],
       "published": "2026-10-15",
       "firstSeen": "2026-10-18"
+    },
+    {
+      "id": "https://www.instagram.com/p/DdqcrYaI83X",
+      "title": "🌿 We're Open for a Barter Collab!✨ Are you a UGC creator, ...",
+      "description": "We're Open for a Barter Collab!✨ Are you a UGC creator, beauty influencer, or skincare & haircare enthusiast? Let's create something beautiful together!",
+      "url": "https://www.instagram.com/p/DdqcrYaI83X",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty"
+      ],
+      "platforms": [
+        "UGC"
+      ],
+      "pay": "Barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-15"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeehY0lAnVi",
+      "title": "🎬 Creators, this one's for you! 💰🔥 Got 500+ followers? ...",
+      "description": "it's a PAID COLLABORATION OPPORTUNITY for creators who want to turn their content into cash. Fill out the form and wait for the team to contact you! out: ₹1,",
+      "url": "https://www.instagram.com/reel/DeehY0lAnVi",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Paid",
+      "minFollowers": 500,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-15"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdtxtdFo1JZ",
+      "title": "4Mation Skins is looking for passionate skincare creators, UGC creators & influencers who know how t",
+      "description": "4Mation Skins is looking for passionate skincare creators, UGC creators & influencers who know how to turn good ideas into great content. Got the creativity? We want to see it. 💗 Drop “INTERESTED” in the comments or DM us your best reel/sample video + contact details to collaborate with 4Mation Skins. #4mationskins #creatorcollab #influencercollaboration #ugccreator #skincarecreator IndianInfluen",
+      "url": "https://www.instagram.com/reel/DdtxtdFo1JZ",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-15",
+      "firstSeen": "2026-10-10"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DefG2DwTUNF",
+      "title": "aryanayushree Paid collaboration word ₹3000 by the brand L’Oreal.",
+      "description": "aryanayushree Paid collaboration word ₹3000 by the brand L’Oreal. With no follower criteria. Hurry up and fill up the form. It’s a trial reel, so do check out my profile. If you are new to my content, you should know, I share paid collaboration every day.✨ Follow me for more updates. 🙌💗 Comment ‘Collab’ Below 💌 #instamusic #trendingsongs #collaboration #viralvideos #fypシ❤️💞❤️ humari_videsh_ki_",
+      "url": "https://www.instagram.com/reel/DefG2DwTUNF",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-14",
+      "firstSeen": "2026-10-19"
     },
     {
       "id": "https://www.instagram.com/reel/Def_2s5trE2",
@@ -2536,25 +3116,6 @@
         "Beauty",
         "Travel",
         "Finance"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-14",
-      "firstSeen": "2026-10-15"
-    },
-    {
-      "id": "https://www.instagram.com/p/DdqcrYaI83X",
-      "title": "Creator collab post on Instagram",
-      "description": "Photo by Utkrisht Khadi on October 14, 2026. May be an image of hair product, fragrance, lotion, hand cream and text. Photo by Utkrisht Khadi on October 13, 2026. May be an image of fragrance, hair product, lotion, hand cream, bottle and text. Photo by Utkrisht Khadi on October 12, 2026. May be an image of hair product, fragrance, lotion, hand cream and text. Photo by Utkrisht Khadi on October 11,",
-      "url": "https://www.instagram.com/p/DdqcrYaI83X",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
       ],
       "platforms": [
         "Instagram"
@@ -2644,8 +3205,8 @@
     },
     {
       "id": "https://www.glassdoor.co.in/Job/india-Content-Creator-%28UGC%29-jobs-SRCH_IL.0,5_IN115_KO6,27.htm",
-      "title": "226 Content Creator (UGC) jobs in India - Glassdoor",
-      "description": "226 Content Creator (UGC) jobs in India ; Make Your Brands. Video Content Creator ; Rore Digital Media Entertainment Pvt Ltd. UGC Content Creator ( Tutorials ).",
+      "title": "241 Content Creator (UGC) jobs in India - Glassdoor",
+      "description": "241 Content Creator (UGC) jobs in India ; Summit Affiliate Group. UGC Producer (Remote) · ₹570.00 - ₹860.00 Per hour (Employer provided) · 24h ; Make Your Brands.",
       "url": "https://www.glassdoor.co.in/Job/india-Content-Creator-%28UGC%29-jobs-SRCH_IL.0,5_IN115_KO6,27.htm",
       "hostname": "glassdoor.co.in",
       "source": "Website",
@@ -2655,7 +3216,7 @@
       "platforms": [
         "UGC"
       ],
-      "pay": "Not stated",
+      "pay": "Paid",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -3024,25 +3585,6 @@
       "firstSeen": "2026-10-14"
     },
     {
-      "id": "https://www.instagram.com/reel/DeehY0lAnVi",
-      "title": "foodmapjaipur 🎬 Creators, this one’s for you!",
-      "description": "foodmapjaipur 🎬 Creators, this one’s for you! 💰🔥 Got 500+ followers? You could earn ₹18,000 for 3 Reels! 🤩✨ Yes, it’s a PAID COLLABORATION OPPORTUNITY for creators who want to turn their content into cash. 📱💸 Here’s how to apply: ✅ Follow the account mentioned in the Reel ✅ DM “FORM” ✅ Get the form link in your DMs ✅ Fill out the form and wait for the team to contact you! ⚠️ Make sure you fo",
-      "url": "https://www.instagram.com/reel/DeehY0lAnVi",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Food"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Paid",
-      "minFollowers": 500,
-      "languages": [],
-      "published": "2026-10-14",
-      "firstSeen": "2026-10-15"
-    },
-    {
       "id": "https://www.instagram.com/reel/DeeWSFcvEVl",
       "title": "Creators, save these 3 tips to discover more brand collab opportunities!",
       "description": "Creators, save these 3 tips to discover more brand collab opportunities! 👀🤝 Want to get noticed by brands and marketing agencies? Here's where to start: ✅ Mention Open Collab @influish4creators in your bio. ✅ Follow Influish on Instagram and keep checking their Stories for collab updates. ✅ Download the Influish app to explore brand collaboration opportunities and connect with brands. 🚀 Your ne",
@@ -3081,26 +3623,6 @@
       "firstSeen": "2026-10-15"
     },
     {
-      "id": "https://www.instagram.com/p/DdtfeDvyHio",
-      "title": "Creator collab post on Instagram",
-      "description": "#fashioncreator #fashioninfluencer #collaboration #clothingbrand #paidcollab Creator Collaboration, UGC Creator, Content Creator, Brand Collaboration, Influencer Marketing, Creator Wanted, Paid Collaboration, Micro Influencers, Barter Collab, UGC Opportunities, Digital Creator, Content Creation, Instagram Creator, Work With Brands, Creator Community, Influencer, Social Media Creator _mummabear_'s ",
-      "url": "https://www.instagram.com/p/DdtfeDvyHio",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Fashion"
-      ],
-      "platforms": [
-        "Instagram",
-        "UGC"
-      ],
-      "pay": "Paid + barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-14",
-      "firstSeen": "2026-10-10"
-    },
-    {
       "id": "https://www.instagram.com/reel/DeO2XPvCRkG",
       "title": "Creator collab post on Instagram",
       "description": "Video by Insstanto on October 14, 2026. May be an image of one or more people, people smiling, poster and text. Photo by Insstanto on October 13, 2026. May be an image of water heater, battery, socket, poster, generator, thermostat and text. Photo by Insstanto on October 12, 2026. May be an image of futon, mattress, vacuum, carpet and text. Photo by Insstanto on October 11, 2026. May be an image o",
@@ -3120,42 +3642,43 @@
       "firstSeen": "2026-10-10"
     },
     {
-      "id": "https://www.instagram.com/reel/DebtD48DuC2",
-      "title": "Want to work with brands and get more opportunities as an ...",
-      "description": "Calling all Nano & Micro Influencers! connects creators with brands & collaboration opportunities. opportunities across India.",
-      "url": "https://www.instagram.com/reel/DebtD48DuC2",
+      "id": "https://www.instagram.com/reel/DdpCFjmRnS1",
+      "title": "aryanayushree Paid Collaboration worth ₹4500 from the Brand Dabur.",
+      "description": "aryanayushree Paid Collaboration worth ₹4500 from the Brand Dabur. Hurry up and fill the form. It’s a trial reel, so do check out my profile. If you are new to my content, you should know, I share collaboration every day. 💅 Follow me for more updates 🙌💗 Comment ‘Paid’ Below 💌 #instadaily #trendingreel #collaboration #viralpost #fypシ❤️💞❤️ dnrault's profile picture dnrault Paid Reply 1112 Log i",
+      "url": "https://www.instagram.com/reel/DdpCFjmRnS1",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
         "General"
       ],
       "platforms": [
-        "Any"
+        "Instagram"
       ],
-      "pay": "Not stated",
+      "pay": "Paid",
       "minFollowers": null,
       "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-14"
+      "published": "2026-10-14",
+      "firstSeen": "2026-10-11"
     },
     {
-      "id": "https://www.instagram.com/p/Ddo_tkolyvj",
-      "title": "A very warm welcome to all content creators, micro/nano- ...",
-      "description": "We are here to provide collaboration opportunities for you to grow . For small creators and influencers its very difficult to get collabs from brands , but we",
-      "url": "https://www.instagram.com/p/Ddo_tkolyvj",
+      "id": "https://www.instagram.com/reel/DedBVBopWMZ",
+      "title": "abclothing.co.in 🚀 WE ARE LOOKING FOR 50+ MICRO-INFLUENCERS!",
+      "description": "abclothing.co.in 🚀 WE ARE LOOKING FOR 50+ MICRO-INFLUENCERS! 🎬✨ Are you a content creator, Instagram influencer, or social media enthusiast? 🤩 Here’s your chance to collaborate with us and grow together! 🤝🔥 📢 We are looking for 50+ micro-influencers for exciting collaborations. ✅ Content Creators ✅ Instagram Reels Creators ✅ Lifestyle & Fashion Influencers ✅ Trending Video Creators 💥 Intere",
+      "url": "https://www.instagram.com/reel/DedBVBopWMZ",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
-        "General"
+        "Fashion",
+        "Lifestyle"
       ],
       "platforms": [
-        "Any"
+        "Instagram"
       ],
       "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-14"
+      "published": "2026-10-13",
+      "firstSeen": "2026-10-19"
     },
     {
       "id": "https://www.instagram.com/reel/Dd8fBu7BV83",
@@ -3318,7 +3841,7 @@
     {
       "id": "https://www.sciencedirect.com/science/article/pii/S0148296326003747",
       "title": "Spheres of influence: How influencers impact society",
-      "description": "and the papers published in this special issue aim to broaden marketing scholarship’s engagement with influencers’ multifaceted and far-reaching societal impact. [...] in this special issue, we synthesise evidence of influencers’ diverse, complex, and often contradictory implications for each sphere, highlight knowledge gaps, and identify future research directions. In doing so, we emphasise the i",
+      "description": "by R Mardon · 2026 · Cited by 2 — Most influencers, though not all, collaborate with brands to monetise their online presence, whether through sponsored content, brand ambassadorships, affiliate",
       "url": "https://www.sciencedirect.com/science/article/pii/S0148296326003747",
       "hostname": "sciencedirect.com",
       "source": "Website",
@@ -3432,7 +3955,7 @@
     {
       "id": "https://brand2collab.com",
       "title": "Brand2Collab: Where brands meet the right creators in India",
-      "description": "Skip to content Now in early access for Indian creators and brands Where brands meet the right creators. Creators build a profile that shows their audience, niche and work. Brands find creators who fit, by city, language and content style. Join as a Creator Find Creators Free to join. Built for creators and brands across India. A brand is looking for Fashion & BeautyDelhi NCRHindi20K–100KReels SP ",
+      "description": "Skip to content Now in early access for Indian creators and brands Where brands meet the right creators. Creators build a profile that shows their audience, niche and work. Brands find creators who fit, by city, language and content style. Join as a Creator Find Creators Free to join. Built for creators and brands across India. A brand is looking for Fashion & BeautyDelhi NCRHindi20K–100KReels SP",
       "url": "https://brand2collab.com",
       "hostname": "brand2collab.com",
       "source": "Website",
@@ -3454,12 +3977,13 @@
     {
       "id": "https://www.anchors.in/influencer",
       "title": "Get Paid for LinkedIn Posts | anchors for LinkedIn Creators",
-      "description": "Anyone from Bangalore chapter? Ask the community...↑ PS Priya Sharma 2h - 🌐 Excited to share my collab with@Cars24 - here's what I learned about the used car market in India and why it matters for professionals... 🖼 Sponsored content POST PERFORMANCE 18.4K Reach 611 Likes 54 Comments 🔥 Like💬 Comment↗ Share ANCHORS - NOTIFICATIONS New collab request Cars24 wants to collaborate with you on their",
+      "description": "View profile -> Dhriti Jain Dhriti Jain Finance Business Partner, Barclays | Symbiosis Pune'22 56KFollowers 427Avg likes 25Collabs View profile -> Harshal Naidu Harshal Naidu PG student - DU LLB | Running MAW Community | Ex-Cars24 15KFollowers 92Avg likes 21Collabs View profile -> ASHISH SHUKLA ASHISH SHUKLA Founder – The AI Edge | AI, ML & Tech Voice | LinkedIn Growth Expert | Marketing & Career ",
       "url": "https://www.anchors.in/influencer",
       "hostname": "anchors.in",
       "source": "Website",
       "niches": [
-        "General"
+        "Tech",
+        "Finance"
       ],
       "platforms": [
         "LinkedIn"
@@ -3889,6 +4413,83 @@
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-13"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeL3eGOx2jx",
+      "title": "Creator collab post on Instagram",
+      "description": "Video by Mukul Verma on October 13, 2026. May be a meme of card and text. Video by Mukul Verma on October 10, 2026. May be a meme of screen, phone and text. Video by Mukul Verma on October 09, 2026. May be an image of phone, screen, tablet and text. Video by Mukul Verma on October 07, 2026. May be an image of screen, clothes hanger, magazine and text. Video by Mukul Verma on October 05, 2026. May ",
+      "url": "https://www.instagram.com/reel/DeL3eGOx2jx",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-13",
+      "firstSeen": "2026-10-12"
+    },
+    {
+      "id": "https://madeinspace.co.in/blog/micro-vs-macro-influencers",
+      "title": "Micro vs. Macro Influencers: Where Should Indian Brands ...",
+      "description": "A creator collaboration can become the starting point for multiple marketing assets. A campaign video can be adapted into short-form reels. Creator",
+      "url": "https://madeinspace.co.in/blog/micro-vs-macro-influencers",
+      "hostname": "madeinspace.co.in",
+      "source": "Website",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-13"
+    },
+    {
+      "id": "https://www.buzzincontent.com/news/google-brings-search-profiles-to-india-creators-with-10000-followers-can-claim-their-page-12670892",
+      "title": "Google brings Search Profiles to India; creators with 10,000 followers can claim their page",
+      "description": "Google has separately improved the way publisher articles appear inside profiles, with larger thumbnails and longer headlines intended to make content easier to discover. Subscribe Buzzincontent/buzzincontent-1/media/media_files/2026/10/13/hpgdbnca49nyfnluailf-2026-10-13-12-56-43.jpg) First Indian B2B news platform dedicated to the growth of \"Content Marketing\", \"Branded Content\", \"Creator Economy",
+      "url": "https://www.buzzincontent.com/news/google-brings-search-profiles-to-india-creators-with-10000-followers-can-claim-their-page-12670892",
+      "hostname": "buzzincontent.com",
+      "source": "Website",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": 10000,
+      "languages": [],
+      "published": "2026-10-13",
+      "firstSeen": "2026-10-20"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeZWCz7ibQb",
+      "title": "srmedia.global Nano/Fresh Creators/Influencers Wanted!",
+      "description": "srmedia.global Nano/Fresh Creators/Influencers Wanted! 📩 DM “FESTIVE” for more details. 💬 Comment “INTERESTED” to receive updates. Open to: Freshers - Nano - Micro - Macro influencers Hurry Up! Limited campaign slots. #InfluencersWanted #InfluencerCollaboration #FestiveCampaigns #SRMediaGlobal #FashionInfluencer #LuxuryLifestyle #NanoInfluencer #ContentCreatorsIndia #BrandCollaboration #LuxuryMa",
+      "url": "https://www.instagram.com/p/DeZWCz7ibQb",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Fashion",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-12",
+      "firstSeen": "2026-10-19"
     },
     {
       "id": "https://www.instagram.com/reel/DeY-ubwt0DC",
@@ -4360,18 +4961,17 @@
     {
       "id": "https://www.facebook.com/mudihfashion/posts/-mudih-creator-collaboration-were-looking-for-micro-influencers-fashion-creators/1007188562414558",
       "title": "🚨 MUDIH CREATOR COLLABORATION 🚨 We're looking ...",
-      "description": "We're looking for micro influencers & fashion creators to collaborate with MUDIH! 🤝🔥 If you create fashion Reels, menswear content, styling videos or lifestyle",
+      "description": "We need Indian influencers for an apparel brand, it would be a paid oppurtunity plus apparel , its a modern apparel company and we are open to working on both",
       "url": "https://www.facebook.com/mudihfashion/posts/-mudih-creator-collaboration-were-looking-for-micro-influencers-fashion-creators/1007188562414558",
       "hostname": "facebook.com",
       "source": "Facebook",
       "niches": [
-        "Fashion",
-        "Lifestyle"
+        "Fashion"
       ],
       "platforms": [
-        "Instagram"
+        "Any"
       ],
-      "pay": "Not stated",
+      "pay": "Paid",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -4654,25 +5254,6 @@
       "firstSeen": "2026-10-09"
     },
     {
-      "id": "https://www.instagram.com/reel/DeL3eGOx2jx",
-      "title": "Please DM me for any Tech Collab",
-      "description": "PRODUCT REVIEW COLLABORATIONS OPEN! ✨ Looking to showcase your product to a real audience? Let's collaborate! We review: Tech & Gadgets • Home",
-      "url": "https://www.instagram.com/reel/DeL3eGOx2jx",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-12"
-    },
-    {
       "id": "https://www.instagram.com/reel/Dd84kj6P_L2",
       "title": "PAID CREATOR PROJECT. Brands don't randomly ...",
       "description": "Paid collaboration for content creators in India... no minimum follower count. Deified Publications is signing creators this month. ₹2,400 for 3 reels",
@@ -4791,18 +5372,20 @@
     {
       "id": "https://www.collabscene.com",
       "title": "Brand collabs for creators · CollabScene",
-      "description": "View & Apply AuravdeicOther Instagram Gifting / Trade 100+followersIndia2w ago Gifting / Trade Auravdeic — Barter Collaboration for Kumkumadi Thailam Open Looking for creators for a barter collaboration. Creators receive a product worth Rs.400 (Auravdeic Kumkumadi Thailam 100ml) in exchange for an Amazon review and an Instagram Reel. Criteria: total Amazon shopping of Rs.1500 in the last 12 months",
+      "description": "Hiring 40Deadline 20 Aug 4pm (to be reconfirmed)English View & Apply skincare brandOther InstagramYouTube Open to negotiation · ₹ 10k–100kfollowersIndia1w ago Open to negotiation · ₹ Skincare Brand — Delhi NCR Barter Collaboration Open Skincare brand barter collaboration seeking Delhi NCR based Instagram/YouTube creators in skincare, beauty or lifestyle to produce reels, stories and posts in excha",
       "url": "https://www.collabscene.com",
       "hostname": "collabscene.com",
       "source": "Website",
       "niches": [
-        "General"
+        "Beauty",
+        "Lifestyle"
       ],
       "platforms": [
-        "Instagram"
+        "Instagram",
+        "YouTube"
       ],
       "pay": "Paid + barter",
-      "minFollowers": 100,
+      "minFollowers": 1000,
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-11"
@@ -4923,19 +5506,18 @@
     },
     {
       "id": "https://hashfame.com/influencer-marketing-jobs",
-      "title": "8 Influencer Marketing Jobs in India October 2026 – Available on HashFame",
-      "description": "Amaan Sayed Influencer Marketing Head @ Recollectix Media Pvt Ltd. 6d ago Actively reviewing Looking forAgencies (Influencers & Talent) Agencies (Influencers & Talent) BarterThis is a Barter Collab Per Influencer₹200 - ₹300 Brand collab withrestaurant CategoryCooking, Recipes & Baking, Food , Food Reviews & Travel & Food [...] Agencies (Influencers & Talent) BarterThis is a Barter Collab No. of cr",
+      "title": "8 Influencer Marketing Jobs in India October 2026",
+      "description": "We are looking to collaborate with influencer marketing agencies and freelancers who have a strong network of Mom Influencers for an upcoming Barter Campaign.",
       "url": "https://hashfame.com/influencer-marketing-jobs",
       "hostname": "hashfame.com",
       "source": "Website",
       "niches": [
-        "Food",
-        "Travel"
+        "Parenting"
       ],
       "platforms": [
-        "Any"
+        "Instagram"
       ],
-      "pay": "Paid + barter",
+      "pay": "Barter",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -5088,25 +5670,6 @@
       ],
       "platforms": [
         "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-11"
-    },
-    {
-      "id": "https://www.instagram.com/p/DeHNhoJTFfo",
-      "title": "Fill out the form linked in our bio • Comment “DONE” once ...",
-      "description": "✨ Are you a UGC creator, influencer or content creator looking for brand collaboration opportunities? Join the MNSV PR Creator Network — where we connect",
-      "url": "https://www.instagram.com/p/DeHNhoJTFfo?__d=undefined",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "UGC"
       ],
       "pay": "Not stated",
       "minFollowers": null,
@@ -5445,12 +6008,15 @@
     {
       "id": "https://www.facebook.com/AntriTheCreativeLearning/videos/your-content-deserves-to-reach-the-right-brands-just-like-great-food-gets-the-ri/1615459913391404",
       "title": "Your content deserves to reach the right brands. ✨ Just like ...",
-      "description": "an open creator-brand collaboration app designed to help creators get discovered. ... Are you a micro influencer in Ahmedabad looking for brand",
+      "description": "an open creator-brand collaboration app designed to help creators get discovered. Whether you're into Food, Fashion, Fitness, Tech … creator",
       "url": "https://www.facebook.com/AntriTheCreativeLearning/videos/your-content-deserves-to-reach-the-right-brands-just-like-great-food-gets-the-ri/1615459913391404",
       "hostname": "facebook.com",
       "source": "Facebook",
       "niches": [
-        "Tech"
+        "Fashion",
+        "Food",
+        "Tech",
+        "Fitness"
       ],
       "platforms": [
         "Any"
@@ -5481,82 +6047,40 @@
       "firstSeen": "2026-10-11"
     },
     {
-      "id": "https://www.instagram.com/reel/DdpCFjmRnS1",
-      "title": "Paid Collaboration worth ₹4500 from the Brand Dabur. ...",
-      "description": "❤️✨ Barter Collaboration with DeoDap! Get products worth up to ₹3500 + create 1 collab reel. 🛍️ No follower criteria! Comment **FORM** for the link",
-      "url": "https://www.instagram.com/reel/DdpCFjmRnS1",
+      "id": "https://www.instagram.com/reel/Ddq44YSzKkl",
+      "title": "Are you a brand owner struggling to choose an influence ...",
+      "description": "Are you a brand owner struggling to choose an influence group for your festive campaign? Then this video is for you! (Brand owners, small brands,",
+      "url": "https://www.instagram.com/reel/Ddq44YSzKkl",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
         "General"
       ],
       "platforms": [
-        "Instagram"
+        "Any"
       ],
-      "pay": "Paid + barter",
+      "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-11"
     },
     {
-      "id": "https://www.instagram.com/reel/Ddi_MEYK9nK",
-      "title": "2K+ followers Beauty, skincare or lifestyle content Based in ...",
-      "description": "We're currently looking for 200 creators for a paid collaboration with a leading hair care brand. Requirements: 2K+ followers. Beauty, skincare or lifestyle",
-      "url": "https://www.instagram.com/reel/Ddi_MEYK9nK",
+      "id": "https://www.instagram.com/p/DdtfeDvyHio",
+      "title": "Comment “JOIN” for details 🔗🤍 Fashion influencers, ...",
+      "description": "✨ INFLUENCER COLLABORATION CALL ✨ Are you passionate about fashion & styling? We're looking for fashion influencers & content creators to collaborate",
+      "url": "https://www.instagram.com/p/DdtfeDvyHio",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
-        "Beauty",
-        "Lifestyle"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Paid",
-      "minFollowers": 2000,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-11"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Dd4N6NSM4Ty",
-      "title": "We're looking for influencers, micro ...",
-      "description": "We're looking for influencers, micro-influencers & UGC creators to collaborate with us! Note : it in only for indian citizens, we don't deliver out of india.",
-      "url": "https://www.instagram.com/reel/Dd4N6NSM4Ty",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "UGC"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-10"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Dd3euKTtN-6",
-      "title": "Calling all Chennai content creators! 👀 Freshbliss is ...",
-      "description": "We're looking for food creators, snack reviewers, lifestyle creators & Tamil content creators to collaborate with our new brand CRAVD Choco Date Bites. Small",
-      "url": "https://www.instagram.com/reel/Dd3euKTtN-6",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Food",
-        "Lifestyle"
+        "Fashion"
       ],
       "platforms": [
         "Any"
       ],
       "pay": "Not stated",
       "minFollowers": null,
-      "languages": [
-        "Tamil"
-      ],
+      "languages": [],
       "published": null,
       "firstSeen": "2026-10-10"
     },
@@ -5850,7 +6374,7 @@
     {
       "id": "https://www.facebook.com/thegotoguy.co/posts/okay-creatorsif-your-camera-roll-is-80-content-your-notes-app-is-full-of-half-wr/1731908288934636",
       "title": "Paid collabs for micro and nano influencers in Hyderabad ...",
-      "description": "We're looking for micro- and nano-influencers in Hyderabad and Pune for paid collaborations across a diverse mix of brands. Sound like your kind of gig? DM",
+      "description": "We're looking for micro- and nano-influencers in Hyderabad and Pune for paid collaborations across a diverse mix of brands. Sound like your kind of gig? DM us",
       "url": "https://www.facebook.com/thegotoguy.co/posts/okay-creatorsif-your-camera-roll-is-80-content-your-notes-app-is-full-of-half-wr/1731908288934636",
       "hostname": "facebook.com",
       "source": "Facebook",
@@ -6349,8 +6873,8 @@
     },
     {
       "id": "https://www.instagram.com/reel/DeEcdv0vLqr",
-      "title": "Love being on camera? Let's create together! Gadgets ...",
-      "description": "Gadgets Destiny is looking for UGC creators who show their face in videos. Paid & unpaid collaborations are open! Send your portfolio via WhatsApp",
+      "title": "Creator collab post on Instagram",
+      "description": "#GadgetsDestiny #UGCCreators #UGCIndia #CreatorsWanted #BrandCollaboration the_prerna_creates_'s profile picture the\\_prerna\\_creates\\_ Interested Reply _.flower__moon._.24's profile picture \\_.flower\\_\\_moon.\\_.24 I am interested Reply ugcwithayu20's profile picture ugcwithayu20 Please check dm brand ❤️ Reply memory_crumbsss's profile picture memory\\_crumbsss Interested ❤️ Reply iammisskhan09's p",
       "url": "https://www.instagram.com/reel/DeEcdv0vLqr",
       "hostname": "instagram.com",
       "source": "Instagram",
@@ -6358,9 +6882,9 @@
         "Tech"
       ],
       "platforms": [
-        "UGC"
+        "Instagram"
       ],
-      "pay": "Paid",
+      "pay": "Paid + barter",
       "minFollowers": null,
       "languages": [],
       "published": null,
@@ -6503,82 +7027,6 @@
       "firstSeen": "2026-10-10"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd8ztn3J0kE",
-      "title": "Form fill kiya aur baith gaye? That was just step 1. . #collab ...",
-      "description": "Form fill kiya aur baith gaye? That was just step 1. . #collab #amazoncollab #brandcollab #paidcollab #indiancreators (Indian content creators, Indian",
-      "url": "https://www.instagram.com/reel/Dd8ztn3J0kE",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-10"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DdtxtdFo1JZ",
-      "title": "📢Collaboration Alert📢 You don't need thousands of ...",
-      "description": "We're looking for creators with 3K+ followers to collaborate with SKIPD. SKIPD is India's format-first multifunctional stick skincare brand, pioneering",
-      "url": "https://www.instagram.com/reel/DdtxtdFo1JZ",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Beauty"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": 3000,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-10"
-    },
-    {
-      "id": "https://www.instagram.com/p/DdsiNpsx9Eb",
-      "title": "📱✨ COLLABORATION OPEN! RL Gadgets is looking to ...",
-      "description": "RL Gadgets is looking to collaborate with Tech Creators ... We're connecting talented creators with exciting brand opportunities — India + worldwide.",
-      "url": "https://www.instagram.com/p/DdsiNpsx9Eb",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-10"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DdjSXbCzDp7",
-      "title": "🚨 Calling all Gen Z creators! 🚨 Got 1K+ followers and love ...",
-      "description": "✨ Reel + Story Payout: ₹1000 All you have to do: Comment “CREATOR” and fill the form! Your next brand collab could",
-      "url": "https://www.instagram.com/reel/DdjSXbCzDp7",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Paid",
-      "minFollowers": 1000,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-10"
-    },
-    {
       "id": "https://www.instagram.com/reel/DddnoUev3qn",
       "title": "If you love makeup and want to work with us ✨ then ...",
       "description": "Are you a UGC Creator, Influencer, Model, or Content Creator ready to work with brands? Visually Sold is building a creative community of fresh faces and",
@@ -6615,6 +7063,49 @@
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-10"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Dd0m0aYMT3w",
+      "title": "BRANDS, THIS IS YOUR SIGN TO DM ME. 👀💌 I'm Juie — ...",
+      "description": "We're looking for content creators across India for exciting barter collaborations with upcoming brands. Fashion | Beauty | Lifestyle | Food | Travel | Fitness",
+      "url": "https://www.instagram.com/reel/Dd0m0aYMT3w",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty",
+        "Fashion",
+        "Food",
+        "Travel",
+        "Fitness",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-10"
+    },
+    {
+      "id": "https://www.instagram.com/p/Dei2IV4RhDH",
+      "title": "May be pop art of poste",
+      "description": "Photo by Bengaluru Happenings on October 09, 2026. May be an image of text. Photo by Bengaluru Happenings on October 08, 2026. Photo by Bengaluru Happenings on October 08, 2026. Photo by Bengaluru Happenings on October 05, 2026. Photo by Bengaluru Happenings on October 04, 2026. May be an image of poster, magazine and text. Video by Bengaluru Happenings on October 04, 2026. May be pop art of poste",
+      "url": "https://www.instagram.com/p/Dei2IV4RhDH",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-09",
+      "firstSeen": "2026-10-17"
     },
     {
       "id": "https://www.instagram.com/p/DeSPhWpi14o",
@@ -7507,25 +7998,6 @@
       "firstSeen": "2026-10-09"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd0xMKCP_J3",
-      "title": "🚨 BRANDS & CREATORS — THIS ...",
-      "description": "Influencers looking for REAL brand collaborations? Stop searching everywhere. InfluencerHai brings brands & creators together — all in one place.",
-      "url": "https://www.instagram.com/reel/Dd0xMKCP_J3",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-09"
-    },
-    {
       "id": "https://www.instagram.com/p/DeJ9YzDz5u2",
       "title": "💰 PAID COLLABORATION ALERT! 💛✨ Dot & Key ...",
       "description": "DOT & KEY PAID COLLABORATION FORM IS HERE! ✨ Are you a beauty creator looking for paid skincare brand collaborations? Don't miss this opportunity to",
@@ -7545,10 +8017,10 @@
       "firstSeen": "2026-10-09"
     },
     {
-      "id": "https://www.instagram.com/reel/DdymqZLPdD9",
-      "title": "InfluencerHai is here. 🤝 And if you're an Influencer/Creator ...",
-      "description": "We're hiring and onboarding influencers with 15K to 200K followers for exciting brand collaborations and partnership opportunities.",
-      "url": "https://www.instagram.com/reel/DdymqZLPdD9",
+      "id": "https://www.instagram.com/reel/Dd655GPzOLN",
+      "title": "Preferably Indian brands💕 Yes, I am open to barter ...",
+      "description": "Preferably Indian brands Yes, I am open to barter collaborations depending on brand & deliveries <3 #creators #contentcreation #barter #follow.",
+      "url": "https://www.instagram.com/reel/Dd655GPzOLN",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
@@ -7557,30 +8029,68 @@
       "platforms": [
         "Any"
       ],
-      "pay": "Not stated",
+      "pay": "Barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-09"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeEbTc6u8nl",
+      "title": "Looking for influencers for barter collaboration 🌸",
+      "description": "We are teaming up with micro influencers for a creative barter collab. Get exclusive offers, get featured & grow with us. DM or Comment “COLLAB” to join in.",
+      "url": "https://www.instagram.com/p/DeEbTc6u8nl",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": null,
+      "firstSeen": "2026-10-09"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdkrTUEPK0g",
+      "title": "✨ Creators Wanted! ✨ We're looking for creators for our ...",
+      "description": "80K–200K followers. We're looking for influencers for paid reels, stories, and brand campaigns. apply via link in bio.",
+      "url": "https://www.instagram.com/reel/DdkrTUEPK0g",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Paid",
       "minFollowers": 200000,
       "languages": [],
       "published": null,
       "firstSeen": "2026-10-09"
     },
     {
-      "id": "https://www.instagram.com/p/DdjM13IEvCp",
-      "title": "CALLING ALL FEMALE CREATORS! 🚨 Delhi NCR creators",
-      "description": "Calling all female content creators! We're looking for talented creators with 5K–10K followers to collaborate with Guardians of D2C. ✨ Paid collaboration",
-      "url": "https://www.instagram.com/p/DdjM13IEvCp",
+      "id": "https://www.instagram.com/p/Ddo_tkolyvj",
+      "title": "affluent\\_jewellery A very warm welcome to all content creators, micro/nano-influencers, bloggers, a",
+      "description": "affluent\\_jewellery A very warm welcome to all content creators, micro/nano-influencers, bloggers, and vloggers! ✨ You are in the right place. Let us grow together How to Get Started: Follow @Affluentdiva Send us a direct message (DM) to receive more details. Important Guidelines: Eligibility: This opportunity is strictly for Indian citizens/residents, as shipping is not available outside of India",
+      "url": "https://www.instagram.com/p/Ddo_tkolyvj",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
-        "General"
+        "Fashion"
       ],
       "platforms": [
         "Any"
       ],
-      "pay": "Paid",
-      "minFollowers": 10000,
+      "pay": "Not stated",
+      "minFollowers": null,
       "languages": [],
-      "published": null,
-      "firstSeen": "2026-10-09"
+      "published": "2026-10-08",
+      "firstSeen": "2026-10-14"
     },
     {
       "id": "https://www.instagram.com/p/DeQSF9RC0YM",
@@ -7639,25 +8149,6 @@
       "languages": [],
       "published": "2026-10-08",
       "firstSeen": "2026-10-11"
-    },
-    {
-      "id": "https://madeinspace.co.in/blog/micro-vs-macro-influencers",
-      "title": "Micro vs. Macro Influencers: Where Should Indian Brands Invest? | Made In Space",
-      "description": "Geography and Language: For Indian campaigns, location and language can be critical. A regional creator may provide a stronger connection with a specific market than a much larger national creator whose audience is spread across the country. Campaign Objectives: What does success look like? Awareness, website traffic, leads, product trials, sales and community building require different strategies",
-      "url": "https://madeinspace.co.in/blog/micro-vs-macro-influencers",
-      "hostname": "madeinspace.co.in",
-      "source": "Website",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Paid",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-08",
-      "firstSeen": "2026-10-13"
     },
     {
       "id": "https://www.instagram.com/the_digital_dropp/p/DeMvAmTtsJa",
@@ -7775,25 +8266,6 @@
       "firstSeen": "2026-10-09"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd655GPzOLN",
-      "title": "Creator collab post on Instagram",
-      "description": "Yes, I am open to barter collaborations depending on brand & deliveries <3 #creators #contentcreation #barter #follow ravikumarraja605's profile picture ravikumarraja605 🔥🔥🔥🔥 Reply jewels.390's profile picture jewels.390 [...] Reply aamra.collective's profile picture aamra.collective @aamra.collective we would love to shoot with you Reply orangebags.in's profile picture orangebags.in Heyy😚💕",
-      "url": "https://www.instagram.com/reel/Dd655GPzOLN",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-06",
-      "firstSeen": "2026-10-09"
-    },
-    {
       "id": "https://www.instagram.com/p/DeJu-f3gVRd",
       "title": "Creator collab post on Instagram",
       "description": "limurse.ai's profile picture Photo by Limurse® on October 06, 2026. May be a graphic of poster and text. limurse.ai's profile picture limurse.ai's profile picture mens_ugc's profile picture Video by Limurse® on September 14, 2026. May be an image of cloak, poster, costume and text that says 'lim Your next creator is already out there. CREATONE'. Video by Limurse® on July 16, 2026. May be an image",
@@ -7829,6 +8301,46 @@
       "minFollowers": null,
       "languages": [],
       "published": "2026-10-06",
+      "firstSeen": "2026-10-11"
+    },
+    {
+      "id": "https://www.instagram.com/reel/Den5Fu6tZ3N",
+      "title": "Creator collab post on Instagram",
+      "description": "Video by Shraddha | Recipe Creator|Food Photographer|Lifestyle on October 05, 2026. May be an image of babka, chiffon cake, banana, baked goods and text. Video by Shraddha | Recipe Creator|Food Photographer|Lifestyle on September 23, 2026. May be an image of vegetable and text. Video by Shraddha | Recipe Creator|Food Photographer|Lifestyle on September 20, 2026. May be an image of dim sum, steamer",
+      "url": "https://www.instagram.com/reel/Den5Fu6tZ3N",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Food",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-05",
+      "firstSeen": "2026-10-19"
+    },
+    {
+      "id": "https://www.instagram.com/p/DeHNhoJTFfo",
+      "title": "Instagram creator collaboration, Instagram collaborations, brand collaboration, creator opportunitie",
+      "description": "Instagram creator collaboration, Instagram collaborations, brand collaboration, creator opportunities, influencer opportunities, influencer collaboration, Instagram influencer, content creator, Instagram creators, Indian creators, Indian influencers, UGC creator, UGC opportunities, paid collaboration, gifted collaboration, PR collaboration, brand deals, influencer marketing, creator community, ree",
+      "url": "https://www.instagram.com/p/DeHNhoJTFfo?__d=1%252F",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Paid + barter",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-05",
       "firstSeen": "2026-10-11"
     },
     {
@@ -7946,6 +8458,25 @@
       "firstSeen": "2026-10-13"
     },
     {
+      "id": "https://www.instagram.com/reel/Dem4vTJSOUN",
+      "title": "Creator collab post on Instagram",
+      "description": "Video by Arpit Malik | Software Engineer on October 04, 2026. May be an image of poster and text. Video by Arpit Malik | Software Engineer on October 04, 2026. May be an image of poster and text. Video by Arpit Malik | Software Engineer on September 27, 2026. May be an image of text. Video by Arpit Malik | Software Engineer on September 26, 2026. May be a video game screenshot of screen and text. ",
+      "url": "https://www.instagram.com/reel/Dem4vTJSOUN",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-04",
+      "firstSeen": "2026-10-19"
+    },
+    {
       "id": "https://www.instagram.com/p/DeGVFaWI3K3",
       "title": "barter collab India, Instagram collaboration, fashion influencer collaboration, beauty influencer co",
       "description": "barter collab India, Instagram collaboration, fashion influencer collaboration, beauty influencer collaboration, lifestyle influencer, influencer collaboration India, brand collaboration, product collaboration, PR collaboration, Gwalior influencer, Gwalior fashion influencer, Gwalior beauty influencer, Madhya Pradesh influencer, Indian fashion creator, Indian lifestyle creator, brand promotion, re",
@@ -7965,25 +8496,6 @@
       "languages": [],
       "published": "2026-10-04",
       "firstSeen": "2026-10-13"
-    },
-    {
-      "id": "https://www.instagram.com/p/DeEbTc6u8nl",
-      "title": "Creator collab post on Instagram",
-      "description": "Log In Sign Up pinkpoppistore's profile picture Never miss a post from pinkpoppistore Sign up for Instagram to stay in the loop. By continuing, you agree to Instagram's Terms of Use and Privacy Policy. Sign up Log in Photo by 𝐏𝐈𝐍𝐊 𝐏𝐎𝐏𝐏𝐈 🌸 on October 04, 2026. May be a graphic of magazine, poster and text. pinkpoppistore's profile picture pinkpoppistore • Follow pinkpoppistore's profile p",
-      "url": "https://www.instagram.com/p/DeEbTc6u8nl",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Travel"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-10-04",
-      "firstSeen": "2026-10-09"
     },
     {
       "id": "https://www.instagram.com/reel/DeEPUQWv4H0",
@@ -8066,7 +8578,7 @@
     {
       "id": "https://www.instagram.com/p/Dd_NZXfJ8O0",
       "title": "AVERO MEDIA INDIA on Instagram: \"For creators\"",
-      "description": "Log In Sign Up Image 1: averomediaindia's profile picture Never miss a post from averomediaindia Sign up for Instagram to stay in the loop. Sign up Log in Image 2: Photo by AVERO MEDIA INDIA on October 02, 2026. May be a graphic of screen, magazine, poster and text. Image 3: averomediaindia's profile picture averomediaindia • Follow Image 4: averomediaindia's profile picture averomediaindia2w For ",
+      "description": "Log In Sign Up Image 1: averomediaindia's profile picture Never miss a post from averomediaindia Sign up for Instagram to stay in the loop. Sign up Log in Image 2: Photo by AVERO MEDIA INDIA on October 02, 2026. May be a graphic of screen, magazine, poster and text. Image 3: averomediaindia's profile picture averomediaindia • Follow Image 4: averomediaindia's profile picture averomediaindia2w For",
       "url": "https://www.instagram.com/p/Dd_NZXfJ8O0",
       "hostname": "instagram.com",
       "source": "Instagram",
@@ -8122,6 +8634,26 @@
       "firstSeen": "2026-10-09"
     },
     {
+      "id": "https://www.instagram.com/reel/Dd8ztn3J0kE",
+      "title": "Creator collab post on Instagram",
+      "description": ". #collab #amazoncollab #brandcollab #paidcollab #indiancreators (Indian content creators, Indian influencers, UGC creators, Amazon cola, per cola, brand cola, content, creators, Indian influencers, creator, community, collaboration, PR) cutekomalloves's profile picture cutekomalloves Details Reply nikitagarg_99's profile picture nikitagarg\\_99 They don't give payment Reply nikitagarg_99's profile",
+      "url": "https://www.instagram.com/reel/Dd8ztn3J0kE",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram",
+        "UGC"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-10-01",
+      "firstSeen": "2026-10-10"
+    },
+    {
       "id": "https://www.instagram.com/p/DeZAW4YiazV",
       "title": "We are looking for nano and micro influencers for a beauty brand campaign.",
       "description": "We are looking for nano and micro influencers for a beauty brand campaign. Deliverables: 1 Reel + 1 Story Interested? DM us “BEAUTY” with your Instagram profile to get considered! #beauty #makeup #beautycreator #influencermarketing #creators selfcare.communityy's profile picture selfcare.communityy Send me this post Reply 21 Log in to like or comment. More posts from \\_sociofluencer Photo by 🌙 on",
@@ -8139,6 +8671,25 @@
       "languages": [],
       "published": "2026-10-01",
       "firstSeen": "2026-10-13"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DeTb5nRxkBL",
+      "title": "[...] Giveaway Result, Result Announcement, Winner Announcement, Giveaway Winner, Winner Reveal, Luc",
+      "description": "Video by EverChiq | Women’s Fashion on September 30, 2026. May be an image of jumpsuit and text. Photo by EverChiq | Women’s Fashion on September 29, 2026. Photo by Nidhi Yadav on September 28, 2026. [...] Giveaway Result, Result Announcement, Winner Announcement, Giveaway Winner, Winner Reveal, Lucky Winner, Giveaway Results, Winner Revealed, One Lucky Winner, Photo by EverChiq | Women’s Fashion ",
+      "url": "https://www.instagram.com/reel/DeTb5nRxkBL",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Fashion"
+      ],
+      "platforms": [
+        "Any"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-09-30",
+      "firstSeen": "2026-10-19"
     },
     {
       "id": "https://www.instagram.com/p/Dd5-Xu7DuWK",
@@ -8161,10 +8712,10 @@
       "firstSeen": "2026-10-12"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd5w7udsHfe",
-      "title": "Adintors, creator brand collaboration, influencer marketing India, content creator opportunities, br",
-      "description": "Adintors, creator brand collaboration, influencer marketing India, content creator opportunities, brand collaboration app, influencer collaboration, creator marketplace India, Instagram brand collaborations, influencer marketing platform, content creator India, creator opportunities India, brand deals for creators, micro influencer collaborations, influencer discovery platform, social media creato",
-      "url": "https://www.instagram.com/reel/Dd5w7udsHfe",
+      "id": "https://www.instagram.com/reel/Dd4D-g7J5-I",
+      "title": "Creator collab post on Instagram",
+      "description": "hypdsquad's profile picture Video by Hypd Squad on September 29, 2026. May be a meme of one or more people, top and text. hypdsquad's profile picture hypdsquad's profile picture kolabo.app's profile picture Photo by Hypd Squad on June 09, 2026. Video by Hypd Squad on October 06, 2026. May be an image of slow loris, poster, banner, calendar and text. Video by HYPD on October 06, 2026. May be a meme",
+      "url": "https://www.instagram.com/reel/Dd4D-g7J5-I",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
@@ -8176,26 +8727,7 @@
       "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
-      "published": "2026-09-30",
-      "firstSeen": "2026-10-18"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Dd6ZKpIqPT_",
-      "title": "Join a community where you get new brands to work with every single week.",
-      "description": "Join a community where you get new brands to work with every single week. Open to creators from all across India 🇮🇳 Fill out the form in our bio and get started 🔗 #CreatorsOfIndia #UGCCreator #InfluencerCommunity #BrandCollabs #ContentCreatorsIndia raww_vrindaa's profile picture raww\\_vrindaa Interested Reply xylemio.ai's profile picture xylemio.ai [...] Log In Sign Up mrh.agency's profile pict",
-      "url": "https://www.instagram.com/reel/Dd6ZKpIqPT_",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-09-30",
+      "published": "2026-09-29",
       "firstSeen": "2026-10-19"
     },
     {
@@ -8258,25 +8790,42 @@
       "firstSeen": "2026-10-14"
     },
     {
-      "id": "https://www.instagram.com/reel/Dd0m0aYMT3w",
-      "title": "food creator india, lifestyle creator india, UGC creator India, Mumbai creator, Vasai Virar creator,",
-      "description": "food creator india, lifestyle creator india, UGC creator India, Mumbai creator, Vasai Virar creator, food blogger Mumbai, cafe creator, restaurant influencer, lifestyle influencer India, Indian creator, micro influencer India, small creator, creator collaboration, brand collaboration India, barter collaboration, UGC collaboration, food collaboration, cafe collaboration, hotel collaboration, fashio",
-      "url": "https://www.instagram.com/reel/Dd0m0aYMT3w",
+      "id": "https://www.instagram.com/reel/Dd0xMKCP_J3",
+      "title": "Brands looking for the RIGHT influencers?",
+      "description": "Original audio influencerhai's profile picture influencerhai 🚨 BRANDS & CREATORS — THIS IS YOUR SIGN! Brands looking for the RIGHT influencers? 🤝 Influencers looking for REAL brand collaborations? 💰 Stop searching everywhere. InfluencerHai brings brands & creators together — all in one place. 🚀 From influencer discovery to campaign collaborations, we help turn content into business opportuniti",
+      "url": "https://www.instagram.com/reel/Dd0xMKCP_J3",
       "hostname": "instagram.com",
       "source": "Instagram",
       "niches": [
-        "Food",
-        "Travel",
-        "Lifestyle"
+        "General"
       ],
       "platforms": [
-        "UGC"
+        "Any"
       ],
-      "pay": "Barter",
+      "pay": "Paid + barter",
       "minFollowers": null,
       "languages": [],
       "published": "2026-09-28",
-      "firstSeen": "2026-10-10"
+      "firstSeen": "2026-10-09"
+    },
+    {
+      "id": "https://www.instagram.com/reel/DdymqZLPdD9",
+      "title": "Creator collab post on Instagram",
+      "description": "influencerhai's profile picture Video by InfluencerHai : Best Influencer Marketing Agency and Platform on September 27, 2026. May be a selfie of one or more people, poster and text. influencerhai_'s profile picture influencerhai's profile picture influencerhai's profile picture No comments yet. Video by Rupali Rawat on October 16, 2026. May be an image of digital audio player, screen, phone, table",
+      "url": "https://www.instagram.com/reel/DdymqZLPdD9",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-09-27",
+      "firstSeen": "2026-10-09"
     },
     {
       "id": "https://www.instagram.com/reel/Dd0dV4ugnL_",
@@ -8378,6 +8927,26 @@
       "firstSeen": "2026-10-10"
     },
     {
+      "id": "https://www.instagram.com/p/DdsiNpsx9Eb",
+      "title": "Creator collab post on Instagram",
+      "description": "Log In Sign Up rlgadgets1's profile picture Never miss a post from rlgadgets1 Sign up for Instagram to stay in the loop. By continuing, you agree to Instagram's Terms of Use and Privacy Policy. Sign up Log in Photo by R.L Gadgets 🏷️ on September 24, 2026. May be an image of text. rlgadgets1's profile picture rlgadgets1 • Follow RL Gadgets rlgadgets1's profile picture rlgadgets1 📱✨ COLLABORATION ",
+      "url": "https://www.instagram.com/p/DdsiNpsx9Eb",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Tech",
+        "Travel"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Not stated",
+      "minFollowers": null,
+      "languages": [],
+      "published": "2026-09-24",
+      "firstSeen": "2026-10-10"
+    },
+    {
       "id": "https://www.instagram.com/reel/DdrCd_bKWw3",
       "title": "Creator collab post on Instagram",
       "description": "Collaboration,influencer collab , female influencers , barter collab india , fashion collab , delhi female influencers, content creators, viral reels , Instagram creators, content creators india, trending reels , promotions, brand deals india , PR collaboration, barter deals maryam_queen023's profile picture maryam\\_queen023 Collab Reply instareellifebyneha's profile picture instareellifebyneha Co",
@@ -8410,25 +8979,6 @@
         "Any"
       ],
       "pay": "Barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-09-24",
-      "firstSeen": "2026-10-11"
-    },
-    {
-      "id": "https://www.instagram.com/reel/Ddq44YSzKkl",
-      "title": "Akanksha Choudhary, splits",
-      "description": "creativefolksfelix_cff's profile picture Video by Creative Folks Felix | Influencer Marketing Agency on September 24, 2026. May be an image of one or more people, dental floss, office and text. creativefolksfelix_cff's profile picture creativefolksfelix_cff's profile picture No comments yet. Photo by Creative Folks Felix | Influencer Marketing Agency on October 15, 2026. Akanksha Choudhary, splits",
-      "url": "https://www.instagram.com/reel/Ddq44YSzKkl",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
       "minFollowers": null,
       "languages": [],
       "published": "2026-09-24",
@@ -8630,6 +9180,47 @@
       "firstSeen": "2026-10-10"
     },
     {
+      "id": "https://www.instagram.com/reel/Ddi_MEYK9nK",
+      "title": "cosmovibesmedia South India creators, we’re looking for you.",
+      "description": "cosmovibesmedia South India creators, we’re looking for you. We’re currently looking for 200 creators for a paid collaboration with a leading hair care brand. Requirements: 2K+ followers Beauty, skincare or lifestyle content Based in South India If you fit the criteria, DM us your commercials for 1 non-collab reel along with your contact number. Shortlisting 200 profiles only. DM us to get conside",
+      "url": "https://www.instagram.com/reel/Ddi_MEYK9nK",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "Beauty",
+        "Lifestyle"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Paid",
+      "minFollowers": 2000,
+      "languages": [],
+      "published": "2026-09-21",
+      "firstSeen": "2026-10-11"
+    },
+    {
+      "id": "https://www.instagram.com/p/DdjM13IEvCp",
+      "title": "Creator collab post on Instagram",
+      "description": "Photo by InfluencerAct - Influencer Marketing Agency & Platform In India on September 21, 2026. May be a graphic of one or more people, helicopter, magazine, poster and text that says 'InfluencerAct CALLING ALL CREATORS PAID OPPORTUNITIES TURN YOUR PASSION INTO OPPORTUNITY Language English & Hindi ၀၁ Category Nano Location Delhi NCR Gender Female Genre Career-focused creators Platform Instagram De",
+      "url": "https://www.instagram.com/p/DdjM13IEvCp",
+      "hostname": "instagram.com",
+      "source": "Instagram",
+      "niches": [
+        "General"
+      ],
+      "platforms": [
+        "Instagram"
+      ],
+      "pay": "Paid",
+      "minFollowers": null,
+      "languages": [
+        "Hindi"
+      ],
+      "published": "2026-09-21",
+      "firstSeen": "2026-10-09"
+    },
+    {
       "id": "https://www.instagram.com/reel/DdjqmzMSTIY",
       "title": "Creator collab post on Instagram",
       "description": "Sign up Log in Video by Jigyasa on September 21, 2026. May be a selfie of one or more people, hair, people smiling and text that says 'jigyasashares Ready Jigyasa 184 posts 12.3K followers 144 following Digital Digitalcreato creator Beauty| Fashion Sharing becoming Collabs- jigyasajangid11@gmail.c Colbe-gyaingidi1@gmail.co jigyasajangi com ® ligyasashares Unfiltered Jigss Insights 210K Add Ad jigy",
@@ -8669,25 +9260,6 @@
       "firstSeen": "2026-10-10"
     },
     {
-      "id": "https://www.instagram.com/reel/DdkrTUEPK0g",
-      "title": "We’re looking for creators for our Review Campaign 🎥💫 Interested?",
-      "description": "We’re looking for creators for our Review Campaign 🎥💫 Interested? 👉 Check our Story 🔗 Click on the Link 📝 Apply now! Simple & quick! 💌 CreatorOpportunity #CreatorCollab #ReviewCampaign #CreatorCampaign #InfluencerCampaign #BrandCollab PaidCollab CollabOpportunity ContentCreators IndianCreators UGCCreators UGCIndia InfluencerMarketing CreatorsIndia CollabzFair kj_mandal_yogini's profile pictu",
-      "url": "https://www.instagram.com/reel/DdkrTUEPK0g",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Barter",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-09-21",
-      "firstSeen": "2026-10-09"
-    },
-    {
       "id": "https://www.instagram.com/p/Ddij4JXjHJM",
       "title": "DO NOT Swipe ➡️ (collaboration, creator collaboration, content creator, fashion creator, jewellery c",
       "description": "DO NOT Swipe ➡️ (collaboration, creator collaboration, content creator, fashion creator, jewellery creator, UGC creator, nano creators, micro creators, macro creators, influencer collaboration, fashion influencers, jewellery influencers, Indian creators, Mysuru creators, Bangalore creators, Korean jewellery, anti-tarnish jewellery, affordable luxury jewellery, fashion jewellery, jewellery styling,",
@@ -8705,65 +9277,6 @@
       "languages": [],
       "published": "2026-09-20",
       "firstSeen": "2026-10-10"
-    },
-    {
-      "id": "https://www.instagram.com/reel/DdeEEdEIdNa",
-      "title": "Creator collab post on Instagram",
-      "description": "Log In Sign Up mebabydragon's profile picture Never miss a post from mebabydragon Sign up for Instagram to stay in the loop. Sign up Log in Video by Megha Patil on September 19, 2026. May be a selfie of one or more people, makeup, eyeliner, hair and text. mebabydragon's profile picture mebabydragon • Follow Original audio mebabydragon's profile picture mebabydragon Finally decided to approach bran",
-      "url": "https://www.instagram.com/reel/DdeEEdEIdNa",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Beauty",
-        "Travel",
-        "Parenting"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-09-19",
-      "firstSeen": "2026-10-18"
-    },
-    {
-      "id": "https://www.instagram.com/p/DdeYw_QM4nc",
-      "title": "Creator collab post on Instagram",
-      "description": "muskanmindset's profile picture Video by M U S K A N ❤️🧿 on September 19, 2026. May be a meme of one or more people, cup, tea and text that says 'Richjs getting ficher All the overhyped influencers are getting iPhone 18 pro for free as a collab:)'. muskanmindset's profile picture muskanmindset's profile picture triloksen67's profile picture triloksen67's profile picture kirodi_didayach___'s profi",
-      "url": "https://www.instagram.com/p/DdeYw_QM4nc",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "General"
-      ],
-      "platforms": [
-        "Instagram"
-      ],
-      "pay": "Not stated",
-      "minFollowers": null,
-      "languages": [],
-      "published": "2026-09-19",
-      "firstSeen": "2026-10-13"
-    },
-    {
-      "id": "https://www.instagram.com/p/DddgrtUAR2T",
-      "title": "Creators today.",
-      "description": "Creators today. Brand partners tomorrow. Want to collaborate with brands? Join the TooroCollab Creator Network. #TooroCollab #CreatorEconomy #CreatorMarketing #InfluencerMarketing #BrandCollaboration #TechCreators #AICreators #GadgetCreators #UGCCreators #CreatorNetwork #BrandDeals #InfluencerMarketingIndia #TechInfluencer #AIInfluencer #ContentCreators #CreatorPartnerships #UGCIndia #TooroProduct",
-      "url": "https://www.instagram.com/p/DddgrtUAR2T?__d=1",
-      "hostname": "instagram.com",
-      "source": "Instagram",
-      "niches": [
-        "Tech"
-      ],
-      "platforms": [
-        "Any"
-      ],
-      "pay": "Not stated",
-      "minFollowers": 100000,
-      "languages": [],
-      "published": "2026-09-19",
-      "firstSeen": "2026-10-18"
     }
   ]
 }
